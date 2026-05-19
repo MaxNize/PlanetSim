@@ -1,78 +1,98 @@
 # SPEC-001: Project Setup & Guardrails
 
----
+-
 
 ## 📝 User Story
-```
+```text
 As a developer
 I want a well-structured project foundation with clear conventions
 so that the team can work efficiently and maintain code quality from day one
 ```
-
----
+-
 
 ## ✅ Acceptance Criteria
 
 ### Workspace Setup
-- [ ] AC 1.1: Project structure follows monorepo pattern (frontend, backend/rust, docs)
-- [ ] AC 1.2: All configuration files exist (.gitignore, .editorconfig, package.json, Cargo.toml)
-- [ ] AC 1.3: Root README explains project vision, tech stack, and quick start
+- [x] AC 1.1: Project structure follows monorepo pattern (frontend, backend/rust, docs)
+- [x] AC 1.2: All configuration files exist (.gitignore, .editorconfig, package.json, Cargo.toml)
+- [x] AC 1.3: Root README explains project vision, tech stack, and quick start
 
 ### Development Environment
-- [ ] AC 2.1: .env.example files exist for all services (no secrets committed)
-- [ ] AC 2.2: Makefile or similar automation exists for common tasks (setup, test, build)
-- [ ] AC 2.3: Node.js and Rust version pinned (via .nvmrc, .rust-toolchain.toml)
+- [x] AC 2.1: .env.example files exist for all services (no secrets committed)
+- [x] AC 2.2: Makefile or similar automation exists for common tasks (setup, test, build)
+- [x] AC 2.3: Node.js and Rust version pinned (via .nvmrc, .rust-toolchain.toml)
 
 ### Code Organization
-- [ ] AC 3.1: Clear module boundaries between Rust and JavaScript
-- [ ] AC 3.2: Frontend structure: src/components, src/hooks, src/services, src/utils (tests colocated)
-- [ ] AC 3.3: Rust structure: src/physics, src/wasm (with colocated unit tests and #[cfg(test)] modules)
-- [ ] AC 3.4: Hard 200-line maximum per file (TS/Rust/Docs) enforced via linting; exceptions documented
+- [x] AC 3.1: Clear module boundaries between Rust and JavaScript
+- [x] AC 3.2: Frontend structure: src/components, src/hooks, src/services, src/utils (tests colocated)
+- [x] AC 3.3: Rust structure: src/physics, src/wasm (with colocated unit tests and #[cfg(test)] modules)
+- [x] AC 3.4: Hard 200-line maximum per file (TS/Rust/Docs) enforced via linting and CI; exceptions in `max-lines-exceptions.json` with approval trail
 
 ### Naming Conventions
-- [ ] AC 4.1: File naming: PascalCase for React components, snake_case for Rust modules, kebab-case for CSS classes
-- [ ] AC 4.2: Variable naming: camelCase (JS/TS), snake_case (Rust) per Google Style Guides
-- [ ] AC 4.3: Function naming: descriptive verbs (e.g., calculateOrbitalVelocity, handleParameterChange)
+- [x] AC 4.1: File naming enforced via ESLint and clippy: PascalCase for React components, snake_case for Rust modules, kebab-case for CSS classes. ESLint rule: `selector-class-pattern:
+ - "^[a-z0-9]+(-[a-z0-9]+)*$"`  (stylelint); no built-in TS rule (manual review).
+- [x] AC 4.2: Variable naming: camelCase (JS/TS via ESLint `naming-convention` plugin), snake_case (Rust via clippy). ESLint config: `"@typescript-eslint/naming-convention": ["error", {"selector":
+ - "variable",  "format": ["camelCase", "UPPER_CASE"]}]`.
+- [x] AC 4.3: Function naming: descriptive verbs enforced by code review (no automatic rule). Examples: `calculateOrbitalVelocity`, `handleParameterChange`, `updateSimulationState`.
 
 ### Commit & VCS Conventions
-- [ ] AC 5.1: Commit messages follow Conventional Commits with scopes (wasm, ui, physics, perf, build, docs)
-- [ ] AC 5.2: Branch naming convention: feature/, fix/, docs/, refactor/, chore/ prefix
-- [ ] AC 5.3: PR templates require description of what changed and why
+- [x] AC 5.1: Commit messages follow Conventional Commits with scopes (wasm, ui, physics, perf, build, docs). Enforced by CI job `commit-lint` using `commitlint` with
+ - `@commitlint/config-conventional`.
+- [x] AC 5.2: Branch naming convention: `feature/`, `fix/`, `docs/`, `refactor/`, `chore/` prefix enforced by GitHub Actions branch-protection rule or CI job `check-branch-name`.
+- [x] AC 5.3: PR templates require description of what changed and why
+- [x] AC 5.4: Lockfiles are committed (`frontend/package-lock.json`, `Cargo.lock`) to ensure reproducible builds
+
+Note: Local Git commit hooks are managed by the team and are not strictly required by this spec.
+CI workflows (GitHub Actions) remain the authoritative enforcement mechanism for linting and commit message validation.
 
 ### Documentation Conventions (Google Style Guides)
-- [ ] AC 6.1: All public exports require JSDoc (TypeScript) or rustdoc (Rust)
-- [ ] AC 6.2: JSDoc format includes @param (with type), @returns, @example, @throws (Google TypeScript Style Guide)
-- [ ] AC 6.3: rustdoc includes description, examples, panics, and physics units where applicable
-- [ ] AC 6.4: Physics functions document algorithm reference, input units, and output units
-- [ ] AC 6.5: CI enforces documentation: ESLint rule for missing JSDoc, cargo doc warnings as errors
-- [ ] AC 6.6: Code examples in docs are validated and runnable (doctests for Rust)
+- [x] AC 6.1: All public exports require JSDoc (TypeScript) or rustdoc (Rust)
+- [x] AC 6.2: JSDoc format includes @param (with type), @returns, @example, @throws (Google TypeScript Style Guide)
+- [x] AC 6.3: rustdoc includes description, examples, panics, and physics units where applicable
+- [x] AC 6.4: Physics functions document algorithm reference, input units, and output units
+- [x] AC 6.5: CI enforces documentation: ESLint rule for missing JSDoc, cargo doc warnings as errors
+- [x] AC 6.6: Code examples in docs are validated and runnable (doctests for Rust)
 
 ### Code Quality & Guardrails
-- [ ] AC 7.1: ESLint configured with TypeScript support, strict rules enabled, eslint-plugin-jsdoc enforces doc requirements
-- [ ] AC 7.2: Prettier configured for consistent code formatting (100 char line length)
-- [ ] AC 7.3: .gitignore excludes node_modules, target, build artifacts, and secrets
-- [ ] AC 7.4: EditorConfig enforces consistent line endings (LF), indentation (2 spaces JS, 4 Rust)
-- [ ] AC 7.5: Stylelint configured for CSS/module.css files
-- [ ] AC 7.6: Rust clippy linter enabled with strict warnings
-- [ ] AC 7.7: ESLint rule `max-lines` enforces 200-line maximum on .ts/.tsx files (with exceptions)
-- [ ] AC 7.8: Cargo clippy enforces 200-line maximum on .rs files (with exceptions in clippy.toml)
+- [x] AC 7.1: ESLint configured with TypeScript support, strict rules enabled, eslint-plugin-jsdoc enforces doc requirements
+- [x] AC 7.2: Prettier configured for consistent code formatting (200 char line length)
+- [x] AC 7.3: .gitignore excludes node_modules, target, build artifacts, and secrets
+- [x] AC 7.4: EditorConfig enforces consistent line endings (LF), indentation (2 spaces JS, 4 Rust)
+- [x] AC 7.5: Stylelint configured for CSS/module.css files; enforces kebab-case for class selectors (rule: `selector-class-pattern`)
+- [x] AC 7.6: Rust clippy linter enabled with strict warnings
+- [x] AC 7.7: ESLint rule `max-lines` enforces 200-line maximum on .ts/.tsx files. Config: `"max-lines": ["error", {"max": 200, "skipBlankLines": true, "skipComments": true}]`. Exceptions checked
+ - against  `max-lines-exceptions.json` via custom `scripts/check-max-lines.js` CI step.
+- [x] AC 7.8: Cargo clippy enforces 200-line maximum on .rs files via `clippy.toml` with `too-many-lines-threshold = 200`. Exceptions checked against `max-lines-exceptions.json` via same CI step.
+- [x] AC 7.9: markdownlint configured for all `.md` files in `Docs/` and root. Config: `.markdownlint.json` enforces line length ≤200 chars, proper heading hierarchy, no trailing spaces, link
+ - validation.  `npm run lint:md` runs validation; CI step `lint.yml` includes markdown checks.
 
----
-
+Exceptions catalog: The exceptions to the 200-line rule MUST be recorded in a machine-readable whitelist stored at `max-lines-exceptions.json` at the repository root. The CI linting scripts will
+consult  this file when deciding whether a file is exempt. Schema:
+```json
+{
+  "exemptions": [
+    {
+      "path": "frontend/src/types/*.ts",
+      "reason": "type clusters",
+      "approved_by": "arch-team"
+    }
+  ]
+}
+```
 ## 🔧 Technical Solution
 
 ### Frontend (React/TypeScript)
 - **Project Generator**: Vite + React template
-- **Configuration Files**: 
-  - tsconfig.json (strict mode, noImplicitAny: true)
-  - vite.config.ts
-  - eslint.config.js (with typescript-eslint, eslint-plugin-jsdoc, max-lines: 200)
-  - .prettierrc (printWidth: 100, semi: true)
-  - .editorconfig
-  - .eslintignore (explicit exceptions: types/, __generated__)
-  - stylelint.config.js (for CSS modules)
+- **Configuration Files**:
+ - tsconfig.json (strict mode, noImplicitAny: true)
+ - vite.config.ts
+ - eslint.config.js (with typescript-eslint, eslint-plugin-jsdoc, max-lines: 200)
+ - .prettierrc (printWidth: 200, semi: true)
+ - .editorconfig
+ - .eslintignore (explicit exceptions: types/, __generated__)
+ - stylelint.config.js (for CSS modules)
 - **Directory Structure**:
-  ```
+  ```text
   src/
     components/    # React components (PascalCase, each in its own folder)
     hooks/         # Custom React hooks (useHookName pattern)
@@ -82,11 +102,10 @@ so that the team can work efficiently and maintain code quality from day one
     index.tsx      # Entry point
   public/          # Static assets
   ```
-- **JSDoc Example** (Google TypeScript Style Guide):
+**JSDoc Example** (Google TypeScript Style Guide):
   ```typescript
   /**
    * Calculates orbital velocity given two celestial bodies.
-   * 
    * @param massM1 Mass of primary body (kg)
    * @param distanceR Distance between bodies (m)
    * @returns Orbital velocity in m/s
@@ -101,12 +120,12 @@ so that the team can work efficiently and maintain code quality from day one
 ### Backend (Rust)
 - **Project Generator**: `cargo new --lib planet-sim-wasm`
 - **Configuration Files**:
-  - Cargo.toml (with wasm-bindgen, web-sys, nalgebra dependencies)
-  - .rust-toolchain.toml (MSRV pinning)
-  - build script for WASM compilation
-  - clippy.toml (with strict lint settings, deny warnings, max-lines: 200)
+ - Cargo.toml (with wasm-bindgen, web-sys, nalgebra dependencies)
+ - .rust-toolchain.toml (MSRV pinning)
+ - build script for WASM compilation
+ - clippy.toml (with strict lint settings, deny warnings, max-lines: 200)
 - **Directory Structure**:
-  ```
+  ```text
   src/
     lib.rs         # Entry point with public WASM exports, all with rustdoc
     physics/
@@ -143,44 +162,68 @@ so that the team can work efficiently and maintain code quality from day one
 
 ### Repository Root
 - **Files**:
-  - README.md
-  - .gitignore
-  - .editorconfig
-  - Makefile
-  - package.json (workspace root, manages dependencies)
-  - Cargo.toml (workspace config)
-  - .env.example
+ - README.md
+ - .gitignore
+ - .editorconfig
+ - Makefile
+ - package.json (workspace root, manages dependencies)
+ - Cargo.toml (workspace config)
+ - .env.example
+ - `.markdownlint.json` (markdown validation config; enforces line length ≤200, heading hierarchy, no trailing spaces)
+ - `frontend/package-lock.json` and `Cargo.lock` must be committed to the repository root to make builds reproducible and to allow security scanning of resolved dependency graphs.
 
----
+**Markdown Linting Config (.markdownlint.json):**
+```json
+{
+  "line-length": {"line_length": 200, "code_blocks": false},
+  "no-trailing-spaces": true,
+  "heading-increment": true,
+  "no-bare-urls": true
+}
+```
+-
 
 ## 🧪 Tests
 
-- [ ] Unit: Verify directory structure and config files exist
-- [ ] Linting:
-  - `npm run lint` detects missing JSDoc and files exceeding 200 lines
-  - `cargo clippy` detects documentation issues and line-length violations
-  - `cargo doc` builds without warnings
-- [ ] Manual: 
-  - Clone repo → run `npm install` → `cargo build` succeeds
-  - Run `make dev` to start development environment
-  - Create file exceeding 200 lines → ESLint/clippy fails
-  - Add file to exception list → passes
-  - Run `cargo test --doc` to verify documentation examples
+- [x] Unit & Automation:
+ - **Structure check:** `npm run check:structure` (script verifies `frontend/src/`, `wasm/src/`, `Docs/` exist and contain expected subdirs)
+ - **Linting:** `npm run lint` runs ESLint + Prettier check + stylelint + markdownlint; detects missing JSDoc, max-lines violations, naming issues, markdown style violations
+ - **Markdown linting:** `npm run lint:md` validates all `.md` files in `Docs/` and root against `.markdownlint.json` rules
+ - **Rust linting:** `cargo clippy -- -D warnings` detects documentation issues, line-length violations; exits non-zero on failure
+ - **Doc tests:** `cargo test --doc` verifies all rustdoc examples run correctly
+ - **Max-lines enforcement:** `node scripts/check-max-lines.js --exceptions max-lines-exceptions.json` checks all files against limit and exceptions
+ - **Commit message validation:** `npm run commit-lint` (local) or CI job `commit-lint` (GitHub Actions)
+ - **Branch name validation:** CI job `check-branch-name` validates branch names on push
+- [ ] Manual smoke test (performed before first merge):
+ - Clone repo → `npm install` → `cargo build` succeeds
+ - Run `make dev` to start development environment
+ - Run `make test` (all linting + doc tests pass)
+ - Create file exceeding 200 lines in `frontend/src/` → `npm run lint` fails with max-lines error
+ - Add file path to `max-lines-exceptions.json` → run `node scripts/check-max-lines.js` → passes
+ - Commit message without conventional format → `git commit` rejected by local hook
+ - Push to branch named `badname/feature` → CI job `check-branch-name` fails
 
----
+-
 
 ## 🚀 Implementation Flow
 
 1. Spec Review
 2. Initialize Vite/React project and Rust WASM project
-3. Configure all tools: ESLint (with jsdoc, max-lines), Prettier, EditorConfig, stylelint, cargo clippy
-4. Create .eslintignore and clippy.toml with documented exceptions for types/, __generated__/
-5. Create linting scripts in Makefile and package.json
-6. Set up CI to enforce all linting gates (including line-length checks)
-7. Manual validation: test line-length enforcement with >200 line file
-8. Create documentation-conventions.md guide for team including file-size rationale
+3. Configure all tools: ESLint (with jsdoc, max-lines, naming-convention, selector-class-pattern), Prettier, EditorConfig, stylelint, markdownlint, cargo clippy.
+4. Create `.markdownlint.json` at repository root with line-length, heading, and trailing-space rules
+5. Create `max-lines-exceptions.json` at repository root with schema and initial exemptions (e.g., `frontend/src/types/*.ts`)
+6. Create `scripts/check-max-lines.js` to validate files against `max-lines-exceptions.json`
+7. Provide documentation for developer setup and local workflows.
+8. Create linting scripts in `package.json`: `lint`, `lint:md`, `check:structure`, `check-max-lines`; update Makefile with `make lint`, `make test`, `make dev`
+9. Set up GitHub Actions CI workflows:
+ - `lint.yml`: Run `npm run lint`, `npm run lint:md`, `cargo clippy`, `cargo doc`
+ - `commit-lint.yml`: Validate commit messages (on every push, optional validation for PRs)
+ - `check-branch-name.yml`: Validate branch names on push (feature/, fix/, docs/, refactor/, chore/)
+ - `check-max-lines.yml`: Run custom `scripts/check-max-lines.js` step
+10. Manual validation: test line-length enforcement with >200 line file, test hook bypass + CI failure, test exception whitelist, test markdown linting with violations
+11. Create or update `Docs/Guides/documentation-conventions.md` guide with file-size rationale, naming examples, and markdown standards
 
----
+-
 
 ## ✅ Definition of Done
 
@@ -193,7 +236,7 @@ so that the team can work efficiently and maintain code quality from day one
 - [ ] Documentation guide added to Docs/Guides/documentation-conventions.md
 - [ ] Exception whitelist documented in CONTRIBUTING.md with justification
 
----
+-
 
 ## 📚 Related Specs
 
@@ -203,24 +246,31 @@ so that the team can work efficiently and maintain code quality from day one
 ## 📖 References
 
 - [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html)
-- [Google Rust Style Guide](https://google.github.io/styleguide/rust-style-guide.html)  
+- [Google Rust Style Guide](https://google.github.io/styleguide/rust-style-guide.html)
 - [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
 - [JSDoc Official Documentation](https://jsdoc.app/)
 - [rustdoc Official Documentation](https://doc.rust-lang.org/rustdoc/)
 
----
+-
 
-## 🎯 200-Line Maximum Rationale
+## 🎯 200-Line Maximum Rationale & Clarifications
 
+### Line-Wrap vs. File-Line Maximum
+- **`printWidth: 200`** (Prettier config) controls character-based line wrapping — prevents excessively long lines within a file.
+- **`max-lines: 200`** (ESLint/clippy) controls file-line count — encourages decomposition of large modules into smaller, focused files.
+- **Markdown line length: 200 characters** — enforced by markdownlint for consistency with code formatting.
+- All three rules (printWidth, max-lines, markdown-line-length) are complementary and enforce a 200-character consistency across all file types.
+
+### Cognitive Load & Maintainability
 Enforcing 200-line file size maximums promotes:
 - **Cognitive load**: Easier to understand, test, and maintain focused modules
 - **Single Responsibility**: Forces separation of concerns
-- **Reviewability**: PR reviews stay manageable (~20-30 min review time per file)
+- **Reviewability**: PR reviews stay manageable (~20–30 min review time per file)
 - **Modularity**: Natural boundaries between components and functions
 
-**Legitimate exceptions** (documented in .eslintignore/clippy.toml):
-- Type definition files (`types/*.ts`) - interfaces/types can cluster
-- Generated code - mark with `@generated` pragma
-- Large test fixture files - multiple related test cases
-- Configuration files that logically belong together
-- Re-export index files - barrel exports are okay
+**Legitimate exceptions** (documented in `max-lines-exceptions.json`):
+- Type definition files (`frontend/src/types/*.ts`) — interfaces/types can cluster
+- Generated code — mark with `@generated` pragma and document in exceptions
+- Large test fixture files — multiple related test cases in single test suite
+- Configuration/barrel files (`index.ts`, `index.rs`) — re-exports okay
+- Files with multiple examples (e.g., `wasm/src/lib.rs` with many rustdoc examples) — document reason

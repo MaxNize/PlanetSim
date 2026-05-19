@@ -1,15 +1,14 @@
 # SPEC-010: Object Manipulation & Management
 
----
+-
 
 ## 📝 User Story
-```
+```text
 As a user in sandbox mode
 I want to edit and delete bodies after placing them
 so that I can refine simulations and explore different configurations
 ```
-
----
+-
 
 ## ✅ Acceptance Criteria
 
@@ -50,7 +49,7 @@ so that I can refine simulations and explore different configurations
 - [ ] AC 6.2: Body list updates smoothly with 10+ bodies
 - [ ] AC 6.3: No memory leaks when deleting/re-adding bodies
 
----
+-
 
 ## 🔧 Technical Solution
 
@@ -79,7 +78,6 @@ const handleContextMenu = (e: React.MouseEvent<HTMLCanvasElement>) => {
   }
 };
 ```
-
 ### Context Menu Component
 
 **`src/components/BodyContextMenu/BodyContextMenu.tsx`**
@@ -128,7 +126,6 @@ export const BodyContextMenu: React.FC<BodyContextMenuProps> = ({
   );
 };
 ```
-
 ### Body Edit Dialog
 
 **`src/components/BodyEditDialog/BodyEditDialog.tsx`**
@@ -208,7 +205,6 @@ export const BodyEditDialog: React.FC<BodyEditDialogProps> = ({
   );
 };
 ```
-
 ### Body List Sidebar
 
 **`src/components/BodyList/BodyList.tsx`**
@@ -263,7 +259,6 @@ export const BodyList: React.FC<BodyListProps> = ({
   );
 };
 ```
-
 ### State Extension
 
 **`src/types/index.ts`**
@@ -279,8 +274,7 @@ export interface Body {
   locked?: boolean;
 }
 ```
-
----
+-
 
 ## 🧪 Tests
 
@@ -290,13 +284,13 @@ export interface Body {
 - [ ] Integration: Delete body → removed from simulation
 - [ ] Manual: Right-click body, edit properties, verify changes
 
----
+-
 
 ## 🚀 Implementation Flow
 
 1. Spec Review → Context menu handler (RED) → Dialog component (GREEN) → Body list UI → State management → Tests
 
----
+-
 
 ## ✅ Definition of Done
 
@@ -305,7 +299,7 @@ export interface Body {
 - [ ] DOD-UX: Body list updates smoothly
 - [ ] All component tests passing
 
----
+-
 
 ## 📚 Related Specs
 
