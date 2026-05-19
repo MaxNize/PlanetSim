@@ -1,0 +1,25 @@
+name: Branch & Commit Policy
+
+on:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate branch name
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "Branch name: $BRANCH_NAME"
+          if ! echo "$BRANCH_NAME" | grep -E '^(feature|fix|docs|refactor|chore)\/'; then
+            echo "Invalid branch name. Use prefixes: feature/, fix/, docs/, refactor/, chore/"
+            exit 1
+          fi
+
+      - name: Commitlint
+        uses: wagoid/commitlint-github-action@v4
+        with:
+          configFile: commitlint.config.js
