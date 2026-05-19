@@ -1,15 +1,14 @@
 # SPEC-012: Documentation Deployment
 
----
+-
 
 ## 📝 User Story
-```
+```text
 As a maintainer
 I want automated deployment of project documentation
 so that the team and community always have access to current specs, guides, and architecture
 ```
-
----
+-
 
 ## ✅ Acceptance Criteria
 
@@ -41,7 +40,7 @@ so that the team and community always have access to current specs, guides, and 
 - [ ] AC 5.2: Build failures alerted and visible
 - [ ] AC 5.3: Documentation links are valid (link checker in CI)
 
----
+-
 
 ## 🔧 Technical Solution
 
@@ -55,13 +54,12 @@ so that the team and community always have access to current specs, guides, and 
 
 - **[Project Overview](./Project-Overview.md)** - Vision and scope
 - **[Management](./Management/)** - Roadmap, specs, DoDs
-  - [Roadmap](./Management/Roadmap.md)
-  - [Specifications](./Management/Specs/)
-  - [Definitions of Done](./Management/DoDs/)
+ - [Roadmap](./Management/Roadmap.md)
+ - [Specifications](./Management/Specs/)
+ - [Definitions of Done](./Management/DoDs/)
 - **[Guides](./Guides/)** - How-to documentation
 - **[Architecture](./Architecture/)** - System design decisions
 ```
-
 ### GitHub Pages Deployment
 
 **`.github/workflows/deploy-docs.yml`**
@@ -72,27 +70,26 @@ on:
   push:
     branches: [main]
     paths:
-      - 'planet-simulation/Docs/**'
-      - '.github/workflows/deploy-docs.yml'
+ - 'planet-simulation/Docs/**'
+ - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
 jobs:
   deploy-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Deploy to GitHub Pages
+ - uses: actions/checkout@v4
+
+ - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./planet-simulation/Docs
           cname: planet-sim-docs.example.com  # Optional custom domain
 ```
-
 ### Documentation Structure
 
-```
+```text
 Docs/
   index.md              # Documentation homepage
   Project-Overview.md   # Vision and scope
@@ -108,7 +105,6 @@ Docs/
     system-design.md
     component-diagram.md
 ```
-
 ### Link Validation in CI
 
 **`.github/workflows/validate-docs.yml`**
@@ -118,31 +114,30 @@ name: Validate Documentation
 on:
   pull_request:
     paths:
-      - 'planet-simulation/Docs/**'
+ - 'planet-simulation/Docs/**'
   push:
     branches: [main]
     paths:
-      - 'planet-simulation/Docs/**'
+ - 'planet-simulation/Docs/**'
 
 jobs:
   markdown-lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: nosborn/github-action-markdown-cli@v3.3.0
+ - uses: actions/checkout@v4
+ - uses: nosborn/github-action-markdown-cli@v3.3.0
         with:
           files: planet-simulation/Docs
 
   link-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+ - uses: actions/checkout@v4
+ - uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           use-quiet-mode: 'yes'
           folder-path: 'planet-simulation/Docs'
 ```
-
 ### Documentation versioning
 
 **`Docs/CHANGELOG.md`**
@@ -157,8 +152,7 @@ jobs:
 ## [1.0.0] - 2026-05-01
 - Initial project documentation structure
 ```
-
----
+-
 
 ## 🧪 Tests
 
@@ -167,7 +161,7 @@ jobs:
 - [ ] Deployment: Manual deploy to GitHub Pages succeeds
 - [ ] Manual: Deployed docs site loads and navigates correctly
 
----
+-
 
 ## 🚀 Implementation Flow
 
@@ -179,7 +173,7 @@ jobs:
 6. Manual validation: push to main → docs deploy to GitHub Pages
 7. Verify docs site accessibility and navigation
 
----
+-
 
 ## ✅ Definition of Done
 
@@ -190,7 +184,7 @@ jobs:
 - [ ] Documentation changelog maintained
 - [ ] All specs and guides accessible from deployed docs
 
----
+-
 
 ## 📚 Related Specs
 

@@ -1,15 +1,14 @@
 # SPEC-007: Physics Parameter Controls
 
----
+-
 
 ## 📝 User Story
-```
+```text
 As a student experimenting with orbital mechanics
 I want to easily adjust simulation parameters in real time
 so that I can explore how mass and time scale affect orbits
 ```
-
----
+-
 
 ## ✅ Acceptance Criteria
 
@@ -47,7 +46,7 @@ so that I can explore how mass and time scale affect orbits
 - [ ] AC 6.1: Reset button returns to default configuration
 - [ ] AC 6.2: Confirmation dialog for destructive changes (optional)
 
----
+-
 
 ## 🔧 Technical Solution
 
@@ -96,7 +95,7 @@ export const ParameterControls: React.FC<ParameterControlsProps> = ({
   return (
     <div className={styles.controls}>
       <h2>Simulation Parameters</h2>
-      
+
       <div className={styles.presets}>
         <button onClick={() => applyPreset('earth-moon')}>Earth-Moon</button>
         <button onClick={() => applyPreset('binary')}>Binary Stars</button>
@@ -152,7 +151,6 @@ export const ParameterControls: React.FC<ParameterControlsProps> = ({
   );
 };
 ```
-
 ### Constants: Presets
 
 **`src/shared/constants/simulation.ts`**
@@ -171,7 +169,6 @@ export const BINARY_STARS_CONFIG: PhysicsConfig = {
 
 export const DEFAULT_CONFIG: PhysicsConfig = EARTH_MOON_CONFIG;
 ```
-
 ### Styling
 
 **`src/components/ParameterControls/ParameterControls.module.css`**
@@ -228,8 +225,7 @@ export const DEFAULT_CONFIG: PhysicsConfig = EARTH_MOON_CONFIG;
   background: #45b5ad;
 }
 ```
-
----
+-
 
 ## 🧪 Tests
 
@@ -238,13 +234,13 @@ export const DEFAULT_CONFIG: PhysicsConfig = EARTH_MOON_CONFIG;
 - [ ] Integration: Config changes update WASM Simulator
 - [ ] Manual: Adjust sliders, verify orbit behavior changes
 
----
+-
 
 ## 🚀 Implementation Flow
 
 1. Spec Review → Component skeleton (RED) → Validation logic (GREEN) → Preset handling → Integration tests
 
----
+-
 
 ## ✅ Definition of Done
 
@@ -253,7 +249,7 @@ export const DEFAULT_CONFIG: PhysicsConfig = EARTH_MOON_CONFIG;
 - [ ] DOD-UX: Sliders responsive and smooth
 - [ ] All preset tests passing
 
----
+-
 
 ## 📚 Related Specs
 

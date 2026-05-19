@@ -1,15 +1,14 @@
 # SPEC-014: Developer Guide & Contribution Framework
 
----
+-
 
 ## 📝 User Story
-```
+```text
 As a developer (student, contributor, maintainer)
 I want clear guidelines on how to extend, test, and contribute to the project
 so that I can confidently implement new features and maintain code quality
 ```
-
----
+-
 
 ## ✅ Acceptance Criteria
 
@@ -56,7 +55,7 @@ so that I can confidently implement new features and maintain code quality
 - [ ] AC 7.3: Spec review process and approval gates
 - [ ] AC 7.4: Linking implementation to spec (traceability)
 
----
+-
 
 ## 🔧 Technical Solution
 
@@ -190,11 +189,11 @@ pub fn force_between(m1: f64, m2: f64, r: f64, g: f64) -> f64 { /* ... */ }
 fn test_circular_orbit_energy_conservation() {
     let state = create_earth_moon_state();
     let mut energy = calculate_total_energy(&state);
-    
+
     for _ in 0..1000 {
         let result = integrate_step(&state, 1.0);
         let new_energy = result.kinetic_energy + result.potential_energy;
-        
+
         // Allow 0.1% relative error
         assert!((new_energy - energy).abs() / energy < 0.001);
     }
@@ -209,10 +208,10 @@ describe('ParameterControls', () => {
     const { getByRole } = render(
       <ParameterControls config={defaultConfig} onConfigChange={mockOnChange} />
     );
-    
+
     const slider = getByRole('slider');
     fireEvent.change(slider, { target: { value: '1e30' } });
-    
+
     expect(mockOnChange).toHaveBeenCalledWith(
       expect.objectContaining({ mass: 1e30 })
     );
@@ -255,7 +254,6 @@ Uses Conventional Commits to auto-bump:
 - Open [GitHub Discussions](https://github.com/.../discussions)
 - Review existing PRs for patterns
 ```
-
 **`docs/ARCHITECTURE.md`**
 ```markdown
 # Project Architecture
@@ -272,8 +270,7 @@ Uses Conventional Commits to auto-bump:
 │       Physics Engine (Rust/WASM)        │
 │  2-Body Orbital Mechanics, Integration  │
 └─────────────────────────────────────────┘
-```
-
+```text
 ## Module Structure
 
 ### Frontend (`src/`)
@@ -316,8 +313,7 @@ SPEC-001 (Foundation)
   │       │           └→ SPEC-010 (Manipulation)
   ├→ SPEC-011 (CI/CD)
   └→ SPEC-012 (Deployment)
-```
-
+```text
 ## Adding a New Feature
 
 1. **Spec**: Create SPEC-XXX.md in Docs/Management/Specs/
@@ -328,11 +324,11 @@ SPEC-001 (Foundation)
 6. **Commit**: Use Conventional Commits
 7. **PR**: Reference SPEC, include before/after behavior
 
----
+- -
 
 **`docs/FAQ.md`**
 
-```markdown
+```
 # Frequently Asked Questions
 
 ## Development
@@ -361,9 +357,8 @@ A: Fix the implementation to pass existing tests, or update tests with spec revi
 
 Q: How do I add a preset?
 A: Update `src/shared/constants/simulation.ts` with new PhysicsConfig
-```
-
----
+```text
+- -
 
 ## 🧪 Tests
 
@@ -371,13 +366,13 @@ A: Update `src/shared/constants/simulation.ts` with new PhysicsConfig
 - [ ] Manual: New contributor follows guide without assistance
 - [ ] Code review: Spec templates useful and complete
 
----
+- -
 
 ## 🚀 Implementation Flow
 
 1. Spec Review → Write core guides (CONTRIBUTING, ARCHITECTURE) → Add examples → Maintenance docs
 
----
+- -
 
 ## ✅ Definition of Done
 
@@ -386,7 +381,7 @@ A: Update `src/shared/constants/simulation.ts` with new PhysicsConfig
 - [ ] Examples provided for common tasks
 - [ ] New contributor successfully follows guide
 
----
+- -
 
 ## 📚 Related Specs
 

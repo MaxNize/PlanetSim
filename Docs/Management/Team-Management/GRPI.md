@@ -1,7 +1,7 @@
-# Goal:
+# Goal
 ## Zweck und Ergebnis
 Wir verstehen die Mission und die erwarteten Ergebnisse
- 
+
 Rust Anwendung, die über Web Asembly in eine Web App eingebunden wird. <=1,7
 
 ## Kunden und Bedürfnisse
@@ -13,15 +13,15 @@ Grebner: Hohe Anforderungen an Code-Qualität, Prozess Effizienz, Skalierbarkeit
 Wir haben die Programmziele und die Verbindung zu den Businesszielen verstanden
 
 Deliverables: Code, Docs, Projektdokumentation nach Grebner
- 
+
 ## Programm Umfang und Definition
 Wir verstehen unseren Beitrag und stimmen zu, diesen zu leisten
 
 Jira Board, Grebner Anforderungen
 
----
+-
 
-# Role:
+# Role
 ## Rolle und Verantwortung
 Wir haben definierte und abgestimmte Rollen, Verantwortung und die nötigen Fähigkeiten und Ressourcen
 
@@ -30,7 +30,7 @@ Dimi: Developer, Designer, Reviewer, SCRUM-Master, Aufarbeiter
 Fabi: Dokumentation, Developer, Reviewer
 
 Tempo angemessen und inklusiv gestalten.
- 
+
 ## Autorität und Autonomie
 Unser Team ist sich im klaren über die Möglichkeiten, Pflichten und Rechte, die wir haben um unser Projektziel zu erreichen.
 
@@ -38,22 +38,22 @@ Unser Team ist sich im klaren über die Möglichkeiten, Pflichten und Rechte, di
 - Sinnvolle Reviews geben
 - Vorausschauend mitdenken
 
---- 
+-
 
-# Process:
+# Process
 ## Kritische Erfolgsfaktoren
 Wir kennen und fokussieren uns auf die Schlüsselfaktoren die notwendig sind, um Projektziele zu erreichen und die Mission zu erfüllen
 
-Backlog grooming, Grebner First, Scoping, 
- 
+Backlog grooming, Grebner First, Scoping,
+
 ## Maßnahmenpläne und Aktionen
-Wir haben eine Roadmap der die Aufgaben klar definiert und zuordnet 
+Wir haben eine Roadmap der die Aufgaben klar definiert und zuordnet
 
 ToBeDefined
 
-## Monitoring und Kontrollmaßnahmen 
+## Monitoring und Kontrollmaßnahmen
 Wir haben einen Plan um die Fortschritte zu messen und KPIs die mit den Projektzielen verbunden sind
- 
+
 Wir holen uns regelmäßiges Feedback in der Vorlesung und versuchen so wenig wie möglich gerostet zu werden
 
 ## Terminierung und Meilensteine
@@ -61,15 +61,15 @@ Die Projektplanung ist terminiert und die Prozessplanung ist mit Meilensteinen h
 
 ToBeDefined
 
---- 
+-
 
-# Interaction:
+# Interaction
 ## Faktoren der Zusammenarbeit
-Wir kennen uns als Team mit unseren Stärken und Schwächen Wir haben gemeinsame Erwartungen, abgestimmte Ziele und eine gemeinsame Mission 
+Wir kennen uns als Team mit unseren Stärken und Schwächen Wir haben gemeinsame Erwartungen, abgestimmte Ziele und eine gemeinsame Mission
 
 Stärken in verschiedene Richtungen, manche eher konzeptionell, manche eher Marketing, manche eher beschreibend
 
-## Beziehungen 
+## Beziehungen
 Wir haben Vertrauen, Zusammengehörigkeitsgefühl und effektives Verhalten
-	
+
 Wir legen Wert auf effektives Verhalten und kontinuueirliche Verbesserung.

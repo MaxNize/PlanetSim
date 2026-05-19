@@ -1,15 +1,14 @@
 # SPEC-008: Trajectory Visualization
 
----
+-
 
 ## 📝 User Story
-```
+```text
 As a student learning orbital mechanics
 I want to see the paths that bodies trace over time
 so that I can understand and predict planetary motion patterns
 ```
-
----
+-
 
 ## ✅ Acceptance Criteria
 
@@ -41,7 +40,7 @@ so that I can understand and predict planetary motion patterns
 - [ ] AC 5.2: Trail renders correctly after pause/resume
 - [ ] AC 5.3: Trail accuracy matches body position (no lag)
 
----
+-
 
 ## 🔧 Technical Solution
 
@@ -98,7 +97,6 @@ export class TrailManager {
   }
 }
 ```
-
 ### Canvas Rendering
 
 **`src/services/CanvasRenderer.ts` (enhanced)**
@@ -135,7 +133,6 @@ export class CanvasRenderer {
   }
 }
 ```
-
 ### Component: TrailControls
 
 **`src/components/TrailControls/TrailControls.tsx`**
@@ -191,7 +188,6 @@ export const TrailControls: React.FC<TrailControlsProps> = ({
   );
 };
 ```
-
 ### Integration with Simulator Hook
 
 **`src/hooks/useSimulation.ts` (enhanced)**
@@ -224,8 +220,7 @@ export function useSimulation(config: PhysicsConfig, trailEnabled: boolean, maxP
   };
 }
 ```
-
----
+-
 
 ## 🧪 Tests
 
@@ -235,13 +230,13 @@ export function useSimulation(config: PhysicsConfig, trailEnabled: boolean, maxP
 - [ ] Integration: Trail updates when simulator steps
 - [ ] Manual: Enable trail, watch it draw, verify smoothness
 
----
+-
 
 ## 🚀 Implementation Flow
 
 1. Spec Review → TrailManager (RED) → Canvas rendering (GREEN) → TrailControls UI → Performance optimization
 
----
+-
 
 ## ✅ Definition of Done
 
@@ -250,7 +245,7 @@ export function useSimulation(config: PhysicsConfig, trailEnabled: boolean, maxP
 - [ ] DOD-Accuracy: Trail positions match body path
 - [ ] TrailManager tests passing
 
----
+-
 
 ## 📚 Related Specs
 

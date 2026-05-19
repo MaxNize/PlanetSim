@@ -9,8 +9,8 @@ This guide defines the standard for new contributions: clean workflow, clear com
 1. Create branch from dev.
 2. Apply small, focused changes.
 3. Test and lint locally:
-   - **Rust/WASM**: Run `cargo fmt` and `cargo clippy` in the physics engine directory
-   - **React/TypeScript**: Run `npm run lint` in the frontend directory
+ - **Rust/WASM**: Run `cargo fmt` and `cargo clippy` in the physics engine directory
+ - **React/TypeScript**: Run `npm run lint` in the frontend directory
 4. Write commit messages in Conventional Commit format.
 5. Open pull request and complete CI successfully.
 
@@ -71,7 +71,7 @@ We create tags, GitHub releases, and maintain `CHANGELOG.md` from Conventional C
 - Commits and PR titles use Conventional Commit format (`feat`, `fix`, `chore`, ...).
 - Prefer `Squash and merge`: PR title becomes squash commit message and forms changelog entry.
 - After merge to `main`, release pipeline runs:
-  - `semantic-release` creates changelog entry, tag, and GitHub release based on Conventional Commit types.
+ - `semantic-release` creates changelog entry, tag, and GitHub release based on Conventional Commit types.
 
 Note: PR title must be Conventional format to group and version releases correctly.
 
