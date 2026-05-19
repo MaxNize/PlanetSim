@@ -1,0 +1,27 @@
+name: Check Branch Name
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - develop
+
+jobs:
+  branch-name:
+    runs-on: ubuntu-latest
+    name: Validate Branch Naming Convention
+
+    steps:
+      - name: Check branch name format
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        run: |
+          echo "Checking branch name: $BRANCH_NAME"
+          if [[ "$BRANCH_NAME" =~ ^(feature|fix|docs|refactor|chore)/.+ ]]; then
+            echo "✅ Branch name follows convention: $BRANCH_NAME"
+            exit 0
+          else
+            echo "❌ Branch name does not follow convention: $BRANCH_NAME"
+            echo "Expected format: feature/, fix/, docs/, refactor/, or chore/ prefix"
+            exit 1
+          fi

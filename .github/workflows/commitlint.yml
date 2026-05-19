@@ -1,0 +1,36 @@
+name: Commit Lint
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    name: Validate Conventional Commits
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install commitlint
+        run: npm install --save-dev @commitlint/cli@19.3.0 @commitlint/config-conventional@19.2.2
+
+      - name: Create commitlint config
+        run: |
+          echo "export default {
+            extends: ['@commitlint/config-conventional']
+          };" > commitlint.config.js
+
+      - name: Validate commits
+        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to HEAD
