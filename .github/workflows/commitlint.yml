@@ -8,6 +8,10 @@ on:
       - reopened
       - ready_for_review
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   commitlint:
     runs-on: ubuntu-latest
@@ -26,11 +30,5 @@ jobs:
       - name: Install commitlint
         run: npm install --save-dev @commitlint/cli@19.3.0 @commitlint/config-conventional@19.2.2
 
-      - name: Create commitlint config
-        run: |
-          echo "export default {
-            extends: ['@commitlint/config-conventional']
-          };" > commitlint.config.js
-
       - name: Validate commits
-        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to HEAD
+        run: npx commitlint --from origin/${{ github.base_ref }} --to HEAD
