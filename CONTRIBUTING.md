@@ -39,7 +39,7 @@ Use branch prefixes to signal intent:
 
 **Example:** `feature/add-orbit-visualization`, `fix/gravity-calculation-precision`
 
-**Enforcement:** CI workflow `check-branch-name.yml` validates branch names during PR checks.
+**Enforcement:** Team convention, enforced through code review on PR approval.
 
 ### Conventional Commits
 
@@ -64,7 +64,7 @@ docs(guides): update naming conventions
 refactor(wasm): extract gravity calculation
 chore(deps): upgrade React to 19.2.6
 ```
-**Enforcement:** CI workflow `commitlint.yml` validates all PR commits against Conventional Commits standards.
+**Enforcement:** Conventional Commits are validated during code review. Developers may run `npm run commit-lint` locally for validation.
 
 -
 
@@ -142,8 +142,6 @@ node scripts/check-structure.js     # verify project structure
 ```
 **CI checks (GitHub Actions):**
 - `lint.yml` — ESLint, Prettier, Stylelint, Cargo Clippy, Cargo Doc
-- `commitlint.yml` — Conventional Commits validation
-- `check-branch-name.yml` — Branch naming validation
 - `check-max-lines.yml` — File-size compliance
 
 All checks must pass before a PR can be merged.

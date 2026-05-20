@@ -36,9 +36,8 @@ so that the team can work efficiently and maintain code quality from day one
 - [x] AC 4.3: Function naming: descriptive verbs enforced by code review (no automatic rule). Examples: `calculateOrbitalVelocity`, `handleParameterChange`, `updateSimulationState`.
 
 ### Commit & VCS Conventions
-- [x] AC 5.1: Commit messages follow Conventional Commits with scopes (wasm, ui, physics, perf, build, docs). Enforced by CI job `commit-lint` using `commitlint` with
- - `@commitlint/config-conventional`.
-- [x] AC 5.2: Branch naming convention: `feature/`, `fix/`, `docs/`, `refactor/`, `chore/` prefix enforced by GitHub Actions branch-protection rule or CI job `check-branch-name`.
+- [x] AC 5.1: Commit messages follow Conventional Commits with scopes (wasm, ui, physics, perf, build, docs). Enforced by code review; local validation available via `npm run commit-lint`.
+- [x] AC 5.2: Branch naming convention: `feature/`, `fix/`, `docs/`, `refactor/`, `chore/` prefix (enforced by team convention and code review).
 - [x] AC 5.3: PR templates require description of what changed and why
 - [x] AC 5.4: Lockfiles are committed (`frontend/package-lock.json`, `Cargo.lock`) to ensure reproducible builds
 
@@ -192,16 +191,14 @@ consult  this file when deciding whether a file is exempt. Schema:
  - **Rust linting:** `cargo clippy -- -D warnings` detects documentation issues, line-length violations; exits non-zero on failure
  - **Doc tests:** `cargo test --doc` verifies all rustdoc examples run correctly
  - **Max-lines enforcement:** `node scripts/check-max-lines.js --exceptions max-lines-exceptions.json` checks all files against limit and exceptions
- - **Commit message validation:** `npm run commit-lint` (local) or CI job `commit-lint` (GitHub Actions)
- - **Branch name validation:** CI job `check-branch-name` validates branch names on push
+ - **Commit message validation:** `npm run commit-lint` (local, optional)
 - [ ] Manual smoke test (performed before first merge):
  - Clone repo → `npm install` → `cargo build` succeeds
  - Run `make dev` to start development environment
  - Run `make test` (all linting + doc tests pass)
  - Create file exceeding 200 lines in `frontend/src/` → `npm run lint` fails with max-lines error
  - Add file path to `max-lines-exceptions.json` → run `node scripts/check-max-lines.js` → passes
- - Commit message without conventional format → `git commit` rejected by local hook
- - Push to branch named `badname/feature` → CI job `check-branch-name` fails
+ - Commit message without conventional format → `npm run commit-lint` fails validation
 
 -
 
@@ -217,10 +214,8 @@ consult  this file when deciding whether a file is exempt. Schema:
 8. Create linting scripts in `package.json`: `lint`, `lint:md`, `check:structure`, `check-max-lines`; update Makefile with `make lint`, `make test`, `make dev`
 9. Set up GitHub Actions CI workflows:
  - `lint.yml`: Run `npm run lint`, `npm run lint:md`, `cargo clippy`, `cargo doc`
- - `commit-lint.yml`: Validate commit messages (on every push, optional validation for PRs)
- - `check-branch-name.yml`: Validate branch names on push (feature/, fix/, docs/, refactor/, chore/)
  - `check-max-lines.yml`: Run custom `scripts/check-max-lines.js` step
-10. Manual validation: test line-length enforcement with >200 line file, test hook bypass + CI failure, test exception whitelist, test markdown linting with violations
+10. Manual validation: test line-length enforcement with >200 line file, test exception whitelist, test markdown linting with violations
 11. Create or update `Docs/Guides/documentation-conventions.md` guide with file-size rationale, naming examples, and markdown standards
 
 -
