@@ -26,7 +26,7 @@ jobs:
         run: npm --prefix frontend ci
 
       - name: TypeScript check
-        run: cd frontend && npx tsc --noEmit
+        run: npm --prefix frontend run build
 
       - name: Frontend lint
         run: npm --prefix frontend run lint

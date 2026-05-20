@@ -39,7 +39,7 @@ Use branch prefixes to signal intent:
 
 **Example:** `feature/add-orbit-visualization`, `fix/gravity-calculation-precision`
 
-**Enforcement:** CI workflow `check-branch-name.yml` validates branch names on push.
+**Enforcement:** CI workflow `check-branch-name.yml` validates branch names during PR checks.
 
 ### Conventional Commits
 
@@ -64,8 +64,7 @@ docs(guides): update naming conventions
 refactor(wasm): extract gravity calculation
 chore(deps): upgrade React to 19.2.6
 ```
-**Enforcement:**
-- **CI:** GitHub Actions `commitlint.yml` validates all PR commits.
+**Enforcement:** CI workflow `commitlint.yml` validates all PR commits against Conventional Commits standards.
 
 -
 
