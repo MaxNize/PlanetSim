@@ -1,0 +1,59 @@
+{
+    "exemptions": [
+        {
+            "path": "frontend/src/types/*.ts",
+            "reason": "type clusters - related TypeScript interfaces and types grouped for maintainability",
+            "approved_by": "arch-team"
+        },
+        {
+            "path": "wasm/src/lib.rs",
+            "reason": "rustdoc examples and WASM bindings - contains multiple documented exports with examples",
+            "approved_by": "arch-team"
+        },
+        {
+            "path": "Docs/Management/Project-Management/Specs/SPEC-001-project-setup-guardrails.md",
+            "reason": "Project spec — accepted length",
+            "approved_by": "MaxNize"
+        },
+        {
+            "path": "Docs/Management/Project-Management/Specs/SPEC-006-canvas-rendering.md",
+            "reason": "Project spec — accepted length",
+            "approved_by": "MaxNize"
+        },
+        {
+            "path": "Docs/Management/Project-Management/Specs/SPEC-007-parameter-controls.md",
+            "reason": "Project spec — accepted length",
+            "approved_by": "MaxNize"
+        },
+        {
+            "path": "Docs/Management/Project-Management/Specs/SPEC-008-trajectory-visualization.md",
+            "reason": "Project spec — accepted length",
+            "approved_by": "MaxNize"
+        },
+        {
+            "path": "Docs/Management/Project-Management/Specs/SPEC-009-sandbox-placement.md",
+            "reason": "Project spec — accepted length",
+            "approved_by": "MaxNize"
+        },
+        {
+            "path": "Docs/Management/Project-Management/Specs/SPEC-010-object-manipulation.md",
+            "reason": "Project spec — accepted length",
+            "approved_by": "MaxNize"
+        },
+        {
+            "path": "Docs/Management/Project-Management/Specs/SPEC-011-cicd-pipeline.md",
+            "reason": "Project spec — accepted length",
+            "approved_by": "MaxNize"
+        },
+        {
+            "path": "Docs/Management/Project-Management/Specs/SPEC-013-api-documentation.md",
+            "reason": "Project spec — accepted length",
+            "approved_by": "MaxNize"
+        },
+        {
+            "path": "Docs/Management/Project-Management/Specs/SPEC-014-developer-guide.md",
+            "reason": "Project spec — accepted length",
+            "approved_by": "MaxNize"
+        }
+    ]
+}

@@ -105,18 +105,18 @@ This DoD applies to all SPEC implementations unless overridden by feature-specif
 
 - [ ] No hardcoded values (extract to constants)
 - [ ] Magic strings in centralized config:
-  - **Backend**: `app/config/constants.py` or `app/utils/api_endpoints.py`
-  - **Frontend**: `src/shared/constants/` with appropriate module (api.ts, simulation.ts, validation.ts)
-  - **Rust**: Module-level `const` or `static`
+ - **Backend**: `app/config/constants.py` or `app/utils/api_endpoints.py`
+ - **Frontend**: `src/shared/constants/` with appropriate module (api.ts, simulation.ts, validation.ts)
+ - **Rust**: Module-level `const` or `static`
 - [ ] Barrel exports updated (`src/shared/constants/index.ts` for new constants)
 
 ## 11. Git Hygiene (Required)
 
 - [ ] Commits use Conventional Commits format:
-  - `feat(scope): description` for features
-  - `fix(scope): description` for bugs
-  - `docs(scope): description` for documentation
-  - Scopes: `wasm`, `ui`, `physics`, `perf`, `build`, `chore`
+ - `feat(scope): description` for features
+ - `fix(scope): description` for bugs
+ - `docs(scope): description` for documentation
+ - Scopes: `wasm`, `ui`, `physics`, `perf`, `build`, `chore`
 - [ ] Commit messages reference SPEC or issue numbers
 - [ ] One logical change per commit (not too granular, not too large)
 - [ ] No merge commits in PR (rebase if needed)
@@ -125,11 +125,11 @@ This DoD applies to all SPEC implementations unless overridden by feature-specif
 
 - [ ] PR title follows Conventional Commits
 - [ ] PR description includes:
-  - Link to SPEC
-  - Summary of changes
-  - Performance metrics (if applicable)
-  - Bundle size impact (if applicable)
-  - Screenshots or video (for UI changes)
+ - Link to SPEC
+ - Summary of changes
+ - Performance metrics (if applicable)
+ - Bundle size impact (if applicable)
+ - Screenshots or video (for UI changes)
 - [ ] All conversations resolved
 - [ ] CI/CD pipeline passes
 - [ ] At least 1 approval from maintainer
@@ -149,7 +149,7 @@ This DoD applies to all SPEC implementations unless overridden by feature-specif
 - [ ] Error messages clear (mention WASM source when possible)
 - [ ] Version compatibility documented (WASM ABI changes noted)
 
----
+-
 
 ## Summary Checklist
 
@@ -169,7 +169,7 @@ This DoD applies to all SPEC implementations unless overridden by feature-specif
 - [ ] Performance validated
 - [ ] Documentation updated
 
----
+-
 
 ## Related DoDs
 

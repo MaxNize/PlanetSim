@@ -1,0 +1,34 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173",
+    "lint": "eslint 'src/**/*.{ts,tsx}' --max-warnings 0",
+    "lint:fix": "eslint 'src/**/*.{ts,tsx}' --fix",
+    "stylelint:fix": "stylelint 'src/**/*.css' --fix || true",
+    "format": "prettier --write 'src/**/*.{ts,tsx,css,md}'",
+    "fix": "npm run format && npm run lint:fix && npm run stylelint:fix || true"
+  },
+  "dependencies": {
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@typescript-eslint/eslint-plugin": "8.59.4",
+    "@typescript-eslint/parser": "8.59.4",
+    "@vitejs/plugin-react": "6.0.2",
+    "eslint": "10.4.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-jsdoc": "62.9.0",
+    "prettier": "3.8.3",
+    "stylelint": "^17.11.1",
+    "stylelint-config-standard": "^40.0.0",
+    "typescript": "6.0.3",
+    "vite": "8.0.13"
+  }
+}
