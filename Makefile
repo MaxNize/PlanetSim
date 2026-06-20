@@ -32,6 +32,7 @@ format:
 test:
 	@echo "Running tests"
 	cd frontend && npx tsc --noEmit
+	cd frontend && npm run test
 	cd wasm && cargo test
 	./scripts/check_rust_line_count.sh
 	cd wasm && RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
