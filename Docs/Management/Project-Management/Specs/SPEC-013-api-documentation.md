@@ -1,15 +1,14 @@
 # SPEC-013: API Documentation
 
----
+-
 
 ## 📝 User Story
-```
+```text
 As a developer
 I want clear documentation of public APIs and physics functions
 so that I can integrate the library or understand how to extend it
 ```
-
----
+-
 
 ## ✅ Acceptance Criteria
 
@@ -48,7 +47,7 @@ so that I can integrate the library or understand how to extend it
 - [ ] AC 6.2: Search functionality available
 - [ ] AC 6.3: Docs versioning (latest + previous releases)
 
----
+-
 
 ## 🔧 Technical Solution
 
@@ -82,7 +81,6 @@ pub use self::types::*;
 pub use self::gravity::*;
 pub use self::integrator::*;
 ```
-
 **`src/physics/gravity.rs` (doc examples)**
 ```rust
 /// Calculates gravitational force between two bodies.
@@ -111,43 +109,40 @@ pub fn force_between(m1: f64, m2: f64, distance: f64, g: f64) -> f64 {
     g * (m1 * m2) / (distance * distance)
 }
 ```
-
 ### TypeScript Documentation
 
 **`src/services/wasmBridge.ts` (JSDoc example)**
 ```typescript
 /**
- * Bridge between Rust WASM physics engine and JavaScript UI.
- * Handles all Rust ↔ JS communication and data marshalling.
- *
- * @example
- * ```typescript
- * const bridge = new SimulatorBridge(config);
- * const state = bridge.step(0.016);  // 60 FPS
- * ```
+- Bridge between Rust WASM physics engine and JavaScript UI.
+- Handles all Rust ↔ JS communication and data marshalling.
+- * @example
+- ```typescript
+- const bridge = new SimulatorBridge(config);
+- const state = bridge.step(0.016);  // 60 FPS
+- ```
  */
 export class SimulatorBridge {
   /**
-   * Initialize simulator with configuration.
-   * @param config - Physics configuration (mass, velocity, time scale)
-   * @throws {Error} If WASM module fails to load or config is invalid
+- Initialize simulator with configuration.
+- @param config - Physics configuration (mass, velocity, time scale)
+- @throws {Error} If WASM module fails to load or config is invalid
    */
   constructor(config: PhysicsConfig) {
     // ...
   }
 
   /**
-   * Execute one simulation step.
-   * @param dt - Delta time in seconds (recommended: 0.016 for 60 FPS)
-   * @returns Current simulation state (bodies, energy, time)
-   * @throws {Error} If dt is negative or WASM panic occurs
+- Execute one simulation step.
+- @param dt - Delta time in seconds (recommended: 0.016 for 60 FPS)
+- @returns Current simulation state (bodies, energy, time)
+- @throws {Error} If dt is negative or WASM panic occurs
    */
   step(dt: number): SimulationState {
     // ...
   }
 }
 ```
-
 ### Generated Documentation Build
 
 **`.github/workflows/docs.yml`**
@@ -164,10 +159,10 @@ jobs:
   rust-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - run: cargo doc --no-deps --document-private-items
-      - uses: actions/upload-artifact@v3
+ - uses: actions/checkout@v4
+ - uses: dtolnay/rust-toolchain@stable
+ - run: cargo doc --no-deps --document-private-items
+ - uses: actions/upload-artifact@v3
         with:
           name: rust-docs
           path: target/doc/
@@ -175,18 +170,17 @@ jobs:
   typedoc:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+ - uses: actions/checkout@v4
+ - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm ci && npm run docs
-      - uses: actions/upload-artifact@v3
+ - run: npm ci && npm run docs
+ - uses: actions/upload-artifact@v3
         with:
           name: ts-docs
           path: docs/generated/
 ```
-
 ### Documentation Site
 
 **`docs/README.md` (index)**
@@ -206,7 +200,6 @@ jobs:
 ## For Contributors
 [Dev setup, testing, deployment...]
 ```
-
 **`docs/physics/README.md`**
 ```markdown
 # Physics Model
@@ -236,8 +229,7 @@ Where:
 - [Classical Mechanics, Goldstein et al.](...)
 - [Celestial Mechanics, Murray & Dermott](...)
 ```
-
----
+-
 
 ## 🧪 Tests
 
@@ -246,13 +238,13 @@ Where:
 - [ ] Build: `npm run docs` generates TypeScript docs
 - [ ] Manual: Documentation site renders correctly, links work
 
----
+-
 
 ## 🚀 Implementation Flow
 
 1. Spec Review → Doc comments in code → Doc examples/tests → Site generation → Publish
 
----
+-
 
 ## ✅ Definition of Done
 
@@ -261,7 +253,7 @@ Where:
 - [ ] Generated docs published automatically
 - [ ] Search functionality works
 
----
+-
 
 ## 📚 Related Specs
 

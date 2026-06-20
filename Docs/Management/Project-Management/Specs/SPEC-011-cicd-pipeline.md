@@ -1,15 +1,14 @@
 # SPEC-011: CI/CD Pipeline
 
----
+-
 
 ## 📝 User Story
-```
+```text
 As a maintainer
 I want automated testing and quality checks on every push
 so that regressions are caught early and code quality remains high
 ```
-
----
+-
 
 ## ✅ Acceptance Criteria
 
@@ -34,7 +33,7 @@ so that regressions are caught early and code quality remains high
 
 ### Security
 - [ ] AC 4.1: Dependency scanning (cargo-audit, npm audit)
-- [ ] AC 4.2: No secrets detected in commits (pre-commit hooks)
+ - [ ] AC 4.2: No secrets detected in commits (CI)
 - [ ] AC 4.3: Security vulnerabilities fail the build
 - [ ] AC 4.4: Critical dependencies pinned (Cargo.lock, package-lock.json)
 
@@ -50,7 +49,7 @@ so that regressions are caught early and code quality remains high
 - [ ] AC 6.2: WASM bundle size tracked (warn if > 500KB)
 - [ ] AC 6.3: Performance regressions detected (optional)
 
----
+-
 
 ## 🔧 Technical Solution
 
@@ -70,40 +69,39 @@ jobs:
   rust-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - run: cargo test --release
-      - run: cargo clippy -- -D warnings
+ - uses: actions/checkout@v4
+ - uses: dtolnay/rust-toolchain@stable
+ - run: cargo test --release
+ - run: cargo clippy -- -D warnings
 
   typescript-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+ - uses: actions/checkout@v4
+ - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm ci
-      - run: npm test
-      - run: npm run coverage
-      - uses: codecov/codecov-action@v3
+ - run: npm ci
+ - run: npm test
+ - run: npm run coverage
+ - uses: codecov/codecov-action@v3
         with:
           files: ./coverage/coverage-final.json
 
   lint-and-format:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+ - uses: actions/checkout@v4
+ - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run format:check
-      - run: cargo clippy -- -D warnings
+ - run: npm ci
+ - run: npm run lint
+ - run: npm run format:check
+ - run: cargo clippy -- -D warnings
 ```
-
 **`.github/workflows/build.yml`** (Runs only on push to main)
 ```yaml
 name: Build & Deploy
@@ -116,14 +114,14 @@ jobs:
   build-wasm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: actions/setup-node@v4
+ - uses: actions/checkout@v4
+ - uses: dtolnay/rust-toolchain@stable
+ - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: cargo build --release --target wasm32-unknown-unknown
-      - run: npm ci && npm run build:wasm
-      - uses: actions/upload-artifact@v3
+ - run: cargo build --release --target wasm32-unknown-unknown
+ - run: npm ci && npm run build:wasm
+ - uses: actions/upload-artifact@v3
         with:
           name: wasm-dist
           path: dist/
@@ -132,13 +130,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-wasm
     steps:
-      - uses: actions/download-artifact@v3
+ - uses: actions/download-artifact@v3
         with:
           name: wasm-dist
-      - run: du -h planet_sim_wasm_bg.wasm | grep -oP '\d+\.?\d*[KM]'
-      - run: echo "Bundle size check: ensure < 500KB"
+ - run: du -h planet_sim_wasm_bg.wasm | grep -oP '\d+\.?\d*[KM]'
+ - run: echo "Bundle size check: ensure < 500KB"
 ```
-
 **`.github/workflows/security.yml`** (Runs on PR and push to main)
 ```yaml
 name: Security
@@ -153,39 +150,28 @@ jobs:
   cargo-audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: rustsec/audit-check-action@v1
+ - uses: actions/checkout@v4
+ - uses: rustsec/audit-check-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   npm-audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+ - uses: actions/checkout@v4
+ - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm audit --audit-level=moderate
+ - run: npm audit --audit-level=moderate
 
   secrets-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: gitleaks/gitleaks-action@v2
+ - uses: actions/checkout@v4
+ - uses: gitleaks/gitleaks-action@v2
 ```
-
-### Local Pre-commit Hooks
-
-**`.husky/pre-commit`**
-```bash
-#!/bin/bash
-npm run lint
-npm run format:check
-cargo clippy -- -D warnings
-cargo test --release
-```
-
+Local pre-commit hooks have been removed from the standard project configuration; CI runs all required checks (linting, formatting, secret scanning, tests).
 ### Branch Protection Rules
 
 **`.github/settings.json` (GitHub App configuration)**
@@ -200,8 +186,7 @@ cargo test --release
   }
 }
 ```
-
----
+-
 
 ## 🧪 Tests
 
@@ -209,19 +194,19 @@ cargo test --release
 - [ ] Integration: Push to PR → CI runs automatically
 - [ ] Manual: Verify failed tests block PR merge
 
----
+-
 
 ## 🚀 Implementation Flow
 
 1. Spec Review
 2. Set up GitHub Actions workflows (test.yml, build.yml, security.yml)
 3. Configure trigger branches: PR against dev/main, push to main only
-4. Set up local pre-commit hooks (Husky)
+4. Ensure CI checks run secret detection and linting
 5. Configure branch protection rules on main
 6. Test: Open PR → tests run, push to main → full CI/CD runs
 7. Verify deployment triggers correctly after main push
 
----
+-
 
 ## ✅ Definition of Done
 
@@ -233,7 +218,7 @@ cargo test --release
 - [ ] Deployment pipeline triggers automatically on main push
 - [ ] Team aware of CI/CD workflow: PR for testing, merge to main for deployment
 
----
+-
 
 ## 📚 Related Specs
 

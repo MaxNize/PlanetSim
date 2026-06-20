@@ -1,0 +1,11 @@
+# clippy configuration (project-wide)
+# Keep this file minimal unless a valid Clippy setting is needed.
+#
+# File-length exceptions are enforced by `scripts/check_rust_line_count.sh`.
+# Known exceptions:
+# - wasm/src/lib.rs
+# - wasm/src/physics/mod.rs
+# - wasm/src/physics/calculations.rs
+# - wasm/src/physics/gravity.rs
+# - wasm/src/wasm/mod.rs
+

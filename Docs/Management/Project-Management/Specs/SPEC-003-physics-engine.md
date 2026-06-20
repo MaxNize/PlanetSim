@@ -1,20 +1,19 @@
 # SPEC-003: 2-Body Physics Engine (Rust)
 
----
+-
 
 ## 📝 User Story
-```
+```text
 As a physics enthusiast
 I want accurate gravitational orbital mechanics calculations
 so that I can learn about real planetary motion and experiment with different configurations
 ```
-
----
+-
 
 ## ✅ Acceptance Criteria
 
 ### Core Physics
-- [ ] AC 1.1: Newton's law of universal gravitation correctly implemented: F = G * (m1 * m2) / r²
+- [ ] AC 1.1: Newton's law of universal gravitation correctly implemented: F = G *(m1* m2) / r²
 - [ ] AC 1.2: Acceleration calculation from forces: a = F / m
 - [ ] AC 1.3: Velocity updated via: v = v_old + a * dt
 - [ ] AC 1.4: Position updated via: x = x_old + v * dt (or better integration method)
@@ -39,7 +38,7 @@ so that I can learn about real planetary motion and experiment with different co
 - [ ] AC 5.2: No allocations in hot loop (pre-allocate state vectors)
 - [ ] AC 5.3: Suitable for 60 FPS @ 60x time acceleration
 
----
+-
 
 ## 🔧 Technical Solution
 
@@ -55,7 +54,6 @@ pub mod types;      // Body, State, PhysicsConfig
 pub mod gravity;    // force_between, acceleration
 pub mod integrator; // StepResult, integrate_step()
 ```
-
 **`src/physics/types.rs`** - Data structures
 ```rust
 pub struct Body {
@@ -76,14 +74,12 @@ pub struct PhysicsConfig {
     pub g: f64,  // Gravitational constant (default 6.674e-11)
 }
 ```
-
 **`src/physics/gravity.rs`** - Physics calculations
 ```rust
 pub fn distance(pos1: (f64, f64), pos2: (f64, f64)) -> f64;
 pub fn force_between(m1: f64, m2: f64, distance: f64, g: f64) -> f64;
 pub fn acceleration_from_force(force: f64, mass: f64) -> f64;
 ```
-
 **`src/physics/integrator.rs`** - Integration method (Velocity Verlet)
 ```rust
 pub struct StepResult {
@@ -94,7 +90,6 @@ pub struct StepResult {
 
 pub fn integrate_step(state: &State, dt: f64) -> StepResult;
 ```
-
 ### WASM Bindings
 
 **`src/lib.rs`** (wasm entry point)
@@ -111,13 +106,12 @@ pub struct Simulator {
 impl Simulator {
     #[wasm_bindgen(constructor)]
     pub fn new(/* config */) -> Simulator;
-    
+
     pub fn step(&mut self, dt: f64) -> StepResult;
     pub fn get_state(&self) -> JsValue;  // Serialize to JS
 }
 ```
-
----
+-
 
 ## 🧪 Tests
 
@@ -126,13 +120,13 @@ impl Simulator {
 - [ ] Reference: Compare with known orbital mechanics (e.g., Earth-Moon system)
 - [ ] Manual: Visualize orbits in browser, verify smooth circular motion
 
----
+-
 
 ## 🚀 Implementation Flow
 
 1. Spec Review → Data structures (RED tests) → Gravity functions (GREEN) → Integrator → Reference validation → Manual visual verification
 
----
+-
 
 ## ✅ Definition of Done
 
@@ -141,7 +135,7 @@ impl Simulator {
 - [ ] DOD-Performance: Single step < 100 microseconds
 - [ ] DOD-WASM: Serialization/deserialization works
 
----
+-
 
 ## 📚 Related Specs
 

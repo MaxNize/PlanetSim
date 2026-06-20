@@ -1,15 +1,14 @@
 # SPEC-009: Sandbox Mode - Interactive Object Placement
 
----
+-
 
 ## 📝 User Story
-```
+```text
 As an advanced user
 I want to create custom planetary configurations by placing objects interactively
 so that I can explore unique orbital scenarios and creative simulations
 ```
-
----
+-
 
 ## ✅ Acceptance Criteria
 
@@ -46,7 +45,7 @@ so that I can explore unique orbital scenarios and creative simulations
 - [ ] AC 6.2: Mode labels clear and understandable
 - [ ] AC 6.3: Switching modes stops simulation and resets view
 
----
+-
 
 ## 🔧 Technical Solution
 
@@ -91,7 +90,6 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   );
 };
 ```
-
 ### Canvas Click Handler
 
 **`src/components/Canvas/Canvas.tsx` (enhanced)**
@@ -133,7 +131,6 @@ export const Canvas: React.FC<CanvasProps> = ({
   );
 };
 ```
-
 ### Body Placement Dialog
 
 **`src/components/BodyPlacementDialog/BodyPlacementDialog.tsx`**
@@ -218,7 +215,6 @@ export const BodyPlacementDialog: React.FC<BodyPlacementDialogProps> = ({
   );
 };
 ```
-
 ### Rust: N-Body Physics (Future)
 
 **`src/physics/n_body.rs`** (stub for future)
@@ -246,8 +242,7 @@ pub fn calculate_acceleration(bodies: &[Body], body_index: usize) -> (f64, f64) 
   (ax, ay)
 }
 ```
-
----
+-
 
 ## 🧪 Tests
 
@@ -257,13 +252,13 @@ pub fn calculate_acceleration(bodies: &[Body], body_index: usize) -> (f64, f64) 
 - [ ] Integration: Add body → appears in simulation → physics updates
 - [ ] Manual: Click canvas, place 3-5 bodies, verify orbits
 
----
+-
 
 ## 🚀 Implementation Flow
 
 1. Spec Review → Click handler + coordinate conversion (RED) → Dialog component (GREEN) → State management → Physics updates → Manual testing
 
----
+-
 
 ## ✅ Definition of Done
 
@@ -272,7 +267,7 @@ pub fn calculate_acceleration(bodies: &[Body], body_index: usize) -> (f64, f64) 
 - [ ] DOD-Performance: No lag with 5+ bodies
 - [ ] Manual test: Place objects and verify simulation behavior
 
----
+-
 
 ## 📚 Related Specs
 

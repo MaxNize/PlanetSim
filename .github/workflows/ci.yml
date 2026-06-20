@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install frontend dependencies
+        run: npm --prefix frontend ci
+
+      - name: TypeScript check
+        run: npm --prefix frontend run build
+
+      - name: Frontend lint
+        run: npm --prefix frontend run lint
+
+      - name: Rust tests
+        run: cargo test
+
+      - name: Rust file length gate
+        run: ./scripts/check_rust_line_count.sh
+
+      - name: Rust docs
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc --no-deps

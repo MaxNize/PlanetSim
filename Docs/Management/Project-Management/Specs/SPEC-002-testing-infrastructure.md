@@ -1,15 +1,14 @@
 # SPEC-002: Testing Infrastructure
 
----
+-
 
 ## 📝 User Story
-```
+```text
 As a developer
 I want a robust testing setup with clear patterns
 so that I can verify physics accuracy and UI behavior with confidence
 ```
-
----
+-
 
 ## ✅ Acceptance Criteria
 
@@ -38,24 +37,24 @@ so that I can verify physics accuracy and UI behavior with confidence
 - [ ] AC 5.2: Test naming convention documented (describe "Module", it "should...")
 - [ ] AC 5.3: Physics test assertions use delta tolerance for float comparisons
 
----
+-
 
 ## 🔧 Technical Solution
 
 ### Rust Testing
 - **Framework**: built-in `#[test]` + `#[wasm_bindgen_test]` for WASM
 - **Libraries**:
-  - assert_approx_eq or similar for float comparisons
-  - proptest for property-based testing (physics invariants)
+ - assert_approx_eq or similar for float comparisons
+ - proptest for property-based testing (physics invariants)
 - **File Location**: Colocated with source modules using `#[cfg(test)] mod tests { ... }`
 - **Fixtures**: Defined inline in test modules with helper functions for standard planet configurations
 
 ### TypeScript/React Testing
 - **Runner**: Vitest
 - **Libraries**:
-  - @testing-library/react (component testing)
-  - @testing-library/user-event (user interactions)
-  - vitest/coverage for coverage reports
+ - @testing-library/react (component testing)
+ - @testing-library/user-event (user interactions)
+ - vitest/coverage for coverage reports
 - **File Location**: `Component.test.tsx` (colocated with Component.tsx, no __tests__ folder)
 - **Mock WASM**: Mock `services/wasmBridge.ts` for isolated component tests
 
@@ -67,7 +66,7 @@ so that I can verify physics accuracy and UI behavior with confidence
   3. Coverage: `npm coverage`
   4. Report: Upload coverage to Codecov (optional)
 
----
+-
 
 ## 🧪 Tests
 
@@ -75,13 +74,13 @@ so that I can verify physics accuracy and UI behavior with confidence
 - [ ] Integration: WASM module loads and marshals data correctly
 - [ ] Manual: Developer runs tests locally before committing
 
----
+-
 
 ## 🚀 Implementation Flow
 
 1. Spec Review → Setup test infrastructure → Write test templates → CI integration → Verification
 
----
+-
 
 ## ✅ Definition of Done
 
@@ -89,7 +88,7 @@ so that I can verify physics accuracy and UI behavior with confidence
 - [ ] DOD-Testing: Coverage reports generated, CI passes
 - [ ] All team members can run tests locally with single command
 
----
+-
 
 ## 📚 Related Specs
 
