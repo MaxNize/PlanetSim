@@ -22,7 +22,7 @@ jobs:
         with:
           node-version-file: frontend/.nvmrc
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
@@ -34,11 +34,8 @@ jobs:
         with:
           workspaces: wasm
 
-      - name: Install root dependencies
+      - name: Install dependencies
         run: npm ci
-
-      - name: Install frontend dependencies
-        run: cd frontend && npm ci
 
       - name: Build WASM Target
         run: cd wasm && cargo build --release --target wasm32-unknown-unknown
