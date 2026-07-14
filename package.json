@@ -16,6 +16,7 @@
         "fix": "npm run fix:frontend && npm run fix:md",
         "check:structure": "node scripts/check-structure.js",
         "check:max-lines": "node scripts/check-max-lines.js --exceptions max-lines-exceptions.json",
+        "test": "npm --prefix frontend run test && (cd wasm && cargo test) && ./scripts/check_rust_line_count.sh && npm run check:structure && npm run check:max-lines",
         "commit-lint": "commitlint --edit"
     },
     "devDependencies": {

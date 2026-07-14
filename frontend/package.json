@@ -10,6 +10,9 @@
     "lint:fix": "eslint 'src/**/*.{ts,tsx}' --fix",
     "stylelint:fix": "stylelint 'src/**/*.css' --fix || true",
     "format": "prettier --write 'src/**/*.{ts,tsx,css,md}'",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "fix": "npm run format && npm run lint:fix && npm run stylelint:fix || true"
   },
   "dependencies": {
@@ -17,18 +20,24 @@
     "react-dom": "19.2.6"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.2",
+    "@testing-library/user-event": "14.6.1",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@typescript-eslint/eslint-plugin": "8.59.4",
     "@typescript-eslint/parser": "8.59.4",
     "@vitejs/plugin-react": "6.0.2",
+    "@vitest/coverage-v8": "4.1.9",
     "eslint": "10.4.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-jsdoc": "62.9.0",
+    "jsdom": "29.1.1",
     "prettier": "3.8.3",
     "stylelint": "^17.11.1",
     "stylelint-config-standard": "^40.0.0",
     "typescript": "6.0.3",
-    "vite": "8.0.13"
+    "vite": "8.0.13",
+    "vitest": "4.1.9"
   }
 }
