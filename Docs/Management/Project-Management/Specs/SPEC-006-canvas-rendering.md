@@ -1,15 +1,14 @@
 # SPEC-006: Canvas Rendering System
 
----
+-
 
 ## 📝 User Story
-```
+```text
 As a user
 I want smooth, high-performance visualization of planetary motion
 so that I can intuitively understand orbital mechanics in real time
 ```
-
----
+-
 
 ## ✅ Acceptance Criteria
 
@@ -52,7 +51,7 @@ so that I can intuitively understand orbital mechanics in real time
 - [ ] AC 7.1: ARIA labels for canvas (fallback text description)
 - [ ] AC 7.2: Keyboard shortcuts documented (if pan/zoom via keyboard)
 
----
+-
 
 ## 🔧 Technical Solution
 
@@ -78,10 +77,10 @@ export const Canvas: React.FC<CanvasProps> = ({
 
   useEffect(() => {
     if (!canvasRef.current) return;
-    
+
     const renderer = new CanvasRenderer(canvasRef.current, viewportConfig);
     rendererRef.current = renderer;
-    
+
     renderer.render(simulationState, showTrail ? trailLength : 0);
   }, [simulationState, viewportConfig, showTrail, trailLength]);
 
@@ -94,7 +93,6 @@ export const Canvas: React.FC<CanvasProps> = ({
   );
 };
 ```
-
 ### Renderer Abstraction
 
 **`src/services/CanvasRenderer.ts`**
@@ -126,23 +124,23 @@ export class CanvasRenderer {
 
   render(state: SimulationState, trailLength: number) {
     this.clear();
-    
+
     this.drawBody(state.body1, '#FF6B6B');
     this.drawBody(state.body2, '#4ECDC4');
-    
+
     if (trailLength > 0) {
       this.updateTrail('body1', state.body1.position, trailLength);
       this.updateTrail('body2', state.body2.position, trailLength);
       this.drawTrails();
     }
-    
+
     this.drawOverlay(state);
   }
 
   private drawBody(body: Body, color: string) {
     const { x, y } = this.worldToCanvas(body.position);
     const radius = Math.max(3, body.radius * this.viewport.scale);
-    
+
     this.ctx.fillStyle = color;
     this.ctx.beginPath();
     this.ctx.arc(x, y, radius, 0, Math.PI * 2);
@@ -152,10 +150,10 @@ export class CanvasRenderer {
   private drawTrails() {
     this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
     this.ctx.lineWidth = 1;
-    
+
     for (const trail of this.trails.values()) {
       if (trail.length < 2) continue;
-      
+
       this.ctx.beginPath();
       trail.forEach((point, i) => {
         const canvas = this.worldToCanvas(point);
@@ -187,7 +185,6 @@ export class CanvasRenderer {
   }
 }
 ```
-
 ### Styling
 ```css
 /* Canvas.module.css */
@@ -203,8 +200,7 @@ export class CanvasRenderer {
   cursor: grabbing;
 }
 ```
-
----
+-
 
 ## 🧪 Tests
 
@@ -213,13 +209,13 @@ export class CanvasRenderer {
 - [ ] Performance: 1000-point trail renders without frame drops
 - [ ] Manual: Visualize simulation, verify body positions and trails
 
----
+-
 
 ## 🚀 Implementation Flow
 
 1. Spec Review → Basic circle rendering (RED) → Coordinate mapping (GREEN) → Trails → Performance optimization → Manual visual verification
 
----
+-
 
 ## ✅ Definition of Done
 
@@ -228,7 +224,7 @@ export class CanvasRenderer {
 - [ ] DOD-Visual: Bodies and trails render correctly
 - [ ] No canvas-related console warnings
 
----
+-
 
 ## 📚 Related Specs
 
