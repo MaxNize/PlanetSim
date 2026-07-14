@@ -1,3 +1,11 @@
+## [1.0.1](https://github.com/MaxNize/fortgeschrittene-programmierung/compare/v1.0.0...v1.0.1) (2026-07-14)
+
+
+### Bug Fixes
+
+* **deploy:** fixed app port ([428ba16](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/428ba1639b804ebbe305ed7424ec657b0f31b5b6))
+* **deploy:** fixed app port ([#8](https://github.com/MaxNize/fortgeschrittene-programmierung/issues/8)) ([0750400](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/07504009bf1022136d02f42de3c14d1f36eaf8cb))
+
 # 1.0.0 (2026-07-14)
 
 
