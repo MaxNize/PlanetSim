@@ -8,7 +8,19 @@ import { calculateOrbitalVelocity } from '../utils/calculateOrbitalVelocity';
  */
 export function SimulationShell() {
   const { massM1, distanceR, setMassM1, setDistanceR } = useSimulationControls();
-  const orbitalVelocity = calculateOrbitalVelocity(massM1, distanceR);
+
+  let orbitalVelocity = 0;
+  let errorMessage: string | null = null;
+
+  try {
+    orbitalVelocity = calculateOrbitalVelocity(massM1, distanceR);
+  } catch (error) {
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else {
+      errorMessage = 'An unknown error occurred';
+    }
+  }
 
   return (
     <section>
@@ -16,7 +28,13 @@ export function SimulationShell() {
       <p>
         Welcome — run <code>npm run dev</code> to start.
       </p>
-      <p>Example orbital velocity: {orbitalVelocity.toFixed(2)} m/s</p>
+      {errorMessage ? (
+        <p aria-label="error-message" style={{ color: 'red' }}>
+          Error: {errorMessage}
+        </p>
+      ) : (
+        <p>Example orbital velocity: {orbitalVelocity.toFixed(2)} m/s</p>
+      )}
       <label>
         Mass 1
         <input aria-label="Mass 1" type="number" value={massM1} onChange={(event) => setMassM1(Number(event.target.value))} />
