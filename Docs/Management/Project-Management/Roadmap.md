@@ -16,7 +16,7 @@ real-time  physics simulation.
 | -------- | -------------------------- | ------------------ | ------ | --------------------------------------------- |
 | SPEC-001 | Project Setup & Guardrails | None               | ✅ Done | Monorepo structure, config files, conventions |
 | SPEC-002 | Testing Infrastructure     | SPEC-001           | ✅ Done | Vitest, cargo test, CI integration            |
-| SPEC-011 | CI/CD Pipeline             | SPEC-001, SPEC-002 | 📋 Todo | GitHub Actions, status checks                 |
+| SPEC-011 | CI/CD Pipeline             | SPEC-001, SPEC-002 | ✅ Done | GitHub Actions, status checks                 |
 
 **Deliverable**: Developers can `make dev` and start coding immediately
 
