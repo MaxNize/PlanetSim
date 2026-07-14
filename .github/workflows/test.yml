@@ -1,0 +1,105 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-and-format:
+    name: Lint & Format Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install frontend dependencies
+        run: cd frontend && npm ci
+
+      - name: Run ESLint
+        run: npm --prefix frontend run lint
+
+      - name: Run Prettier check
+        run: cd frontend && npx prettier --check 'src/**/*.{ts,tsx,css}'
+
+      - name: Run Stylelint
+        run: cd frontend && npx stylelint 'src/**/*.css' || true
+
+      - name: Run Markdownlint
+        run: npm run lint:md
+
+      - name: Run Max-lines check
+        run: node scripts/check-max-lines.js --exceptions max-lines-exceptions.json
+
+  typescript-tests:
+    name: TypeScript Tests & Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: cd frontend && npm ci
+
+      - name: Run TypeScript check
+        run: cd frontend && npx tsc --noEmit
+
+      - name: Run tests with coverage
+        run: cd frontend && npm run test:coverage
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage/
+          if-no-files-found: error
+
+  rust-tests:
+    name: Rust Physics Engine Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: wasm
+
+      - name: Run Cargo Clippy
+        run: cd wasm && cargo clippy --all-targets -- -D warnings
+
+      - name: Run Cargo tests
+        run: cd wasm && cargo test
+
+      - name: Run doctests
+        run: cd wasm && cargo test --doc
+
+      - name: Build Cargo docs
+        run: cd wasm && RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
+
+      - name: Check Rust line count
+        run: ./scripts/check_rust_line_count.sh
