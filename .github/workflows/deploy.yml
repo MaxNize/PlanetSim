@@ -63,6 +63,7 @@ jobs:
       - name: Deploy Application
         env:
           NPM_NETWORK_NAME: ${{ secrets.NPM_NETWORK_NAME }}
+          APP_PORT: ${{ secrets.APP_PORT }}
         run: |
           echo "Building and starting Docker container..."
           docker compose down
