@@ -1,15 +1,14 @@
 # SPEC-004: WASM Integration & JS Bridge
 
----
+-
 
 ## 📝 User Story
-```
+```text
 As a frontend developer
 I want seamless communication between Rust physics and JavaScript UI
 so that I can build reactive components without worrying about FFI complexity
 ```
-
----
+-
 
 ## ✅ Acceptance Criteria
 
@@ -44,7 +43,7 @@ so that I can build reactive components without worrying about FFI complexity
 - [ ] AC 6.2: 10 steps produce consistent state progression
 - [ ] AC 6.3: Trajectory history maintained correctly
 
----
+-
 
 ## 🔧 Technical Solution
 
@@ -80,22 +79,21 @@ impl Simulator {
     }
 }
 ```
-
 ### JavaScript Service Layer
 
 **`src/services/wasmBridge.ts`**
 ```typescript
 export class SimulatorBridge {
   private simulator: any;  // WASM Simulator instance
-  
+
   constructor(config: PhysicsConfig) {
     this.simulator = new Simulator(JSON.stringify(config));
   }
-  
+
   step(dt: number): SimulationState {
     return this.simulator.step(dt);
   }
-  
+
   getState(): SimulationState {
     return this.simulator.get_state();
   }
@@ -108,7 +106,6 @@ export interface SimulationState {
   energy: { kinetic: number; potential: number };
 }
 ```
-
 ### Cargo.toml Dependencies
 ```toml
 [dependencies]
@@ -119,7 +116,6 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde-wasm-bindgen = "0.4"
 ```
-
 ### Build Configuration
 
 **`Cargo.toml` (lib section)**
@@ -127,7 +123,6 @@ serde-wasm-bindgen = "0.4"
 [lib]
 crate-type = ["cdylib"]
 ```
-
 **`vite.config.ts`** (WASM plugin)
 ```typescript
 import { defineConfig } from 'vite';
@@ -138,8 +133,7 @@ export default defineConfig({
   // ...
 });
 ```
-
----
+-
 
 ## 🧪 Tests
 
@@ -148,13 +142,13 @@ export default defineConfig({
 - [ ] Manual: Open DevTools, inspect WASM module memory
 - [ ] Performance: Measure JS ↔ Rust crossing time
 
----
+-
 
 ## 🚀 Implementation Flow
 
 1. Spec Review → WASM binding scaffolding (RED) → Data marshalling (GREEN) → Integration tests → Performance profiling
 
----
+-
 
 ## ✅ Definition of Done
 
@@ -163,7 +157,7 @@ export default defineConfig({
 - [ ] DOD-Perf: Crossing overhead < 5% of step time
 - [ ] Integration test passes in CI
 
----
+-
 
 ## 📚 Related Specs
 

@@ -1,6 +1,24 @@
+# Planet Simulation — Project (Monorepo)
+
+High-performance browser-based physics sandbox (Rust/WASM + React/TypeScript).
+
+Quick start
+
+1. Install Node (use .nvmrc): `nvm install`
+2. Run setup: `make setup`
+3. Start dev: `make dev`
+
+Structure
+
+- frontend/ — Vite + React + TypeScript
+- wasm/ — Rust library compiled to WASM (wasm-bindgen)
+- Docs/ — project docs and specs
+
+See Docs/Management/Project-Management/Specs/SPEC-001-project-setup-guardrails.md for conventions and guardrails.
 # Planet Simulation – Advanced Programming
 
-A high-performance 2D planet simulation web application for learning gravitational physics. Built with **Rust** for the physics engine (compiled to WebAssembly) and **React/TypeScript** for the interactive web interface.
+A high-performance 2D planet simulation web application for learning gravitational physics. Built with **Rust** for the physics engine (compiled to WebAssembly) and **React/TypeScript** for the
+interactive  web interface.
 
 ## The Problem
 
@@ -46,6 +64,6 @@ This project demonstrates:
 - **Physics simulation** (gravitational mechanics, numerical methods)
 - **Performance optimization** techniques for computational workloads
 
----
+-
 
 **Exam project for Advanced Programming Module** | Team: Gemmingen, Müller, Tsigaropoulos

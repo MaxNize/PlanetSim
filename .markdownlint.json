@@ -1,0 +1,41 @@
+{
+    "extends": "markdownlint/style/prettier",
+    "default": true,
+    "MD013": {
+        "line_length": 200,
+        "code_blocks": false,
+        "code_lines": false,
+        "headers": false
+    },
+    "MD025": false,
+    "MD024": false,
+    "MD033": false,
+    "no-trailing-spaces": true,
+    "heading-increment": true,
+    "heading-style": "consistent",
+    "ul-style": {
+        "style": "consistent"
+    },
+    "no-bare-urls": true,
+    "no-multiple-blanks": {
+        "maximum": 1
+    },
+    "list-marker-space": {
+        "ol-single": {
+            "open": 1,
+            "close": 1
+        },
+        "ol-multi": {
+            "open": 1,
+            "close": 1
+        },
+        "ul-single": {
+            "open": 1,
+            "close": 1
+        },
+        "ul-multi": {
+            "open": 1,
+            "close": 1
+        }
+    }
+}

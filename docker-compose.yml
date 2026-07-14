@@ -1,0 +1,16 @@
+services:
+  planet-simulation:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: planet-simulation
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    networks:
+      - npm_network
+
+networks:
+  npm_network:
+    name: ${NPM_NETWORK_NAME:-bridge}
+    external: true

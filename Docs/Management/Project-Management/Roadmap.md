@@ -2,24 +2,25 @@
 
 ## 🎯 Project Vision
 
-A high-performance, interactive 2-body orbital mechanics simulator for students and physics enthusiasts. Built with Rust/WASM + React to demonstrate systems programming, web technologies, and real-time physics simulation.
+A high-performance, interactive 2-body orbital mechanics simulator for students and physics enthusiasts. Built with Rust/WASM + React to demonstrate systems programming, web technologies, and
+real-time  physics simulation.
 
----
+-
 
 ## 📅 Implementation Roadmap
 
 ### Phase 1: Foundation & Setup (Weeks 1-2)
 **Goal**: Establish project infrastructure and development workflow
 
-| Spec     | Title                      | Dependencies       | Status | Notes                                           |
-| -------- | -------------------------- | ------------------ | ------ | ----------------------------------------------- |
-| SPEC-001 | Project Setup & Guardrails | None               | 📋 Todo | Monorepo structure, config files, conventions   |
-| SPEC-002 | Testing Infrastructure     | SPEC-001           | 📋 Todo | Vitest, cargo test, CI integration              |
-| SPEC-011 | CI/CD Pipeline             | SPEC-001, SPEC-002 | 📋 Todo | GitHub Actions, pre-commit hooks, status checks |
+| Spec     | Title                      | Dependencies       | Status | Notes                                         |
+| -------- | -------------------------- | ------------------ | ------ | --------------------------------------------- |
+| SPEC-001 | Project Setup & Guardrails | None               | ✅ Done | Monorepo structure, config files, conventions |
+| SPEC-002 | Testing Infrastructure     | SPEC-001           | ✅ Done | Vitest, cargo test, CI integration            |
+| SPEC-011 | CI/CD Pipeline             | SPEC-001, SPEC-002 | ✅ Done | GitHub Actions, status checks                 |
 
 **Deliverable**: Developers can `make dev` and start coding immediately
 
----
+-
 
 ### Phase 2: Physics Engine Core (Weeks 3-4)
 **Goal**: Implement accurate gravitational calculations
@@ -31,7 +32,7 @@ A high-performance, interactive 2-body orbital mechanics simulator for students 
 
 **Deliverable**: `npm run dev` → Browser opens with WASM module loaded
 
----
+-
 
 ### Phase 3: UI Foundation (Weeks 5-6)
 **Goal**: Build React component architecture and basic visualization
@@ -43,7 +44,7 @@ A high-performance, interactive 2-body orbital mechanics simulator for students 
 
 **Deliverable**: Two bodies orbit each other smoothly on canvas
 
----
+-
 
 ### Phase 4: Core Features (Weeks 7-8)
 **Goal**: Add interactivity and learner controls
@@ -55,7 +56,7 @@ A high-performance, interactive 2-body orbital mechanics simulator for students 
 
 **Deliverable**: Students can adjust parameters and see orbit changes in real time
 
----
+-
 
 ### Phase 5: Advanced Features (Weeks 9-10)
 **Goal**: Sandbox mode for creative exploration
@@ -67,7 +68,7 @@ A high-performance, interactive 2-body orbital mechanics simulator for students 
 
 **Deliverable**: Users can create custom multi-body configurations and experiment
 
----
+-
 
 ### Phase 6: Documentation & DevOps (Weeks 11-12)
 **Goal**: Make project production-ready and maintainable
@@ -80,11 +81,11 @@ A high-performance, interactive 2-body orbital mechanics simulator for students 
 
 **Deliverable**: App live at `planet-sim.example.com`, docs complete, contributions welcome
 
----
+-
 
 ## 🔄 Dependency Graph
 
-```
+```text
 ┌─────────────────────────────────────┐
 │    SPEC-001: Project Setup          │
 │    SPEC-011: CI/CD (parallel)       │
@@ -99,22 +100,21 @@ A high-performance, interactive 2-body orbital mechanics simulator for students 
              │             │   │   ├──→ SPEC-008: Trajectory
              │             │   │   │   ├──→ SPEC-009: Sandbox Placement
              │             │   │   │   └──→ SPEC-010: Object Manipulation
-             │             │   │   
+             │             │   │
              └──────→ SPEC-012: Deployment
                      └──→ SPEC-013: API Docs
                      └──→ SPEC-014: Developer Guide
 ```
-
----
+-
 
 ## 📊 Parallel Work Opportunities
 
-### Can be done in parallel:
+### Can be done in parallel
 - **Phase 1**: SPEC-001, SPEC-002, SPEC-011 (all independent)
 - **Phase 3 & 4**: SPEC-007 + SPEC-008 (both use SPEC-006)
 - **Phase 6**: All documentation specs can be drafted while Phase 5 is in progress
 
-### Recommended sequential order:
+### Recommended sequential order
 1. SPEC-001 → foundation ready
 2. SPEC-002 + SPEC-011 in parallel → testing infrastructure ready
 3. SPEC-003 → physics engine done
@@ -127,7 +127,7 @@ A high-performance, interactive 2-body orbital mechanics simulator for students 
 10. SPEC-012 → deploy to production
 11. SPEC-013 + SPEC-014 in parallel → documentation complete
 
----
+-
 
 ## 🎯 Milestone Summary
 
@@ -140,7 +140,7 @@ A high-performance, interactive 2-body orbital mechanics simulator for students 
 | **Sandbox Mode**     | 009, 010      | 10   | Multi-body sandbox for experimentation    |
 | **Production Ready** | 012, 013, 014 | 12   | Deployed, documented, maintainable        |
 
----
+-
 
 ## 🚀 Post-MVP Enhancements (Future)
 
@@ -159,7 +159,7 @@ A high-performance, interactive 2-body orbital mechanics simulator for students 
 - **Real observatories**: Live ephemeris data integration
 - **Multi-player**: Collaborative simulations
 
----
+-
 
 ## 📝 Notes
 
@@ -168,7 +168,7 @@ A high-performance, interactive 2-body orbital mechanics simulator for students 
 - **Learning Focus**: Prioritize clear code and documentation over features
 - **Quality First**: All features must meet physics DoD before shipping
 
----
+-
 
 ## 🔗 Links
 

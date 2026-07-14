@@ -1,15 +1,14 @@
 # SPEC-005: React Component Architecture
 
----
+-
 
 ## 📝 User Story
-```
+```text
 As a UI developer
 I want well-organized, reusable React components
 so that I can build features quickly and maintain them with confidence
 ```
-
----
+-
 
 ## ✅ Acceptance Criteria
 
@@ -45,12 +44,12 @@ so that I can build features quickly and maintain them with confidence
 - [ ] AC 6.2: Props are validated; invalid props cause test failures
 - [ ] AC 6.3: User interactions trigger expected state updates
 
----
+-
 
 ## 🔧 Technical Solution
 
 ### Directory Structure
-```
+```text
 src/
   components/
     Simulator/
@@ -79,7 +78,6 @@ src/
   types/
     index.ts                # Component interfaces
 ```
-
 ### Example: `hooks/useSimulation.ts`
 ```typescript
 export function useSimulation(config: PhysicsConfig) {
@@ -98,7 +96,6 @@ export function useSimulation(config: PhysicsConfig) {
   return { simulator, error };
 }
 ```
-
 ### Example: `context/SimulationContext.tsx`
 ```typescript
 export interface SimulationContextType {
@@ -121,7 +118,6 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   );
 };
 ```
-
 ### ESLint Config for React
 ```js
 // eslint.config.js
@@ -139,8 +135,7 @@ export default [
   },
 ];
 ```
-
----
+-
 
 ## 🧪 Tests
 
@@ -149,13 +144,13 @@ export default [
 - [ ] Hooks: useSimulation initializes and handles errors
 - [ ] Manual: UI components display without console errors
 
----
+-
 
 ## 🚀 Implementation Flow
 
 1. Spec Review → Components skeleton (RED) → Context setup → Hooks implementation → Tests → Manual render verification
 
----
+-
 
 ## ✅ Definition of Done
 
@@ -164,7 +159,7 @@ export default [
 - [ ] DOD-Hooks: Custom hooks follow React rules-of-hooks
 - [ ] All components have passing tests
 
----
+-
 
 ## 📚 Related Specs
 
