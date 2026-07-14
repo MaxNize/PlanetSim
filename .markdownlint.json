@@ -8,6 +8,7 @@
         "headers": false
     },
     "MD025": false,
+    "MD060": false,
     "MD024": false,
     "MD033": false,
     "no-trailing-spaces": true,
