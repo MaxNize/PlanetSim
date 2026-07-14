@@ -27,9 +27,12 @@
         "@semantic-release/git": "10.0.1",
         "@semantic-release/github": "12.0.8",
         "@semantic-release/release-notes-generator": "14.1.1",
-        "minimatch": "10.0.1",
-        "glob": "11.0.0",
-        "markdownlint-cli2": "0.13.0",
+        "minimatch": "10.2.5",
+        "glob": "11.1.0",
+        "markdownlint-cli2": "0.23.0",
         "semantic-release": "25.0.3"
+    },
+    "overrides": {
+        "npm": "11.18.0"
     }
 }
