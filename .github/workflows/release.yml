@@ -1,0 +1,39 @@
+name: Release (semantic)
+
+on:
+  workflow_run:
+    workflows: [CI Pipeline]
+    types: [completed]
+    branches:
+      - main
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Run semantic-release
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release --no-ci
