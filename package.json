@@ -1,38 +1,42 @@
 {
-    "name": "fortgeschrittene-programmierung",
-    "private": true,
-    "workspaces": [
-        "frontend",
-        "wasm"
-    ],
-    "scripts": {
-        "setup": "npm --prefix frontend install",
-        "build": "npm --prefix frontend run build && (cd wasm && cargo build --release)",
-        "dev": "npm --prefix frontend run dev",
-        "lint": "npm --prefix frontend run lint && (cd wasm && cargo clippy --all-targets -- -D warnings) && npm run lint:md",
-        "lint:md": "markdownlint-cli2 'Docs/**/*.md' 'README.md' 'CONTRIBUTING.md'",
-        "fix:md": "markdownlint-cli2 --fix 'Docs/**/*.md' 'README.md' 'CONTRIBUTING.md' || true",
-        "fix:frontend": "npm --prefix frontend run fix || true",
-        "fix": "npm run fix:frontend && npm run fix:md",
-        "check:structure": "node scripts/check-structure.js",
-        "check:max-lines": "node scripts/check-max-lines.js --exceptions max-lines-exceptions.json",
-        "test": "npm --prefix frontend run test && (cd wasm && cargo test) && ./scripts/check_rust_line_count.sh && npm run check:structure && npm run check:max-lines",
-        "commit-lint": "commitlint --edit"
-    },
-    "devDependencies": {
-        "@commitlint/cli": "19.3.0",
-        "@commitlint/config-conventional": "19.2.2",
-        "@semantic-release/changelog": "6.0.3",
-        "@semantic-release/commit-analyzer": "13.0.1",
-        "@semantic-release/git": "10.0.1",
-        "@semantic-release/github": "12.0.8",
-        "@semantic-release/release-notes-generator": "14.1.1",
-        "minimatch": "10.2.5",
-        "glob": "11.1.0",
-        "markdownlint-cli2": "0.23.0",
-        "semantic-release": "25.0.3"
-    },
-    "overrides": {
-        "npm": "11.18.0"
-    }
+  "name": "fortgeschrittene-programmierung",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "wasm"
+  ],
+  "scripts": {
+    "setup": "npm --prefix frontend install",
+    "build": "npm --prefix frontend run build && (cd wasm && cargo build --release)",
+    "dev": "npm --prefix frontend run dev",
+    "lint": "npm --prefix frontend run lint && (cd wasm && cargo clippy --all-targets -- -D warnings) && npm run lint:md",
+    "lint:md": "markdownlint-cli2 'Docs/**/*.md' 'README.md' 'CONTRIBUTING.md'",
+    "fix:md": "markdownlint-cli2 --fix 'Docs/**/*.md' 'README.md' 'CONTRIBUTING.md' || true",
+    "fix:frontend": "npm --prefix frontend run fix || true",
+    "fix": "npm run fix:frontend && npm run fix:md",
+    "check:structure": "node scripts/check-structure.js",
+    "check:max-lines": "node scripts/check-max-lines.js --exceptions max-lines-exceptions.json",
+    "check:fallow": "fallow audit --base main --fail-on-issues",
+    "check:rust-udeps": "cd wasm && cargo +nightly udeps --all-targets --all-features",
+    "check:quality": "npm run check:fallow && npm run check:rust-udeps",
+    "test": "npm --prefix frontend run test && (cd wasm && cargo test) && ./scripts/check_rust_line_count.sh && npm run check:structure && npm run check:max-lines",
+    "commit-lint": "commitlint --edit"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "19.3.0",
+    "@commitlint/config-conventional": "19.2.2",
+    "@semantic-release/changelog": "6.0.3",
+    "@semantic-release/commit-analyzer": "13.0.1",
+    "@semantic-release/git": "10.0.1",
+    "@semantic-release/github": "12.0.8",
+    "@semantic-release/release-notes-generator": "14.1.1",
+    "minimatch": "10.2.5",
+    "glob": "11.1.0",
+    "markdownlint-cli2": "0.23.0",
+    "semantic-release": "25.0.3",
+    "fallow": "latest"
+  },
+  "overrides": {
+    "npm": "11.18.0"
+  }
 }
