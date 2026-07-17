@@ -39,7 +39,7 @@ real-time  physics simulation.
 
 | Spec     | Title                        | Dependencies       | Status | Notes                                           |
 | -------- | ---------------------------- | ------------------ | ------ | ----------------------------------------------- |
-| SPEC-005 | React Component Architecture | SPEC-001, SPEC-004 | 📋 Todo | Context API, hooks, component structure         |
+| SPEC-005 | React Component Architecture | SPEC-001, SPEC-004 | ✅ Done | Context API, hooks, component structure         |
 | SPEC-006 | Canvas Rendering System      | SPEC-004, SPEC-005 | 📋 Todo | 2D canvas, coordinate transforms, 60 FPS target |
 
 **Deliverable**: Two bodies orbit each other smoothly on canvas
