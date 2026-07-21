@@ -1,4 +1,4 @@
-.PHONY: setup dev build lint format test check-structure check-max-lines
+.PHONY: setup dev build lint format test check-structure check-max-lines check-quality
 
 NODE_VERSION := $(shell cat .nvmrc 2>/dev/null || echo "18")
 
@@ -54,3 +54,7 @@ check-structure:
 check-max-lines:
 	@echo "Checking max-lines compliance..."
 	node scripts/check-max-lines.js --exceptions max-lines-exceptions.json
+
+check-quality:
+	@echo "Running code quality scans..."
+	npm run check:quality

@@ -10,7 +10,9 @@ This guide defines the standard for new contributions: clean workflow, clear com
 2. Apply small, focused changes.
 3. Test and lint locally:
  - **Rust/WASM**: Run `cargo fmt` and `cargo clippy` in the physics engine directory
- - **React/TypeScript**: Run `npm run lint` in the frontend directory
+ - **Rust/WASM**: Run `cargo fmt`, `cargo clippy`, and `cargo +nightly udeps` in the physics engine directory
+ - **React/TypeScript**: Run `npm run lint` and `npm run check:fallow` from the repository root
+ - **Full quality gate**: Run `npm run check:quality` from the repository root when you want both scans together
 4. Write commit messages in Conventional Commit format.
 5. Open pull request and complete CI successfully.
 
