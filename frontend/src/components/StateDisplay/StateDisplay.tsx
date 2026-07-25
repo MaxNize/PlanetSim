@@ -1,6 +1,31 @@
 import React from 'react';
 import { StateDisplayProps } from '../../types';
 
+interface BodyDisplayProps {
+  name: string;
+  position: [number, number];
+  velocity: [number, number];
+}
+
+/**
+ * Presentational component to display name, position, and velocity for a celestial body.
+ */
+function BodyDisplay({ name, position, velocity }: BodyDisplayProps) {
+  return (
+    <div>
+      <strong>{name}:</strong>
+      <div style={{ paddingLeft: '12px' }}>
+        Pos: [{position[0].toExponential(3)}, {position[1].toExponential(3)}] m<br />
+        Vel: [{velocity[0].toFixed(2)}, {velocity[1].toFixed(2)}] m/s
+      </div>
+    </div>
+  );
+}
+
+function formatEnergy(value: number | undefined): string {
+  return value !== undefined ? value.toExponential(4) : 'N/A';
+}
+
 /**
  * Presentational component to display coordinates, velocities, energies, and error states.
  */
@@ -20,38 +45,18 @@ export function StateDisplay({ time, primaryPos, primaryVel, secondaryPos, secon
 
         <hr style={{ border: 'none', borderTop: '1px solid #eee' }} />
 
-        <div>
-          <strong>Primary Body (M1):</strong>
-          <div style={{ paddingLeft: '12px' }}>
-            Pos: [{primaryPos[0].toExponential(3)}, {primaryPos[1].toExponential(3)}] m<br />
-            Vel: [{primaryVel[0].toFixed(2)}, {primaryVel[1].toFixed(2)}] m/s
-          </div>
-        </div>
-
-        <div>
-          <strong>Secondary Body (M2):</strong>
-          <div style={{ paddingLeft: '12px' }}>
-            Pos: [{secondaryPos[0].toExponential(3)}, {secondaryPos[1].toExponential(3)}] m<br />
-            Vel: [{secondaryVel[0].toFixed(2)}, {secondaryVel[1].toFixed(2)}] m/s
-          </div>
-        </div>
-
-        <div>
-          <strong>Test Particle:</strong>
-          <div style={{ paddingLeft: '12px' }}>
-            Pos: [{testParticlePos[0].toExponential(3)}, {testParticlePos[1].toExponential(3)}] m<br />
-            Vel: [{testParticleVel[0].toFixed(2)}, {testParticleVel[1].toFixed(2)}] m/s
-          </div>
-        </div>
+        <BodyDisplay name="Primary Body (M1)" position={primaryPos} velocity={primaryVel} />
+        <BodyDisplay name="Secondary Body (M2)" position={secondaryPos} velocity={secondaryVel} />
+        <BodyDisplay name="Test Particle" position={testParticlePos} velocity={testParticleVel} />
 
         <hr style={{ border: 'none', borderTop: '1px solid #eee' }} />
 
         <div>
           <strong>Energies:</strong>
           <div style={{ paddingLeft: '12px' }}>
-            Kinetic: {kineticEnergy !== undefined ? kineticEnergy.toExponential(4) : 'N/A'} J<br />
-            Potential: {potentialEnergy !== undefined ? potentialEnergy.toExponential(4) : 'N/A'} J<br />
-            Total: {totalEnergy !== undefined ? totalEnergy.toExponential(4) : 'N/A'} J
+            Kinetic: {formatEnergy(kineticEnergy)} J<br />
+            Potential: {formatEnergy(potentialEnergy)} J<br />
+            Total: {formatEnergy(totalEnergy)} J
           </div>
         </div>
       </div>

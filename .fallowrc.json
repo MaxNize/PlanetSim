@@ -7,7 +7,14 @@
     "**/*.spec.*",
     "**/node_modules/**",
     "**/dist/**",
-    "**/build/**"
+    "**/build/**",
+    "Docs/Wireframe/**"
+  ],
+  "ignoreDependencies": [
+    "eslint-config-prettier",
+    "vite-plugin-top-level-await",
+    "glob",
+    "minimatch"
   ],
   "rules": {
     "unused-files": "error",
