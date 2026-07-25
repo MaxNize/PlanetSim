@@ -34,7 +34,7 @@ describe('Simulator container component', () => {
     render(
       <simulationContext.Provider value={mockContextValue}>
         <Simulator />
-      </simulationContext.Provider>
+      </simulationContext.Provider>,
     );
 
     // Assert container renders headings from presentational children

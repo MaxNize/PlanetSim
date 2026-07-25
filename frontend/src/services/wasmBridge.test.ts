@@ -78,7 +78,7 @@ describe('SimulatorBridge integration tests', () => {
     // D = 3.844e8. D/2 = 1.922e8. D * sqrt(3)/2 ≈ 3.329e8.
     const D = 3.844e8;
     const expectedX = D / 2;
-    const expectedY = D * Math.sqrt(3) / 2;
+    const expectedY = (D * Math.sqrt(3)) / 2;
 
     expect(points.l4[0]).toBeCloseTo(expectedX, -4); // compare within tolerance
     expect(points.l4[1]).toBeCloseTo(expectedY, -4);

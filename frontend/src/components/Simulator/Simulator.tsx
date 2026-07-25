@@ -7,62 +7,59 @@ import { StateDisplay } from '../StateDisplay/StateDisplay';
  * Container component that connects the global simulation context to presentational children.
  */
 export function Simulator() {
-  const {
-    initialState,
-    setInitialState,
-    currentState,
-    stepResult,
-    isPaused,
-    setIsPaused,
-    speedMultiplier,
-    setSpeedMultiplier,
-    lagrangePoints,
-    resetSimulation,
-    error,
-  } = useSimulationContext();
+  const { initialState, setInitialState, currentState, stepResult, isPaused, setIsPaused, speedMultiplier, setSpeedMultiplier, lagrangePoints, resetSimulation, error } = useSimulationContext();
 
-  const setMassM1 = useCallback((m: number) => {
-    setInitialState({
-      ...initialState,
-      primary: { ...initialState.primary, mass: m },
-    });
-  }, [initialState, setInitialState]);
+  const setMassM1 = useCallback(
+    (m: number) => {
+      setInitialState({
+        ...initialState,
+        primary: { ...initialState.primary, mass: m },
+      });
+    },
+    [initialState, setInitialState],
+  );
 
-  const setMassM2 = useCallback((m: number) => {
-    setInitialState({
-      ...initialState,
-      secondary: { ...initialState.secondary, mass: m },
-    });
-  }, [initialState, setInitialState]);
+  const setMassM2 = useCallback(
+    (m: number) => {
+      setInitialState({
+        ...initialState,
+        secondary: { ...initialState.secondary, mass: m },
+      });
+    },
+    [initialState, setInitialState],
+  );
 
-  const setDistanceR = useCallback((d: number) => {
-    // When distanceR changes, update secondary body position x coordinate
-    setInitialState({
-      ...initialState,
-      secondary: { ...initialState.secondary, position: [d, 0.0] },
-      testParticle: { ...initialState.testParticle, position: [d * 0.78, 0.0] }, // shift test particle position proportionally
-    });
-  }, [initialState, setInitialState]);
+  const setDistanceR = useCallback(
+    (d: number) => {
+      // When distanceR changes, update secondary body position x coordinate
+      setInitialState({
+        ...initialState,
+        secondary: { ...initialState.secondary, position: [d, 0.0] },
+        testParticle: { ...initialState.testParticle, position: [d * 0.78, 0.0] }, // shift test particle position proportionally
+      });
+    },
+    [initialState, setInitialState],
+  );
 
   return (
     <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
       {/* Simulation Area */}
       <div style={{ flex: '1 1 500px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <div 
+        <div
           aria-label="Simulation Canvas Placeholder"
-          style={{ 
-            height: '400px', 
-            background: '#1e1e1e', 
-            borderRadius: '8px', 
-            display: 'flex', 
-            justifyContent: 'center', 
+          style={{
+            height: '400px',
+            background: '#1e1e1e',
+            borderRadius: '8px',
+            display: 'flex',
+            justifyContent: 'center',
             alignItems: 'center',
-            color: '#888'
+            color: '#888',
           }}
         >
           [Canvas Rendering Area Placeholder (SPEC-006)]
         </div>
-        
+
         {/* Simple inline legend */}
         <div style={{ display: 'flex', justifyContent: 'space-around', fontSize: '14px', color: '#555' }}>
           <span>🟡 M1 (Primary)</span>

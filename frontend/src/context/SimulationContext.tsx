@@ -12,18 +12,18 @@ export const DEFAULT_INITIAL_STATE: SimulationState = {
     position: [0.0, 0.0],
     velocity: [0.0, 0.0],
     mass: 5.9722e24, // Earth mass in kg
-    radius: 6.371e6,  // Earth radius in meters
+    radius: 6.371e6, // Earth radius in meters
   },
   secondary: {
     position: [3.844e8, 0.0], // Earth-Moon distance in meters
     velocity: [0.0, 1022.0], // Moon orbital speed in m/s
     mass: 7.3477e22, // Moon mass in kg
-    radius: 1.737e6,  // Moon radius in meters
+    radius: 1.737e6, // Moon radius in meters
   },
   testParticle: {
     position: [3.0e8, 0.0], // Test particle position between Earth and Moon
-    velocity: [0.0, 800.0],  // Test particle initial velocity
-    mass: 1.0,               // Negligible mass
+    velocity: [0.0, 800.0], // Test particle initial velocity
+    mass: 1.0, // Negligible mass
     radius: 1.0,
   },
   time: 0.0,
@@ -83,25 +83,23 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
   }, [simulator, initialState]);
 
   // Handle updates after each simulation step
-  const handleStep = useCallback((result: StepResult) => {
-    setCurrentState(result.newState);
-    setHistory((prev) => [...prev, result.newState.testParticle.position]);
-    if (simulator) {
-      try {
-        setLagrangePoints(simulator.getLagrangePoints());
-      } catch (err) {
-        console.error('Failed to compute Lagrange points during step:', err);
+  const handleStep = useCallback(
+    (result: StepResult) => {
+      setCurrentState(result.newState);
+      setHistory((prev) => [...prev, result.newState.testParticle.position]);
+      if (simulator) {
+        try {
+          setLagrangePoints(simulator.getLagrangePoints());
+        } catch (err) {
+          console.error('Failed to compute Lagrange points during step:', err);
+        }
       }
-    }
-  }, [simulator]);
+    },
+    [simulator],
+  );
 
   // Run simulation stepping loop
-  const { stepResult, setStepResult } = useSimulationStep(
-    simulator,
-    isPaused,
-    speedMultiplier,
-    handleStep
-  );
+  const { stepResult, setStepResult } = useSimulationStep(simulator, isPaused, speedMultiplier, handleStep);
 
   const clearHistory = useCallback(() => {
     setHistory([]);

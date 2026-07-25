@@ -3,8 +3,8 @@ import { Simulator } from 'planet-sim-wasm';
 export interface Body {
   position: [number, number]; // (x, y) in meters
   velocity: [number, number]; // (vx, vy) in m/s
-  mass: number;               // kg
-  radius: number;             // meters
+  mass: number; // kg
+  radius: number; // meters
 }
 
 export interface SimulationState {

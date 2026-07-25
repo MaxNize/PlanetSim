@@ -17,7 +17,7 @@
     "fix": "npm run fix:frontend && npm run fix:md",
     "check:structure": "node scripts/check-structure.js",
     "check:max-lines": "node scripts/check-max-lines.js --exceptions max-lines-exceptions.json",
-    "check:fallow": "fallow audit --base main --fail-on-issues",
+    "check:fallow": "fallow audit --base origin/main --fail-on-issues",
     "check:rust-udeps": "cd wasm && cargo +nightly udeps --all-targets --all-features",
     "check:quality": "npm run check:fallow && npm run check:rust-udeps",
     "test": "npm --prefix frontend run test && (cd wasm && cargo test) && ./scripts/check_rust_line_count.sh && npm run check:structure && npm run check:max-lines",
