@@ -1,3 +1,11 @@
+## [1.0.2](https://github.com/MaxNize/fortgeschrittene-programmierung/compare/v1.0.1...v1.0.2) (2026-07-25)
+
+
+### Bug Fixes
+
+* **ci:** fix ci problems ([1663358](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/16633580a0b588b8132072ec9106f185288cf95d))
+* **ci:** fix fallow checking ([1b3020e](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/1b3020ea0f1bc259832666350129d365ee43c282))
+
 ## [1.0.1](https://github.com/MaxNize/fortgeschrittene-programmierung/compare/v1.0.0...v1.0.1) (2026-07-14)
 
 
