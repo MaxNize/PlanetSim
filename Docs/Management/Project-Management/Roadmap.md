@@ -27,8 +27,8 @@ real-time  physics simulation.
 
 | Spec     | Title                        | Dependencies       | Status | Notes                                          |
 | -------- | ---------------------------- | ------------------ | ------ | ---------------------------------------------- |
-| SPEC-003 | 2-Body Physics Engine (Rust) | SPEC-001, SPEC-002 | 📋 Todo | Newton's laws, Velocity Verlet integrator      |
-| SPEC-004 | WASM Integration & JS Bridge | SPEC-003, SPEC-002 | 📋 Todo | wasm-bindgen, data marshalling, error handling |
+| SPEC-003 | 2-Body Physics Engine (Rust) | SPEC-001, SPEC-002 | ✅ Done | Newton's laws, Velocity Verlet integrator      |
+| SPEC-004 | WASM Integration & JS Bridge | SPEC-003, SPEC-002 | ✅ Done | wasm-bindgen, data marshalling, error handling |
 
 **Deliverable**: `npm run dev` → Browser opens with WASM module loaded
 
@@ -39,7 +39,7 @@ real-time  physics simulation.
 
 | Spec     | Title                        | Dependencies       | Status | Notes                                           |
 | -------- | ---------------------------- | ------------------ | ------ | ----------------------------------------------- |
-| SPEC-005 | React Component Architecture | SPEC-001, SPEC-004 | 📋 Todo | Context API, hooks, component structure         |
+| SPEC-005 | React Component Architecture | SPEC-001, SPEC-004 | ✅ Done | Context API, hooks, component structure         |
 | SPEC-006 | Canvas Rendering System      | SPEC-004, SPEC-005 | 📋 Todo | 2D canvas, coordinate transforms, 60 FPS target |
 
 **Deliverable**: Two bodies orbit each other smoothly on canvas
@@ -77,7 +77,7 @@ real-time  physics simulation.
 | -------- | ------------------------------ | ---------------------- | ------ | --------------------------------------------- |
 | SPEC-012 | Deployment Strategy            | SPEC-001, SPEC-011     | 📋 Todo | GitHub Pages, Docker, auto-release            |
 | SPEC-013 | API Documentation              | All physics/WASM specs | 📋 Todo | Cargo docs, JSDoc, physics guide              |
-| SPEC-014 | Developer Guide & Contribution | All specs              | 📋 Todo | CONTRIBUTING.md, architecture guide, examples |
+| SPEC-014 | Developer Guide & Contribution | All specs              | ✅ Done | CONTRIBUTING.md, architecture guide, examples |
 
 **Deliverable**: App live at `planet-sim.example.com`, docs complete, contributions welcome
 

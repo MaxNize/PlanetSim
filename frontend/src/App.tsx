@@ -1,10 +1,16 @@
-import { SimulationShell } from './components/SimulationShell';
+import { SimulationProvider } from './context/SimulationContext';
+import { Layout } from './components/Layout/Layout';
 
 /**
- * Root application component for the planet simulation demo.
+ * Root application component for the planet simulation.
+ * Sets up global state context provider and mounts the layout.
  *
- * @returns The application shell.
+ * @returns The main application view.
  */
 export default function App() {
-  return <SimulationShell />;
+  return (
+    <SimulationProvider>
+      <Layout />
+    </SimulationProvider>
+  );
 }

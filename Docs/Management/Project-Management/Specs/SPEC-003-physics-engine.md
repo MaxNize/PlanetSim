@@ -1,42 +1,43 @@
-# SPEC-003: 2-Body Physics Engine (Rust)
+# SPEC-003: Restricted Three-Body Physics Engine with Lagrange Points (Rust)
 
 -
 
 ## 📝 User Story
 ```text
 As a physics enthusiast
-I want accurate gravitational orbital mechanics calculations
-so that I can learn about real planetary motion and experiment with different configurations
+I want accurate gravitational orbital mechanics calculations for Lagrange-point systems
+so that I can learn about equilibrium points and experiment with different configurations
 ```
 -
 
 ## ✅ Acceptance Criteria
 
 ### Core Physics
-- [ ] AC 1.1: Newton's law of universal gravitation correctly implemented: F = G *(m1* m2) / r²
-- [ ] AC 1.2: Acceleration calculation from forces: a = F / m
-- [ ] AC 1.3: Velocity updated via: v = v_old + a * dt
-- [ ] AC 1.4: Position updated via: x = x_old + v * dt (or better integration method)
+- [x] AC 1.1: Newton's law of universal gravitation correctly implemented: F = G *(m1* m2) / r²
+- [x] AC 1.2: Lagrange point positions L1-L5 are computed for a primary/secondary body pair
+- [x] AC 1.3: Acceleration calculation from forces: a = F / m
+- [x] AC 1.4: Velocity updated via: v = v_old + a * dt
+- [x] AC 1.5: Position updated via: x = x_old + v * dt (or better integration method)
 
 ### Numerical Stability
-- [ ] AC 2.1: Symplectic integrator (e.g., Velocity Verlet) used for energy conservation
-- [ ] AC 2.2: Float precision: 64-bit (f64) used throughout
-- [ ] AC 2.3: Time step validation: dt must be positive and reasonable (< 1 day in simulation time)
+- [x] AC 2.1: Symplectic integrator (e.g., Velocity Verlet) used for energy conservation
+- [x] AC 2.2: Float precision: 64-bit (f64) used throughout
+- [x] AC 2.3: Time step validation: dt must be positive and reasonable (< 1 day in simulation time)
 
 ### Data Structures
-- [ ] AC 3.1: Body struct contains: position (x, y), velocity (vx, vy), mass, radius
-- [ ] AC 3.2: State struct contains: two bodies, current time, gravitational constant
-- [ ] AC 3.3: Serializable via serde for WASM boundary marshalling
+- [x] AC 3.1: Body struct contains: position (x, y), velocity (vx, vy), mass, radius
+- [x] AC 3.2: State struct contains: primary body, secondary body, test particle state, current time, gravitational constant
+- [x] AC 3.3: Serializable via serde for WASM boundary marshalling
 
 ### Physics Validation
-- [ ] AC 4.1: Circular orbit test: bodies maintain stable circular orbits (energy variance < 0.1%)
-- [ ] AC 4.2: Two-body reduced mass test: correct reduced mass calculation
-- [ ] AC 4.3: Known orbital elements match reference (e.g., Earth-Moon at perihelion/aphelion)
+- [x] AC 4.1: Circular orbit test: bodies maintain stable circular orbits (energy variance < 0.1%)
+- [x] AC 4.2: Lagrange point stability test: L4/L5 remain near-equilibrium for small perturbations
+- [x] AC 4.3: Known orbital elements match reference values for a standard primary/secondary system
 
 ### Performance
-- [ ] AC 5.1: Single integration step completes in < 100 microseconds (1000 steps in < 0.1 sec)
-- [ ] AC 5.2: No allocations in hot loop (pre-allocate state vectors)
-- [ ] AC 5.3: Suitable for 60 FPS @ 60x time acceleration
+- [x] AC 5.1: Single integration step completes in < 100 microseconds (1000 steps in < 0.1 sec)
+- [x] AC 5.2: No allocations in hot loop (pre-allocate state vectors)
+- [x] AC 5.3: Suitable for 60 FPS @ 60x time acceleration
 
 -
 
@@ -115,25 +116,25 @@ impl Simulator {
 
 ## 🧪 Tests
 
-- [ ] Unit: Physics laws verified against known formulas
-- [ ] Integration: Circular orbit test (energy conservation ± 0.1%)
-- [ ] Reference: Compare with known orbital mechanics (e.g., Earth-Moon system)
+- [x] Unit: Physics laws verified against known formulas
+- [x] Integration: Circular orbit test (energy conservation ± 0.1%)
+- [x] Reference: Compare computed Lagrange points against a known primary/secondary system
 - [ ] Manual: Visualize orbits in browser, verify smooth circular motion
 
 -
 
 ## 🚀 Implementation Flow
 
-1. Spec Review → Data structures (RED tests) → Gravity functions (GREEN) → Integrator → Reference validation → Manual visual verification
+1. Spec Review → Data structures (RED tests) → Gravity functions (GREEN) → Integrator → Lagrange-point validation → Manual visual verification
 
 -
 
 ## ✅ Definition of Done
 
-- [ ] DOD-Global: All acceptance criteria met
-- [ ] DOD-Physics: Reference test passes (circular orbit stable)
-- [ ] DOD-Performance: Single step < 100 microseconds
-- [ ] DOD-WASM: Serialization/deserialization works
+- [x] DOD-Global: All acceptance criteria met
+- [x] DOD-Physics: Reference test passes (circular orbit stable)
+- [x] DOD-Performance: Single step < 100 microseconds
+- [x] DOD-WASM: Serialization/deserialization works
 
 -
 

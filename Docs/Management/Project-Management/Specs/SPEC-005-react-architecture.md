@@ -13,36 +13,36 @@ so that I can build features quickly and maintain them with confidence
 ## ✅ Acceptance Criteria
 
 ### Component Structure
-- [ ] AC 1.1: Components follow container/presentational pattern
-- [ ] AC 1.2: All components are functional, use hooks (no class components)
-- [ ] AC 1.3: Props are fully typed (TypeScript interfaces)
-- [ ] AC 1.4: Component directory structure: components/{FeatureName}/{Component}.tsx
+- [x] AC 1.1: Components follow container/presentational pattern
+- [x] AC 1.2: All components are functional, use hooks (no class components)
+- [x] AC 1.3: Props are fully typed (TypeScript interfaces)
+- [x] AC 1.4: Component directory structure: components/{FeatureName}/{Component}.tsx
 
 ### State Management
-- [ ] AC 2.1: Global state (WASM instance, simulation config) in Context API
-- [ ] AC 2.2: Local component state for UI (sliders, dialogs, selections)
-- [ ] AC 2.3: Custom hook `useSimulation()` encapsulates WASM interaction
+- [x] AC 2.1: Global state (WASM instance, simulation config) in Context API
+- [x] AC 2.2: Local component state for UI (sliders, dialogs, selections)
+- [x] AC 2.3: Custom hook `useSimulation()` encapsulates WASM interaction
 
 ### Hooks
-- [ ] AC 3.1: `useSimulation()` - manage Simulator instance lifecycle
-- [ ] AC 3.2: `useSimulationStep()` - execute step and track energy/state
-- [ ] AC 3.3: `useAnimationFrame()` - handle 60 FPS rendering loop
+- [x] AC 3.1: `useSimulation()` - manage Simulator instance lifecycle
+- [x] AC 3.2: `useSimulationStep()` - execute step and track energy/state
+- [x] AC 3.3: `useAnimationFrame()` - handle 60 FPS rendering loop
 
 ### Component Library
-- [ ] AC 4.1: Simulator wrapper component (canvas + controls)
-- [ ] AC 4.2: ParameterControl component (sliders for mass, time scale)
-- [ ] AC 4.3: StateDisplay component (show current bodies, energy)
-- [ ] AC 4.4: Layout component (responsive grid: canvas + sidebar)
+- [x] AC 4.1: Simulator wrapper component (canvas + controls)
+- [x] AC 4.2: ParameterControl component (sliders for mass, time scale)
+- [x] AC 4.3: StateDisplay component (show current bodies, energy)
+- [x] AC 4.4: Layout component (responsive grid: canvas + sidebar)
 
 ### Error Boundaries
-- [ ] AC 5.1: Error boundary wraps Simulator to catch render errors
-- [ ] AC 5.2: WASM errors surface as user-friendly messages
-- [ ] AC 5.3: Recovery/retry mechanism available
+- [x] AC 5.1: Error boundary wraps Simulator to catch render errors
+- [x] AC 5.2: WASM errors surface as user-friendly messages
+- [x] AC 5.3: Recovery/retry mechanism available
 
 ### Testing
-- [ ] AC 6.1: Component tests render with mock WASM
-- [ ] AC 6.2: Props are validated; invalid props cause test failures
-- [ ] AC 6.3: User interactions trigger expected state updates
+- [x] AC 6.1: Component tests render with mock WASM
+- [x] AC 6.2: Props are validated; invalid props cause test failures
+- [x] AC 6.3: User interactions trigger expected state updates
 
 -
 
@@ -139,10 +139,10 @@ export default [
 
 ## 🧪 Tests
 
-- [ ] Unit: Each component renders with mock props
-- [ ] Integration: Context provider passes values correctly
-- [ ] Hooks: useSimulation initializes and handles errors
-- [ ] Manual: UI components display without console errors
+- [x] Unit: Each component renders with mock props
+- [x] Integration: Context provider passes values correctly
+- [x] Hooks: useSimulation initializes and handles errors
+- [x] Manual: UI components display without console errors
 
 -
 
@@ -154,10 +154,10 @@ export default [
 
 ## ✅ Definition of Done
 
-- [ ] DOD-Global: All criteria met
-- [ ] DOD-TypeScript: All props typed, no `any`
-- [ ] DOD-Hooks: Custom hooks follow React rules-of-hooks
-- [ ] All components have passing tests
+- [x] DOD-Global: All criteria met
+- [x] DOD-TypeScript: All props typed, no `any`
+- [x] DOD-Hooks: Custom hooks follow React rules-of-hooks
+- [x] All components have passing tests
 
 -
 

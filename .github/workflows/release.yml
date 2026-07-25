@@ -31,7 +31,7 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install root dependencies
-        run: npm ci
+        run: npm ci --workspaces=false
 
       - name: Run semantic-release
         env:

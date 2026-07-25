@@ -19,7 +19,7 @@ const path = require('path');
 const { globSync } = require('glob');
 
 const MAX_LINES = 200;
-const SKIP_DIRS = ['node_modules', 'target', 'dist', '.git', '.github'];
+const SKIP_DIRS = ['node_modules', 'target', 'dist', '.git', '.github', 'Docs/Wireframe'];
 
 // Parse CLI args
 const args = process.argv.slice(2);
@@ -46,6 +46,7 @@ try {
  * @param {string} filePath - relative file path
  * @returns {object|null} - matching exception or null
  */
+// fallow-ignore-next-line complexity
 function isExempt(filePath) {
     const minimatchLib = require('minimatch');
     const minimatch = (

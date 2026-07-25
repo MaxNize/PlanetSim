@@ -4,17 +4,55 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'Docs/Wireframe/**'
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - 'Docs/Wireframe/**'
 
 jobs:
-  lint-and-format:
-    name: Lint & Format Checks
+  build-wasm:
+    name: Build WASM Module
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: wasm
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Build WASM module
+        run: cd wasm && wasm-pack build
+
+      - name: Upload WASM package
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-pkg
+          path: wasm/pkg/
+
+  lint-and-format:
+    name: Lint & Format Checks
+    needs: build-wasm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download WASM package
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-pkg
+          path: wasm/pkg/
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -41,12 +79,65 @@ jobs:
       - name: Run Max-lines check
         run: node scripts/check-max-lines.js --exceptions max-lines-exceptions.json
 
-  typescript-tests:
-    name: TypeScript Tests & Coverage
+  code-quality:
+    name: Code Quality Scans
+    needs: build-wasm
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download WASM package
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-pkg
+          path: wasm/pkg/
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Fallow code quality scan
+        run: npm run check:fallow
+
+      - name: Set up Rust nightly
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: wasm
+
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
+
+      - name: Install cargo-udeps
+        run: cargo binstall cargo-udeps --no-confirm
+
+      - name: Run cargo-udeps
+        run: npm run check:rust-udeps
+
+  typescript-tests:
+    name: TypeScript Tests & Coverage
+    needs: build-wasm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download WASM package
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-pkg
+          path: wasm/pkg/
 
       - name: Set up Node.js
         uses: actions/setup-node@v4

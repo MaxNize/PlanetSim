@@ -24,6 +24,8 @@ so that regressions are caught early and code quality remains high
 - [x] AC 2.2: Prettier format checks run on pull requests and main push
 - [x] AC 2.3: Clippy lints Rust code on pull requests and main push
 - [x] AC 2.4: Linting/formatting failures block PR merge
+- [x] AC 2.5: Fallow runs as a frontend code-quality scan on pull requests and main push
+- [x] AC 2.6: cargo-udeps runs for the Rust/WASM crate on pull requests and main push
 
 ### Build Checks
 - [x] AC 3.1: Frontend builds without errors or warnings (on main push only)
@@ -82,6 +84,21 @@ jobs:
       - run: cd frontend && npx stylelint 'src/**/*.css' || true
       - run: npm run lint:md
       - run: node scripts/check-max-lines.js --exceptions max-lines-exceptions.json
+
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - run: npm run check:fallow
+      - uses: dtolnay/rust-toolchain@nightly
+      - run: cargo install cargo-udeps --locked
+      - run: npm run check:rust-udeps
 
   typescript-tests:
     runs-on: ubuntu-latest

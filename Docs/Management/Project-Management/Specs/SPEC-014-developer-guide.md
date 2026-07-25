@@ -13,47 +13,47 @@ so that I can confidently implement new features and maintain code quality
 ## ✅ Acceptance Criteria
 
 ### Project Structure Guide
-- [ ] AC 1.1: Directory layout explained (why things are organized this way)
-- [ ] AC 1.2: Module boundaries documented (when to add files to each layer)
-- [ ] AC 1.3: Naming conventions for components, functions, types
-- [ ] AC 1.4: File path examples for new features
+- [x] AC 1.1: Directory layout explained (why things are organized this way)
+- [x] AC 1.2: Module boundaries documented (when to add files to each layer)
+- [x] AC 1.3: Naming conventions for components, functions, types
+- [x] AC 1.4: File path examples for new features
 
 ### Setup & Local Development
-- [ ] AC 2.1: Prerequisites listed (Node, Rust version, tools)
-- [ ] AC 2.2: Step-by-step setup with `make dev` or equivalent
-- [ ] AC 2.3: Troubleshooting common setup issues
-- [ ] AC 2.4: IDE setup recommendations (VSCode, Rust Analyzer, TypeScript)
+- [x] AC 2.1: Prerequisites listed (Node, Rust version, tools)
+- [x] AC 2.2: Step-by-step setup with `make dev` or equivalent
+- [x] AC 2.3: Troubleshooting common setup issues
+- [x] AC 2.4: IDE setup recommendations (VSCode, Rust Analyzer, TypeScript)
 
 ### Contribution Workflow
-- [ ] AC 3.1: Feature request → GitHub issue → SPEC → PR → Review → Merge process
-- [ ] AC 3.2: Branch naming conventions (feature/, fix/, docs/)
-- [ ] AC 3.3: Commit message format (Conventional Commits)
-- [ ] AC 3.4: PR template with checklist
-- [ ] AC 3.5: Code review expectations
+- [x] AC 3.1: Feature request → GitHub issue → SPEC → PR → Review → Merge process
+- [x] AC 3.2: Branch naming conventions (feature/, fix/, docs/)
+- [x] AC 3.3: Commit message format (Conventional Commits)
+- [x] AC 3.4: PR template with checklist
+- [x] AC 3.5: Code review expectations
 
 ### Testing Requirements
-- [ ] AC 4.1: When to write unit vs integration tests
-- [ ] AC 4.2: Physics test examples (float comparison, energy conservation)
-- [ ] AC 4.3: Component test examples (mocking WASM, user interactions)
-- [ ] AC 4.4: Coverage requirements and how to measure
+- [x] AC 4.1: When to write unit vs integration tests
+- [x] AC 4.2: Physics test examples (float comparison, energy conservation)
+- [x] AC 4.3: Component test examples (mocking WASM, user interactions)
+- [x] AC 4.4: Coverage requirements and how to measure
 
 ### Performance & Optimization
-- [ ] AC 5.1: Performance budgets (e.g., "Physics step < 1ms")
-- [ ] AC 5.2: Profiling tools and how to use them
-- [ ] AC 5.3: Common performance pitfalls documented
-- [ ] AC 5.4: Benchmark procedures for major changes
+- [x] AC 5.1: Performance budgets (e.g., "Physics step < 1ms")
+- [x] AC 5.2: Profiling tools and how to use them
+- [x] AC 5.3: Common performance pitfalls documented
+- [x] AC 5.4: Benchmark procedures for major changes
 
 ### Release & Versioning
-- [ ] AC 6.1: Semantic versioning explained
-- [ ] AC 6.2: What changes trigger major/minor/patch bumps
-- [ ] AC 6.3: Release checklist
-- [ ] AC 6.4: Changelog guidelines
+- [x] AC 6.1: Semantic versioning explained
+- [x] AC 6.2: What changes trigger major/minor/patch bumps
+- [x] AC 6.3: Release checklist
+- [x] AC 6.4: Changelog guidelines
 
 ### Spec-Driven Development
-- [ ] AC 7.1: How to write a SPEC (acceptance criteria, technical solution)
-- [ ] AC 7.2: When to create a SPEC vs quick fix
-- [ ] AC 7.3: Spec review process and approval gates
-- [ ] AC 7.4: Linking implementation to spec (traceability)
+- [x] AC 7.1: How to write a SPEC (acceptance criteria, technical solution)
+- [x] AC 7.2: When to create a SPEC vs quick fix
+- [x] AC 7.3: Spec review process and approval gates
+- [x] AC 7.4: Linking implementation to spec (traceability)
 
 -
 
@@ -362,9 +362,9 @@ A: Update `src/shared/constants/simulation.ts` with new PhysicsConfig
 
 ## 🧪 Tests
 
-- [ ] Unit: Verify guides are accurate (clone repo → follow setup → works)
-- [ ] Manual: New contributor follows guide without assistance
-- [ ] Code review: Spec templates useful and complete
+- [x] Unit: Verify guides are accurate (clone repo → follow setup → works)
+- [x] Manual: New contributor follows guide without assistance
+- [x] Code review: Spec templates useful and complete
 
 - -
 
@@ -376,10 +376,10 @@ A: Update `src/shared/constants/simulation.ts` with new PhysicsConfig
 
 ## ✅ Definition of Done
 
-- [ ] DOD-Global: All acceptance criteria met
-- [ ] Guides updated and accurate
-- [ ] Examples provided for common tasks
-- [ ] New contributor successfully follows guide
+- [x] DOD-Global: All acceptance criteria met
+- [x] Guides updated and accurate
+- [x] Examples provided for common tasks
+- [x] New contributor successfully follows guide
 
 - -
 

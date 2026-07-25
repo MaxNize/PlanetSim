@@ -1,10 +1,12 @@
-.PHONY: setup dev build lint format test check-structure check-max-lines
+.PHONY: setup dev build lint format test check-structure check-max-lines check-quality
 
 NODE_VERSION := $(shell cat .nvmrc 2>/dev/null || echo "18")
 
 setup:
-	@echo "Installing frontend dependencies..."
-	cd frontend && npm install
+	@echo "Building WASM bindings..."
+	cd wasm && wasm-pack build
+	@echo "Installing workspace dependencies..."
+	npm install
 	@echo "Rust toolchain should be installed separately. Run: rustup toolchain install --file .rust-toolchain.toml"
 
 dev:
@@ -13,8 +15,8 @@ dev:
 
 build:
 	@echo "Building frontend and wasm"
+	cd wasm && wasm-pack build
 	cd frontend && npm run build
-	cd wasm && cargo build --release
 
 lint:
 	@echo "Running linters"
@@ -31,6 +33,7 @@ format:
 
 test:
 	@echo "Running tests"
+	cd wasm && wasm-pack build
 	cd frontend && npx tsc --noEmit
 	cd frontend && npm run test
 	cd wasm && cargo test
@@ -54,3 +57,7 @@ check-structure:
 check-max-lines:
 	@echo "Checking max-lines compliance..."
 	node scripts/check-max-lines.js --exceptions max-lines-exceptions.json
+
+check-quality:
+	@echo "Running code quality scans..."
+	npm run check:quality

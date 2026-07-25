@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/fallow/schema.json",
+  "entry": ["frontend/src/main.tsx", "frontend/src/App.tsx"],
+  "ignorePatterns": [
+    "**/*.generated.ts",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "Docs/Wireframe/**"
+  ],
+  "ignoreDependencies": [
+    "eslint-config-prettier",
+    "vite-plugin-top-level-await",
+    "glob",
+    "minimatch"
+  ],
+  "rules": {
+    "unused-files": "error",
+    "unused-exports": "warn",
+    "unused-types": "warn",
+    "circular-dependencies": "error",
+    "code-duplication": "warn",
+    "complexity-hotspots": "warn",
+    "boundary-violations": "error"
+  }
+}
