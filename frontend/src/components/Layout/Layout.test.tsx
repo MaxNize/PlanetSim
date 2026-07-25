@@ -25,16 +25,12 @@ describe('Layout component', () => {
     render(
       <simulationContext.Provider value={mockContextValue}>
         <Layout />
-      </simulationContext.Provider>
+      </simulationContext.Provider>,
     );
 
     // Assert main header text
     expect(screen.getByText('Restricted 3-Body Planet Simulation')).toBeDefined();
-    expect(
-      screen.getByText(
-        'Simulates orbital mechanics of a test particle in a primary/secondary gravitational system.'
-      )
-    ).toBeDefined();
+    expect(screen.getByText('Simulates orbital mechanics of a test particle in a primary/secondary gravitational system.')).toBeDefined();
 
     // Assert children are rendered
     expect(screen.getByText('Simulation Controls')).toBeDefined();

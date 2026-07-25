@@ -5,15 +5,7 @@ import { SimulationProvider, useSimulationContext } from './SimulationContext';
 
 // Helper component to consume context and expose fields for assertion
 function TestConsumer() {
-  const {
-    currentState,
-    isPaused,
-    setIsPaused,
-    speedMultiplier,
-    setSpeedMultiplier,
-    resetSimulation,
-    history,
-  } = useSimulationContext();
+  const { currentState, isPaused, setIsPaused, speedMultiplier, setSpeedMultiplier, resetSimulation, history } = useSimulationContext();
 
   return (
     <div>
@@ -21,9 +13,15 @@ function TestConsumer() {
       <span data-testid="paused">{isPaused ? 'paused' : 'running'}</span>
       <span data-testid="speed">{speedMultiplier}</span>
       <span data-testid="history-len">{history.length}</span>
-      <button data-testid="btn-toggle" onClick={() => setIsPaused(!isPaused)}>Toggle</button>
-      <button data-testid="btn-speed" onClick={() => setSpeedMultiplier(20000)}>Speed</button>
-      <button data-testid="btn-reset" onClick={resetSimulation}>Reset</button>
+      <button data-testid="btn-toggle" onClick={() => setIsPaused(!isPaused)}>
+        Toggle
+      </button>
+      <button data-testid="btn-speed" onClick={() => setSpeedMultiplier(20000)}>
+        Speed
+      </button>
+      <button data-testid="btn-reset" onClick={resetSimulation}>
+        Reset
+      </button>
     </div>
   );
 }
@@ -33,7 +31,7 @@ describe('SimulationContext and SimulationProvider', () => {
     render(
       <SimulationProvider>
         <TestConsumer />
-      </SimulationProvider>
+      </SimulationProvider>,
     );
 
     // Assert defaults

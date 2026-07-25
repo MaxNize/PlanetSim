@@ -26,7 +26,7 @@ describe('useSimulation hook', () => {
 
       primary: undefined as any,
     };
-    
+
     const { result } = renderHook(() => useSimulation(invalidState, 0));
 
     expect(result.current.simulator).toBeNull();

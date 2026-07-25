@@ -4,35 +4,18 @@ import { StateDisplayProps } from '../../types';
 /**
  * Presentational component to display coordinates, velocities, energies, and error states.
  */
-export function StateDisplay({
-  time,
-  primaryPos,
-  primaryVel,
-  secondaryPos,
-  secondaryVel,
-  testParticlePos,
-  testParticleVel,
-  kineticEnergy,
-  potentialEnergy,
-  error,
-}: StateDisplayProps) {
-  const totalEnergy = (kineticEnergy !== undefined && potentialEnergy !== undefined)
-    ? kineticEnergy + potentialEnergy
-    : undefined;
+export function StateDisplay({ time, primaryPos, primaryVel, secondaryPos, secondaryVel, testParticlePos, testParticleVel, kineticEnergy, potentialEnergy, error }: StateDisplayProps) {
+  const totalEnergy = kineticEnergy !== undefined && potentialEnergy !== undefined ? kineticEnergy + potentialEnergy : undefined;
 
   return (
     <div style={{ padding: '16px', border: '1px solid #ccc', borderRadius: '8px', marginTop: '16px' }}>
       <h3>Simulation Telemetry</h3>
 
-      {error && (
-        <div style={{ color: 'red', fontWeight: 'bold', marginBottom: '12px' }}>
-          ⚠️ Error: {error}
-        </div>
-      )}
+      {error && <div style={{ color: 'red', fontWeight: 'bold', marginBottom: '12px' }}>⚠️ Error: {error}</div>}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontFamily: 'monospace' }}>
         <div>
-          <strong>Elapsed Time:</strong> {time.toFixed(1)} s ({ (time / 3600).toFixed(2) } h)
+          <strong>Elapsed Time:</strong> {time.toFixed(1)} s ({(time / 3600).toFixed(2)} h)
         </div>
 
         <hr style={{ border: 'none', borderTop: '1px solid #eee' }} />

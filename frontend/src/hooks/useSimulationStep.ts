@@ -12,18 +12,13 @@ import { useAnimationFrame } from './useAnimationFrame';
  * @param onStep Callback executed after each successful step.
  * @returns The latest StepResult from the physics engine.
  */
-export function useSimulationStep(
-  simulator: SimulatorBridge | null,
-  isPaused: boolean,
-  speedMultiplier: number,
-  onStep?: (result: StepResult) => void
-) {
+export function useSimulationStep(simulator: SimulatorBridge | null, isPaused: boolean, speedMultiplier: number, onStep?: (result: StepResult) => void) {
   const [stepResult, setStepResult] = useState<StepResult | null>(null);
 
   const tick = useCallback(
     (dt: number) => {
       if (!simulator) return;
-      
+
       const simDt = dt * speedMultiplier;
       try {
         const result = simulator.step(simDt);
@@ -35,7 +30,7 @@ export function useSimulationStep(
         console.error('Simulation step failed:', err);
       }
     },
-    [simulator, speedMultiplier, onStep]
+    [simulator, speedMultiplier, onStep],
   );
 
   useAnimationFrame(tick, !isPaused && simulator !== null);

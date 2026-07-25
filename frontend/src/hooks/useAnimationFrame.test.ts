@@ -14,7 +14,7 @@ describe('useAnimationFrame hook', () => {
 
   it('should call callback on animation frame when active', () => {
     const callback = vi.fn();
-    
+
     // Mock requestAnimationFrame to invoke the animate function inside the hook
     let requestFrameCallback: FrameRequestCallback | null = null;
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
