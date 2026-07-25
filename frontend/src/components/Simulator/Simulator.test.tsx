@@ -41,8 +41,8 @@ describe('Simulator container component', () => {
     expect(screen.getByText('Simulation Controls')).toBeDefined();
     expect(screen.getByText('Simulation Telemetry')).toBeDefined();
 
-    // Assert Canvas placeholder renders
-    expect(screen.getByLabelText('Simulation Canvas Placeholder')).toBeDefined();
+    // Assert Canvas renders
+    expect(screen.getByLabelText('Celestial simulation rendering area')).toBeDefined();
 
     // Assert context errors are passed
     expect(screen.getByText('⚠️ Error: Mock engine error')).toBeDefined();
