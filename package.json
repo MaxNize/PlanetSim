@@ -43,8 +43,5 @@
     "markdown-it": "14.3.0",
     "brace-expansion": "5.0.8",
     "tar": "7.5.22"
-  },
-  "dependencies": {
-    "vite-plugin-top-level-await": "1.2.2"
   }
 }

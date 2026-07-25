@@ -12,7 +12,6 @@
   ],
   "ignoreDependencies": [
     "eslint-config-prettier",
-    "vite-plugin-top-level-await",
     "glob",
     "minimatch"
   ],
