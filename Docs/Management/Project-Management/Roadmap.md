@@ -27,7 +27,7 @@ real-time  physics simulation.
 
 | Spec     | Title                        | Dependencies       | Status | Notes                                          |
 | -------- | ---------------------------- | ------------------ | ------ | ---------------------------------------------- |
-| SPEC-003 | 2-Body Physics Engine (Rust) | SPEC-001, SPEC-002 | 📋 Todo | Newton's laws, Velocity Verlet integrator      |
+| SPEC-003 | 2-Body Physics Engine (Rust) | SPEC-001, SPEC-002 | ✅ Done | Newton's laws, Velocity Verlet integrator      |
 | SPEC-004 | WASM Integration & JS Bridge | SPEC-003, SPEC-002 | 📋 Todo | wasm-bindgen, data marshalling, error handling |
 
 **Deliverable**: `npm run dev` → Browser opens with WASM module loaded
