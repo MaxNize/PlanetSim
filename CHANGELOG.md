@@ -1,3 +1,15 @@
+## [1.0.3](https://github.com/MaxNize/fortgeschrittene-programmierung/compare/v1.0.2...v1.0.3) (2026-07-25)
+
+
+### Bug Fixes
+
+* **cd:** fix deploy job ([c57053e](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/c57053ecdf35184561196a8eeb9085281f0a3637))
+* **cd:** fix deploy job ([#17](https://github.com/MaxNize/fortgeschrittene-programmierung/issues/17)) ([cde3b4e](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/cde3b4e3d92d278cadb66e12d53ef48c71ef1a89))
+* **cd:** fix deploy script ([af6ef98](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/af6ef980fa9c2dc8c43c85c841e3e9395d8e610e))
+* **cd:** fix deploy script ([9046917](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/904691757bd14715165c12bc635830ffbe4fe0fc))
+* **cd:** fix deploy script ([#18](https://github.com/MaxNize/fortgeschrittene-programmierung/issues/18)) ([cb88184](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/cb88184e949ed7d05e90613e6b9aa0cda54f9a66))
+* **cd:** fix deploy script ([#19](https://github.com/MaxNize/fortgeschrittene-programmierung/issues/19)) ([866240e](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/866240e92024f85c21e5568651b27d27d314dce7))
+
 ## [1.0.2](https://github.com/MaxNize/fortgeschrittene-programmierung/compare/v1.0.1...v1.0.2) (2026-07-25)
 
 
