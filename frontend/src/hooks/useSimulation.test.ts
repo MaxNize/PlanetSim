@@ -23,11 +23,7 @@ describe('useSimulation hook', () => {
   it('should return error on invalid state deserialization', () => {
     const invalidState = {
       ...createValidState(),
-      // Trigger serialization/deserialization failure by setting negative mass
-      // Wait, let's check: does negative mass fail deserialization?
-      // No, mass is just f64, so it deserializes fine.
-      // What fails deserialization? Missing fields or incorrect types!
-      // If we cast the state incorrectly or omit fields in state:
+
       primary: undefined as any,
     };
     
