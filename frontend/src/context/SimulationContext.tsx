@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { SimulatorBridge, SimulationState, StepResult, LagrangePointSet } from '../services/wasmBridge';
+import { SimulationState, StepResult, LagrangePointSet } from '../services/wasmBridge';
 import { useSimulation } from '../hooks/useSimulation';
 import { useSimulationStep } from '../hooks/useSimulationStep';
 
@@ -46,9 +46,16 @@ export interface SimulationContextType {
   error: string | null;
 }
 
-export const SimulationContext = createContext<SimulationContextType | null>(null);
+export const simulationContext = createContext<SimulationContextType | null>(null);
 
-export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+/**
+ * Provider component that wraps the application and exposes the simulation state.
+ *
+ * @param props Component properties.
+ * @param props.children React child elements.
+ * @returns The context provider component.
+ */
+export function SimulationProvider({ children }: { children: React.ReactNode }) {
   const [initialState, setInitialState] = useState<SimulationState>(DEFAULT_INITIAL_STATE);
   const [currentState, setCurrentState] = useState<SimulationState>(DEFAULT_INITIAL_STATE);
   const [isPaused, setIsPaused] = useState<boolean>(true);
@@ -107,7 +114,7 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, [initialState, setStepResult]);
 
   return (
-    <SimulationContext.Provider
+    <simulationContext.Provider
       value={{
         initialState,
         setInitialState,
@@ -125,12 +132,12 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       }}
     >
       {children}
-    </SimulationContext.Provider>
+    </simulationContext.Provider>
   );
-};
+}
 
 export const useSimulationContext = () => {
-  const context = useContext(SimulationContext);
+  const context = useContext(simulationContext);
   if (!context) {
     throw new Error('useSimulationContext must be used within a SimulationProvider');
   }

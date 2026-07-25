@@ -64,7 +64,8 @@ CI workflows (GitHub Actions) remain the authoritative enforcement mechanism for
 - [x] AC 7.8: Cargo clippy enforces 200-line maximum on .rs files via `clippy.toml` with `too-many-lines-threshold = 200`. Exceptions checked against `max-lines-exceptions.json` via same CI step.
 - [x] AC 7.9: markdownlint configured for all `.md` files in `Docs/` and root. Config: `.markdownlint.json` enforces line length ≤200 chars, proper heading hierarchy, no trailing spaces, link
  - validation.  `npm run lint:md` runs validation; CI step `lint.yml` includes markdown checks.
-- [x] AC 7.10: Fallow runs on the frontend TypeScript sources to flag unused files, unused exports/types, duplication, complexity hotspots, and boundary violations. Local check: `npm run check:fallow`; CI gate: `npm run check:quality`.
+- [x] AC 7.10: Fallow runs on the frontend TypeScript sources to flag unused files, unused exports/types, duplication, complexity hotspots, and boundary violations.
+  Local check: `npm run check:fallow`; CI gate: `npm run check:quality`.
 - [x] AC 7.11: Rust uses `cargo-udeps` as the comparable unused-dependency quality check for the `wasm` crate. Local check: `cargo +nightly udeps --all-targets --all-features`; CI gate: `npm run check:quality`.
 
 Exceptions catalog: The exceptions to the 200-line rule MUST be recorded in a machine-readable whitelist stored at `max-lines-exceptions.json` at the repository root. The CI linting scripts will

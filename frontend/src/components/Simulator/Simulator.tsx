@@ -6,7 +6,7 @@ import { StateDisplay } from '../StateDisplay/StateDisplay';
 /**
  * Container component that connects the global simulation context to presentational children.
  */
-export const Simulator: React.FC = () => {
+export function Simulator() {
   const {
     initialState,
     setInitialState,
@@ -103,4 +103,4 @@ export const Simulator: React.FC = () => {
       </div>
     </div>
   );
-};
+}

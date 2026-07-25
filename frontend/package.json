@@ -16,9 +16,11 @@
     "fix": "npm run format && npm run lint:fix && npm run stylelint:fix || true"
   },
   "dependencies": {
+    "markdownlint-cli2": "^0.23.1",
     "planet-sim-wasm": "file:../wasm/pkg",
     "react": "19.2.6",
-    "react-dom": "19.2.6"
+    "react-dom": "19.2.6",
+    "semantic-release": "25.0.8"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "6.9.1",
@@ -42,7 +44,7 @@
     "stylelint-config-standard": "^40.0.0",
     "typescript": "6.0.3",
     "vite": "8.1.4",
-    "vite-plugin-top-level-await": "^1.4.4",
+    "vite-plugin-top-level-await": "^1.2.2",
     "vite-plugin-wasm": "^3.3.0",
     "vitest": "4.1.9"
   }

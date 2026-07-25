@@ -4,7 +4,7 @@ import { StateDisplayProps } from '../../types';
 /**
  * Presentational component to display coordinates, velocities, energies, and error states.
  */
-export const StateDisplay: React.FC<StateDisplayProps> = ({
+export function StateDisplay({
   time,
   primaryPos,
   primaryVel,
@@ -15,7 +15,7 @@ export const StateDisplay: React.FC<StateDisplayProps> = ({
   kineticEnergy,
   potentialEnergy,
   error,
-}) => {
+}: StateDisplayProps) {
   const totalEnergy = (kineticEnergy !== undefined && potentialEnergy !== undefined)
     ? kineticEnergy + potentialEnergy
     : undefined;
@@ -74,4 +74,4 @@ export const StateDisplay: React.FC<StateDisplayProps> = ({
       </div>
     </div>
   );
-};
+}

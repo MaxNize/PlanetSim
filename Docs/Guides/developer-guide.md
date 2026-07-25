@@ -1,6 +1,8 @@
 # Developer Guide
 
-Welcome to the Developer Guide for the Planet Simulation project! This document outlines setup instructions, local development commands, testing guidelines, performance budgets, and answers to frequently asked questions.
+Welcome to the Developer Guide for the Planet Simulation project! This document
+outlines setup instructions, local development commands, testing guidelines,
+performance budgets, and answers to frequently asked questions.
 
 ---
 
@@ -88,14 +90,14 @@ The project uses semantic versioning (`MAJOR.MINOR.PATCH`) automated by Conventi
 
 ## ❓ Frequently Asked Questions (FAQ)
 
-#### Q: How do I build the optimized WASM package?
+### Q: How do I build the optimized WASM package?
 A: Run `npm run build` or `make build`. This compiles the WebAssembly target in release mode, applying optimizations like dead-code elimination and size shrinking.
 
-#### Q: How do I debug WASM code in the browser?
+### Q: How do I debug WASM code in the browser?
 A: Open Chrome DevTools ➔ Settings ➔ Experiments ➔ Check "WebAssembly debugging: Enable DWARF support". This allows you to set breakpoints directly inside the Rust source files in the dev panel!
 
-#### Q: The build fails with `Cannot find module 'planet-sim-wasm'`?
+### Q: The build fails with `Cannot find module 'planet-sim-wasm'`?
 A: You must run `wasm-pack build` inside the `wasm/` directory before installing node dependencies. Running `make setup` in the root directory takes care of this step automatically.
 
-#### Q: How do I add a new preset planet system configuration?
+### Q: How do I add a new preset planet system configuration?
 A: Update the preset constants under the frontend state or configuration files. Ensure that the initial body coordinates and masses are mathematically stable to avoid immediate ejection.
