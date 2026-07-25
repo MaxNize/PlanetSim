@@ -13,35 +13,35 @@ so that I can build reactive components without worrying about FFI complexity
 ## ✅ Acceptance Criteria
 
 ### WASM Module Compilation
-- [ ] AC 1.1: `npm run build:wasm` compiles Rust to .wasm + .js bindings
-- [ ] AC 1.2: WASM module bundles into frontend build automatically
-- [ ] AC 1.3: No runtime errors loading WASM in browser dev console
+- [x] AC 1.1: `npm run build:wasm` compiles Rust to .wasm + .js bindings
+- [x] AC 1.2: WASM module bundles into frontend build automatically
+- [x] AC 1.3: No runtime errors loading WASM in browser dev console
 
 ### Data Marshalling
-- [ ] AC 2.1: Rust `State` serializes to JavaScript object with no precision loss
-- [ ] AC 2.2: JavaScript `SimulationConfig` deserializes correctly in Rust
-- [ ] AC 2.3: Float arrays (trajectories) marshalled efficiently via shared memory or typed arrays
+- [x] AC 2.1: Rust `State` serializes to JavaScript object with no precision loss
+- [x] AC 2.2: JavaScript `SimulationConfig` deserializes correctly in Rust
+- [x] AC 2.3: Float arrays (trajectories) marshalled efficiently via shared memory or typed arrays
 
 ### Simulator Instance
-- [ ] AC 3.1: `new Simulator(config)` constructs instance in WASM
-- [ ] AC 3.2: `step(dt)` advances simulation and returns new state
-- [ ] AC 3.3: `getState()` returns current bodies without performing step
-- [ ] AC 3.4: Multiple instances can coexist without interference
+- [x] AC 3.1: `new Simulator(config)` constructs instance in WASM
+- [x] AC 3.2: `step(dt)` advances simulation and returns new state
+- [x] AC 3.3: `getState()` returns current bodies without performing step
+- [x] AC 3.4: Multiple instances can coexist without interference
 
 ### Error Handling
-- [ ] AC 4.1: Invalid parameters (e.g., negative mass) raise clear JS errors
-- [ ] AC 4.2: WASM panics are caught and logged (no silent crashes)
-- [ ] AC 4.3: Error messages mention relevant SPEC or physics law
+- [x] AC 4.1: Invalid parameters (e.g., negative mass) raise clear JS errors
+- [x] AC 4.2: WASM panics are caught and logged (no silent crashes)
+- [x] AC 4.3: Error messages mention relevant SPEC or physics law
 
 ### Performance
-- [ ] AC 5.1: Overhead of JS ↔ Rust crossing < 5% of step time
-- [ ] AC 5.2: No garbage collection pauses during hot simulation
-- [ ] AC 5.3: Memory usage stable (no leaks after 10k steps)
+- [x] AC 5.1: Overhead of JS ↔ Rust crossing < 5% of step time
+- [x] AC 5.2: No garbage collection pauses during hot simulation
+- [x] AC 5.3: Memory usage stable (no leaks after 10k steps)
 
 ### Integration Tests
-- [ ] AC 6.1: Simulator initialized with realistic parameters (Earth mass, Sun mass)
-- [ ] AC 6.2: 10 steps produce consistent state progression
-- [ ] AC 6.3: Trajectory history maintained correctly
+- [x] AC 6.1: Simulator initialized with realistic parameters (Earth mass, Sun mass)
+- [x] AC 6.2: 10 steps produce consistent state progression
+- [x] AC 6.3: Trajectory history maintained correctly
 
 -
 
@@ -137,10 +137,10 @@ export default defineConfig({
 
 ## 🧪 Tests
 
-- [ ] Unit: Serialization roundtrip (JS object → Rust → JS object)
-- [ ] Integration: Create Simulator, step 10 times, verify state consistency
+- [x] Unit: Serialization roundtrip (JS object → Rust → JS object)
+- [x] Integration: Create Simulator, step 10 times, verify state consistency
 - [ ] Manual: Open DevTools, inspect WASM module memory
-- [ ] Performance: Measure JS ↔ Rust crossing time
+- [x] Performance: Measure JS ↔ Rust crossing time
 
 -
 
@@ -152,10 +152,10 @@ export default defineConfig({
 
 ## ✅ Definition of Done
 
-- [ ] DOD-Global: All criteria met
-- [ ] DOD-WASM: WASM builds without warnings
-- [ ] DOD-Perf: Crossing overhead < 5% of step time
-- [ ] Integration test passes in CI
+- [x] DOD-Global: All criteria met
+- [x] DOD-WASM: WASM builds without warnings
+- [x] DOD-Perf: Crossing overhead < 5% of step time
+- [x] Integration test passes in CI
 
 -
 
