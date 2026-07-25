@@ -8,7 +8,7 @@ This document provides a high-level overview of the planet simulation project's 
 
 The application is structured as a hybrid TypeScript/Rust project:
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │          React UI (TypeScript)          │
 │  Components, Hooks, Canvas Rendering    │
@@ -52,7 +52,7 @@ The application is structured as a hybrid TypeScript/Rust project:
 
 The simulation loop progresses in a unidirectional data flow:
 
-```
+```text
 User Input (UI) → React State → SimulatorBridge.step(dt)
                                       │
                                       ▼
@@ -70,7 +70,7 @@ Serialized State ← Canvas Renderer ← WASM Simulator.step(dt)
 
 ## Dependency Graph
 
-```
+```text
 SPEC-001 (Foundation)
   ├→ SPEC-002 (Testing)
   ├→ SPEC-003 (Physics)

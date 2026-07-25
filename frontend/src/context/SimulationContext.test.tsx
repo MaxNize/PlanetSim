@@ -4,7 +4,7 @@ import { render, screen, act } from '@testing-library/react';
 import { SimulationProvider, useSimulationContext } from './SimulationContext';
 
 // Helper component to consume context and expose fields for assertion
-const TestConsumer: React.FC = () => {
+function TestConsumer() {
   const {
     currentState,
     isPaused,
@@ -26,7 +26,7 @@ const TestConsumer: React.FC = () => {
       <button data-testid="btn-reset" onClick={resetSimulation}>Reset</button>
     </div>
   );
-};
+}
 
 describe('SimulationContext and SimulationProvider', () => {
   it('should provide default simulation state and update values', () => {

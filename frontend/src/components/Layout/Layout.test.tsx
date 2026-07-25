@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { SimulationContext, DEFAULT_INITIAL_STATE } from '../../context/SimulationContext';
+import { simulationContext, DEFAULT_INITIAL_STATE } from '../../context/SimulationContext';
 import { Layout } from './Layout';
 
 describe('Layout component', () => {
@@ -23,9 +23,9 @@ describe('Layout component', () => {
     };
 
     render(
-      <SimulationContext.Provider value={mockContextValue}>
+      <simulationContext.Provider value={mockContextValue}>
         <Layout />
-      </SimulationContext.Provider>
+      </simulationContext.Provider>
     );
 
     // Assert main header text

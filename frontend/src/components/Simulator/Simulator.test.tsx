@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { SimulationContext } from '../../context/SimulationContext';
+import { simulationContext } from '../../context/SimulationContext';
 import { Simulator } from './Simulator';
 import { SimulationState } from '../../services/wasmBridge';
 
@@ -32,9 +32,9 @@ describe('Simulator container component', () => {
     };
 
     render(
-      <SimulationContext.Provider value={mockContextValue}>
+      <simulationContext.Provider value={mockContextValue}>
         <Simulator />
-      </SimulationContext.Provider>
+      </simulationContext.Provider>
     );
 
     // Assert container renders headings from presentational children

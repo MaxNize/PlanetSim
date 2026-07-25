@@ -4,7 +4,7 @@ import { Simulator } from '../Simulator/Simulator';
 /**
  * Layout component providing a responsive structure for the application.
  */
-export const Layout: React.FC = () => {
+export function Layout() {
   return (
     <main style={{ maxWidth: '1000px', margin: '0 auto', padding: '24px', fontFamily: 'sans-serif' }}>
       <header style={{ marginBottom: '24px', borderBottom: '1px solid #eee', paddingBottom: '12px' }}>
@@ -17,4 +17,4 @@ export const Layout: React.FC = () => {
       <Simulator />
     </main>
   );
-};
+}

@@ -4,7 +4,7 @@ import { ParameterControlsProps } from '../../types';
 /**
  * Presentational component for simulation parameter inputs and buttons.
  */
-export const ParameterControls: React.FC<ParameterControlsProps> = ({
+export function ParameterControls({
   massM1,
   setMassM1,
   massM2,
@@ -16,7 +16,7 @@ export const ParameterControls: React.FC<ParameterControlsProps> = ({
   isPaused,
   setIsPaused,
   onReset,
-}) => {
+}: ParameterControlsProps) {
   return (
     <div style={{ padding: '16px', border: '1px solid #ccc', borderRadius: '8px' }}>
       <h3>Simulation Controls</h3>
@@ -115,4 +115,4 @@ export const ParameterControls: React.FC<ParameterControlsProps> = ({
       </div>
     </div>
   );
-};
+}
