@@ -46,6 +46,7 @@ try {
  * @param {string} filePath - relative file path
  * @returns {object|null} - matching exception or null
  */
+// fallow-ignore-next-line complexity
 function isExempt(filePath) {
     const minimatchLib = require('minimatch');
     const minimatch = (
