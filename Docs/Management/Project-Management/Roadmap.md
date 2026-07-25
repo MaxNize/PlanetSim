@@ -77,7 +77,7 @@ real-time  physics simulation.
 | -------- | ------------------------------ | ---------------------- | ------ | --------------------------------------------- |
 | SPEC-012 | Deployment Strategy            | SPEC-001, SPEC-011     | 📋 Todo | GitHub Pages, Docker, auto-release            |
 | SPEC-013 | API Documentation              | All physics/WASM specs | 📋 Todo | Cargo docs, JSDoc, physics guide              |
-| SPEC-014 | Developer Guide & Contribution | All specs              | 📋 Todo | CONTRIBUTING.md, architecture guide, examples |
+| SPEC-014 | Developer Guide & Contribution | All specs              | ✅ Done | CONTRIBUTING.md, architecture guide, examples |
 
 **Deliverable**: App live at `planet-sim.example.com`, docs complete, contributions welcome
 

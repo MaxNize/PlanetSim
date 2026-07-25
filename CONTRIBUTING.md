@@ -1,6 +1,10 @@
 # Contributing
 
-Thank you for contributing! This guide covers workflow, commit standards, and guardrails.
+Thank you for contributing! This guide covers the contribution workflow, commit standards, and guardrails.
+
+For deeper technical information, please refer to our companion guides:
+* **[Project Architecture Guide](Docs/Guides/architecture.md)**: Module layouts, unidirectional data flow, and dependency tree.
+* **[Developer Guide](Docs/Guides/developer-guide.md)**: Extended setup instructions, testing conventions, performance budgets, and troubleshooting FAQ.
 
 -
 
