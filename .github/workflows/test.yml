@@ -116,8 +116,11 @@ jobs:
         with:
           workspaces: wasm
 
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
+
       - name: Install cargo-udeps
-        run: cargo install cargo-udeps --locked
+        run: cargo binstall cargo-udeps --no-confirm
 
       - name: Run cargo-udeps
         run: npm run check:rust-udeps
