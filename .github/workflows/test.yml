@@ -116,13 +116,10 @@ jobs:
         with:
           workspaces: wasm
 
-      - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@main
-
       - name: Install cargo-udeps
-        run: |
-          cargo binstall cargo-udeps --no-confirm
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-udeps
 
       - name: Run cargo-udeps
         run: npm run check:rust-udeps
