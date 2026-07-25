@@ -120,7 +120,9 @@ jobs:
         uses: cargo-bins/cargo-binstall@main
 
       - name: Install cargo-udeps
-        run: cargo binstall cargo-udeps --no-confirm
+        run: |
+          cargo binstall cargo-udeps --no-confirm
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
       - name: Run cargo-udeps
         run: npm run check:rust-udeps
