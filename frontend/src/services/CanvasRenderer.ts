@@ -1,4 +1,5 @@
 import { SimulationState, LagrangePointSet } from './wasmBridge';
+import { TrailHistory } from '../types';
 
 export interface ViewportConfig {
   scale: number; // pixels per meter
@@ -16,7 +17,7 @@ export class CanvasRenderer {
   }
 
   /** Main render method that coordinates drawing the entire simulation state. */
-  public draw(state: SimulationState, history: [number, number][], showTrail: boolean, lagrangePoints: LagrangePointSet | null, viewport: ViewportConfig): void {
+  public draw(state: SimulationState, trailHistory: TrailHistory, showTrail: boolean, lagrangePoints: LagrangePointSet | null, viewport: ViewportConfig): void {
     const { width, height } = this.resize();
     this.clear();
 
@@ -24,8 +25,10 @@ export class CanvasRenderer {
       this.drawLagrangePoints(lagrangePoints, viewport, width, height);
     }
 
-    if (showTrail && history.length > 0) {
-      this.drawTrail(history, 'rgba(46, 213, 115, 0.4)', viewport, width, height);
+    if (showTrail) {
+      this.drawTrail(trailHistory.primary, '#f0932b', viewport, width, height);
+      this.drawTrail(trailHistory.secondary, '#48dbfb', viewport, width, height);
+      this.drawTrail(trailHistory.testParticle, '#2ed573', viewport, width, height);
     }
 
     // Draw primary (M1), secondary (M2), and test particle
@@ -104,23 +107,36 @@ export class CanvasRenderer {
     }
   }
 
-  /** Draws the historical trajectory trail of a body. */
+  /** Draws the historical trajectory trail of a body with a fading alpha gradient. */
   public drawTrail(history: [number, number][], color: string, viewport: ViewportConfig, width: number, height: number): void {
     if (!this.ctx) return;
-    if (history.length < 2) return;
+    const len = history.length;
+    if (len < 2) return;
 
-    this.ctx.beginPath();
-    const start = this.worldToCanvas(history[0], viewport, width, height);
-    this.ctx.moveTo(start.x, start.y);
+    const numSections = Math.min(10, len - 1);
+    const sectionSize = Math.ceil(len / numSections);
 
-    for (let i = 1; i < history.length; i++) {
-      const next = this.worldToCanvas(history[i], viewport, width, height);
-      this.ctx.lineTo(next.x, next.y);
+    for (let s = 0; s < numSections; s++) {
+      const startIdx = s * sectionSize;
+      const endIdx = Math.min(len - 1, (s + 1) * sectionSize);
+
+      if (startIdx >= endIdx) continue;
+
+      this.ctx.beginPath();
+      const firstPoint = this.worldToCanvas(history[startIdx], viewport, width, height);
+      this.ctx.moveTo(firstPoint.x, firstPoint.y);
+
+      for (let i = startIdx + 1; i <= endIdx; i++) {
+        const pt = this.worldToCanvas(history[i], viewport, width, height);
+        this.ctx.lineTo(pt.x, pt.y);
+      }
+
+      this.ctx.globalAlpha = ((s + 1) / numSections) * 0.45;
+      this.ctx.strokeStyle = color;
+      this.ctx.lineWidth = 1.5;
+      this.ctx.stroke();
     }
-
-    this.ctx.strokeStyle = color;
-    this.ctx.lineWidth = 1.5;
-    this.ctx.stroke();
+    this.ctx.globalAlpha = 1.0;
   }
 
   /** Draws Lagrange points L1 to L5 as markers. */
