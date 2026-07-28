@@ -1,4 +1,21 @@
-.PHONY: setup dev build lint format test check-structure check-max-lines check-quality
+.PHONY: help setup dev build lint format test check-structure check-max-lines check-quality
+
+.DEFAULT_GOAL := help
+
+help:
+	@echo "Usage: make [target]"
+	@echo ""
+	@echo "Available targets:"
+	@echo "  help             Show this help message"
+	@echo "  setup            Install dependencies and build WASM bindings"
+	@echo "  dev              Start the frontend development server"
+	@echo "  build            Build frontend production assets and WASM module"
+	@echo "  lint             Run ESLint, Clippy, Markdownlint, and line checks"
+	@echo "  format           Format frontend files using Prettier"
+	@echo "  test             Run Vitest, Cargo tests, doc checks, and project validation"
+	@echo "  check-structure  Verify the mandatory project directory layout"
+	@echo "  check-max-lines  Verify that source files do not exceed 200 lines"
+	@echo "  check-quality    Run Fallow and cargo-udeps dependency audits"
 
 NODE_VERSION := $(shell cat .nvmrc 2>/dev/null || echo "18")
 

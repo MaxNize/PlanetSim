@@ -17,7 +17,7 @@ test.describe('Restricted 3-Body Planet Simulation E2E Tests', () => {
     await expect(canvas).toBeVisible();
 
     // 3. Assert floating UI cards are visible
-    await expect(page.getByRole('heading', { name: 'Simulation Controls' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Simulation System' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Simulation Telemetry' })).toBeVisible();
   });
 

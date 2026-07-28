@@ -40,7 +40,7 @@ real-time  physics simulation.
 | Spec     | Title                        | Dependencies       | Status | Notes                                           |
 | -------- | ---------------------------- | ------------------ | ------ | ----------------------------------------------- |
 | SPEC-005 | React Component Architecture | SPEC-001, SPEC-004 | ✅ Done | Context API, hooks, component structure         |
-| SPEC-006 | Canvas Rendering System      | SPEC-004, SPEC-005 | 📋 Todo | 2D canvas, coordinate transforms, 60 FPS target |
+| SPEC-006 | Canvas Rendering System      | SPEC-004, SPEC-005 | ✅ Done | 2D canvas, coordinate transforms, 60 FPS target |
 
 **Deliverable**: Two bodies orbit each other smoothly on canvas
 
@@ -51,7 +51,7 @@ real-time  physics simulation.
 
 | Spec     | Title                      | Dependencies       | Status | Notes                                                  |
 | -------- | -------------------------- | ------------------ | ------ | ------------------------------------------------------ |
-| SPEC-007 | Physics Parameter Controls | SPEC-005, SPEC-006 | 📋 Todo | Mass sliders, time scale, presets (Earth-Moon, Binary) |
+| SPEC-007 | Physics Parameter Controls | SPEC-005, SPEC-006 | ✅ Done | Mass sliders, time scale, presets (Earth-Moon, Binary) |
 | SPEC-008 | Trajectory Visualization   | SPEC-005, SPEC-006 | 📋 Todo | Trail rendering, length control, performance           |
 
 **Deliverable**: Students can adjust parameters and see orbit changes in real time

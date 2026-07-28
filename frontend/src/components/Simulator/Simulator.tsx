@@ -8,7 +8,8 @@ import { Canvas } from '../Canvas/Canvas';
  * Container component that connects the global simulation context to presentational children.
  */
 export function Simulator() {
-  const { initialState, setInitialState, currentState, stepResult, isPaused, setIsPaused, speedMultiplier, setSpeedMultiplier, lagrangePoints, resetSimulation, error } = useSimulationContext();
+  const { initialState, setInitialState, currentState, stepResult, isPaused, setIsPaused, speedMultiplier, setSpeedMultiplier, lagrangePoints, resetSimulation, error, preset, setPreset } =
+    useSimulationContext();
 
   const setMassM1 = useCallback(
     (m: number) => {
@@ -98,6 +99,7 @@ export function Simulator() {
             border: '1px solid rgba(255, 255, 255, 0.1)',
             color: '#fff',
             overflow: 'hidden',
+            flexShrink: 0,
           }}
         >
           <ParameterControls
@@ -112,6 +114,8 @@ export function Simulator() {
             isPaused={isPaused}
             setIsPaused={setIsPaused}
             onReset={resetSimulation}
+            preset={preset}
+            setPreset={setPreset}
           />
         </div>
 
@@ -123,6 +127,7 @@ export function Simulator() {
             border: '1px solid rgba(255, 255, 255, 0.1)',
             color: '#fff',
             overflow: 'hidden',
+            flexShrink: 0,
           }}
         >
           <StateDisplay

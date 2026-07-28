@@ -76,8 +76,20 @@ impl State {
     }
 
     /// Creates a new state using a configuration object.
-    pub const fn with_config(primary: Body, secondary: Body, test_particle: Body, time: f64, config: PhysicsConfig) -> Self {
-        Self::new(primary, secondary, test_particle, time, config.gravitational_constant)
+    pub const fn with_config(
+        primary: Body,
+        secondary: Body,
+        test_particle: Body,
+        time: f64,
+        config: PhysicsConfig,
+    ) -> Self {
+        Self::new(
+            primary,
+            secondary,
+            test_particle,
+            time,
+            config.gravitational_constant,
+        )
     }
 }
 
