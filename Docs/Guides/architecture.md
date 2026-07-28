@@ -21,30 +21,32 @@ The application is structured as a hybrid TypeScript/Rust project:
 └─────────────────────────────────────────┘
 ```
 
-* **Frontend (TypeScript/React)**: Manages state, handles user interactions, runs the animation loop, and renders the canvas.
-* **Backend (Rust/WASM)**: A high-performance, stateless physics engine compiled to WebAssembly for numerical stability and speed.
+- **Frontend (TypeScript/React)**: Manages state, handles user interactions, runs the animation loop, and renders the canvas.
+- **Backend (Rust/WASM)**: A high-performance, stateless physics engine compiled to WebAssembly for numerical stability and speed.
 
 ---
 
 ## Directory Layout & Module Structure
 
 ### Frontend (`frontend/src/`)
-* **`components/`**: React components representing visual parts of the application (e.g., `SimulationShell.tsx`).
-* **`hooks/`**: Custom React hooks managing states and controls (e.g., `useSimulationControls.ts`).
-* **`services/`**: Class wrappers and rendering logic.
-  * [`wasmBridge.ts`](../../frontend/src/services/wasmBridge.ts) — The wrapper for the WASM `Simulator` instance.
-  * [`wasm.ts`](../../frontend/src/services/wasm.ts) — The asynchronous loader for the WASM module.
-* **`types/`**: Domain-specific TypeScript declarations.
-* **`utils/`**: Helper utilities (e.g., `calculateOrbitalVelocity.ts`).
+
+- **`components/`**: React components representing visual parts of the application (e.g., `SimulationShell.tsx`).
+- **`hooks/`**: Custom React hooks managing states and controls (e.g., `useSimulationControls.ts`).
+- **`services/`**: Class wrappers and rendering logic.
+  - [`wasmBridge.ts`](../../frontend/src/services/wasmBridge.ts) — The wrapper for the WASM `Simulator` instance.
+  - [`wasm.ts`](../../frontend/src/services/wasm.ts) — The asynchronous loader for the WASM module.
+- **`types/`**: Domain-specific TypeScript declarations.
+- **`utils/`**: Helper utilities (e.g., `calculateOrbitalVelocity.ts`).
 
 ### Physics Engine (`wasm/src/`)
-* **[`lib.rs`](../../wasm/src/lib.rs)**: Re-exports public items for WASM bindings.
-* **`physics/`**: Core orbital mechanics code.
-  * [`types.rs`](../../wasm/src/physics/types.rs) — Core structs (`Body`, `State`, `PhysicsConfig`).
-  * [`gravity.rs`](../../wasm/src/physics/gravity.rs) — Newton's law of gravitation and Lagrange point calculators.
-  * [`integrator.rs`](../../wasm/src/physics/integrator.rs) — Symplectic Velocity Verlet integrator.
-* **`wasm/`**: WASM-bindgen interface wrapper.
-  * [`mod.rs`](../../wasm/src/wasm/mod.rs) — Implements `Simulator` wrapper class exposing methods to JavaScript.
+
+- **[`lib.rs`](../../wasm/src/lib.rs)**: Re-exports public items for WASM bindings.
+- **`physics/`**: Core orbital mechanics code.
+  - [`types.rs`](../../wasm/src/physics/types.rs) — Core structs (`Body`, `State`, `PhysicsConfig`).
+  - [`gravity.rs`](../../wasm/src/physics/gravity.rs) — Newton's law of gravitation and Lagrange point calculators.
+  - [`integrator.rs`](../../wasm/src/physics/integrator.rs) — Symplectic Velocity Verlet integrator.
+- **`wasm/`**: WASM-bindgen interface wrapper.
+  - [`mod.rs`](../../wasm/src/wasm/mod.rs) — Implements `Simulator` wrapper class exposing methods to JavaScript.
 
 ---
 
