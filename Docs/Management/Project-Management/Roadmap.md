@@ -52,7 +52,7 @@ real-time  physics simulation.
 | Spec     | Title                      | Dependencies       | Status | Notes                                                  |
 | -------- | -------------------------- | ------------------ | ------ | ------------------------------------------------------ |
 | SPEC-007 | Physics Parameter Controls | SPEC-005, SPEC-006 | ✅ Done | Mass sliders, time scale, presets (Earth-Moon, Binary) |
-| SPEC-008 | Trajectory Visualization   | SPEC-005, SPEC-006 | 📋 Todo | Trail rendering, length control, performance           |
+| SPEC-008 | Trajectory Visualization   | SPEC-005, SPEC-006 | ✅ Done | Trail rendering, length control, performance           |
 
 **Deliverable**: Students can adjust parameters and see orbit changes in real time
 

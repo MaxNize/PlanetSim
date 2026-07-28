@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ParameterControlsProps } from '../../types';
 import { ParameterField } from './ParameterField';
+import { TrailControls } from './TrailControls';
 
 const toLogValue = (val: number) => Math.log10(val);
 const fromLogValue = (logVal: number) => Math.pow(10, logVal);
@@ -188,6 +189,8 @@ export function ParameterControls({
           onSliderChange={(val) => setSpeedMultiplier(fromLogValue(val))}
         />
       </div>
+      <hr style={{ border: 'none', borderTop: '1px solid rgba(255, 255, 255, 0.08)', margin: '16px 0' }} />
+      <TrailControls />
     </div>
   );
 }

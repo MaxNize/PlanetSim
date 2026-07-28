@@ -3,6 +3,16 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ParameterControls } from './ParameterControls';
 
+vi.mock('../../context/SimulationContext', () => ({
+  useSimulationContext: () => ({
+    showTrail: true,
+    setShowTrail: vi.fn(),
+    trailLength: 1000,
+    setTrailLength: vi.fn(),
+    clearTrailHistory: vi.fn(),
+  }),
+}));
+
 describe('ParameterControls component', () => {
   it('should render all inputs and buttons with correct values', () => {
     const props = {
