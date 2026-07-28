@@ -33,6 +33,9 @@ export interface SimulationContextType {
 
 export const simulationContext = createContext<SimulationContextType | null>(null);
 
+/**
+ * Context provider that manages the simulation engine state and lifecycle.
+ */
 export function SimulationProvider({ children }: { children: React.ReactNode }) {
   const [initialState, setInitialState] = useState<SimulationState>(DEFAULT_INITIAL_STATE);
   const [currentState, setCurrentState] = useState<SimulationState>(DEFAULT_INITIAL_STATE);
