@@ -64,4 +64,12 @@ export class SimulatorBridge {
   public getLagrangePoints(): LagrangePointSet {
     return this.simulator.get_lagrange_points() as LagrangePointSet;
   }
+
+  /**
+   * Updates the simulator state in-place.
+   * @param state The new SimulationState.
+   */
+  public setState(state: SimulationState): void {
+    this.simulator.set_state(JSON.stringify(state));
+  }
 }

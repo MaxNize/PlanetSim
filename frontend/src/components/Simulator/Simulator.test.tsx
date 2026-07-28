@@ -29,6 +29,8 @@ describe('Simulator container component', () => {
       clearHistory: vi.fn(),
       resetSimulation: vi.fn(),
       error: 'Mock engine error',
+      preset: 'earth-moon' as const,
+      setPreset: vi.fn(),
     };
 
     render(
@@ -38,7 +40,7 @@ describe('Simulator container component', () => {
     );
 
     // Assert container renders headings from presentational children
-    expect(screen.getByText('Simulation Controls')).toBeDefined();
+    expect(screen.getByText('Simulation System')).toBeDefined();
     expect(screen.getByText('Simulation Telemetry')).toBeDefined();
 
     // Assert Canvas renders

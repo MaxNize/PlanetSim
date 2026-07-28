@@ -20,7 +20,10 @@ pub struct StepResult {
 /// Advances the simulation by one step using a symplectic Velocity-Verlet integrator.
 pub fn integrate_step(state: &State, dt: f64) -> StepResult {
     assert!(dt > 0.0, "dt must be positive");
-    assert!(dt < MAX_TIME_STEP_SECONDS, "dt must be less than one day in simulation time");
+    assert!(
+        dt < MAX_TIME_STEP_SECONDS,
+        "dt must be less than one day in simulation time"
+    );
 
     let g = state.gravitational_constant;
     let a_p_init = pairwise_acc(&state.secondary, &state.primary, g);
@@ -28,12 +31,37 @@ pub fn integrate_step(state: &State, dt: f64) -> StepResult {
     let a_t_init = tp_acc(&state.primary, &state.secondary, &state.test_particle, g);
 
     let pos_p = advance_pos(state.primary.position, state.primary.velocity, a_p_init, dt);
-    let pos_s = advance_pos(state.secondary.position, state.secondary.velocity, a_s_init, dt);
-    let pos_t = advance_pos(state.test_particle.position, state.test_particle.velocity, a_t_init, dt);
+    let pos_s = advance_pos(
+        state.secondary.position,
+        state.secondary.velocity,
+        a_s_init,
+        dt,
+    );
+    let pos_t = advance_pos(
+        state.test_particle.position,
+        state.test_particle.velocity,
+        a_t_init,
+        dt,
+    );
 
-    let p_mid = Body::new(pos_p, state.primary.velocity, state.primary.mass, state.primary.radius);
-    let s_mid = Body::new(pos_s, state.secondary.velocity, state.secondary.mass, state.secondary.radius);
-    let t_mid = Body::new(pos_t, state.test_particle.velocity, state.test_particle.mass, state.test_particle.radius);
+    let p_mid = Body::new(
+        pos_p,
+        state.primary.velocity,
+        state.primary.mass,
+        state.primary.radius,
+    );
+    let s_mid = Body::new(
+        pos_s,
+        state.secondary.velocity,
+        state.secondary.mass,
+        state.secondary.radius,
+    );
+    let t_mid = Body::new(
+        pos_t,
+        state.test_particle.velocity,
+        state.test_particle.mass,
+        state.test_particle.radius,
+    );
 
     let a_p_final = pairwise_acc(&s_mid, &p_mid, g);
     let a_s_final = pairwise_acc(&p_mid, &s_mid, g);
@@ -41,9 +69,16 @@ pub fn integrate_step(state: &State, dt: f64) -> StepResult {
 
     let new_primary = advance_vel_and_body(state.primary, a_p_init, a_p_final, dt, pos_p);
     let new_secondary = advance_vel_and_body(state.secondary, a_s_init, a_s_final, dt, pos_s);
-    let new_test_particle = advance_vel_and_body(state.test_particle, a_t_init, a_t_final, dt, pos_t);
+    let new_test_particle =
+        advance_vel_and_body(state.test_particle, a_t_init, a_t_final, dt, pos_t);
 
-    let new_state = State::new(new_primary, new_secondary, new_test_particle, state.time + dt, g);
+    let new_state = State::new(
+        new_primary,
+        new_secondary,
+        new_test_particle,
+        state.time + dt,
+        g,
+    );
 
     StepResult {
         kinetic_energy: kinetic_energy(&new_state),
@@ -57,7 +92,13 @@ fn advance_pos(p: (f64, f64), v: (f64, f64), a: (f64, f64), dt: f64) -> (f64, f6
     (p.0 + v.0 * dt + a.0 * h, p.1 + v.1 * dt + a.1 * h)
 }
 
-fn advance_vel_and_body(b: Body, a_init: (f64, f64), a_final: (f64, f64), dt: f64, pos: (f64, f64)) -> Body {
+fn advance_vel_and_body(
+    b: Body,
+    a_init: (f64, f64),
+    a_final: (f64, f64),
+    dt: f64,
+    pos: (f64, f64),
+) -> Body {
     Body::new(
         pos,
         (
@@ -117,13 +158,20 @@ mod tests {
         let secondary = Body::new((separation * 0.5, 0.0), (0.0, -orbital_speed), mass, 1.0e6);
         let test_particle = Body::new((0.0, 0.0), (0.0, 0.0), 1.0, 1.0);
 
-        State::new(primary, secondary, test_particle, 0.0, DEFAULT_GRAVITATIONAL_CONSTANT)
+        State::new(
+            primary,
+            secondary,
+            test_particle,
+            0.0,
+            DEFAULT_GRAVITATIONAL_CONSTANT,
+        )
     }
 
     #[test]
     fn integrate_step_advances_time_and_preserves_circular_orbit_energy_reasonably() {
         let initial_state = circular_orbit_state();
-        let initial_energy = super::kinetic_energy(&initial_state) + super::potential_energy(&initial_state);
+        let initial_energy =
+            super::kinetic_energy(&initial_state) + super::potential_energy(&initial_state);
         let mut state = initial_state;
 
         for _ in 0..500 {

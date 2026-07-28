@@ -19,6 +19,8 @@ describe('Canvas component', () => {
     clearHistory: vi.fn(),
     resetSimulation: vi.fn(),
     error: null,
+    preset: 'earth-moon' as const,
+    setPreset: vi.fn(),
   };
 
   it('should render canvas element with appropriate attributes', () => {

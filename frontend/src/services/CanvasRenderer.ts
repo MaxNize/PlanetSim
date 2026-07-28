@@ -125,26 +125,27 @@ export class CanvasRenderer {
 
   /** Draws Lagrange points L1 to L5 as markers. */
   public drawLagrangePoints(points: LagrangePointSet, viewport: ViewportConfig, width: number, height: number): void {
-    if (!this.ctx) return;
+    const ctx = this.ctx;
+    if (!ctx) return;
     const labels: (keyof LagrangePointSet)[] = ['l1', 'l2', 'l3', 'l4', 'l5'];
 
-    this.ctx.fillStyle = '#ff4757';
-    this.ctx.font = '10px sans-serif';
+    ctx.fillStyle = '#ff4757';
+    ctx.font = '10px sans-serif';
 
     labels.forEach((label) => {
       const pt = points[label];
       const { x, y } = this.worldToCanvas(pt, viewport, width, height);
 
-      this.ctx.strokeStyle = 'rgba(255, 71, 87, 0.8)';
-      this.ctx.lineWidth = 1;
-      this.ctx.beginPath();
-      this.ctx.moveTo(x - 5, y);
-      this.ctx.lineTo(x + 5, y);
-      this.ctx.moveTo(x, y - 5);
-      this.ctx.lineTo(x, y + 5);
-      this.ctx.stroke();
+      ctx.strokeStyle = 'rgba(255, 71, 87, 0.8)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x - 5, y);
+      ctx.lineTo(x + 5, y);
+      ctx.moveTo(x, y - 5);
+      ctx.lineTo(x, y + 5);
+      ctx.stroke();
 
-      this.ctx.fillText(label.toUpperCase(), x + 6, y - 4);
+      ctx.fillText(label.toUpperCase(), x + 6, y - 4);
     });
   }
 
