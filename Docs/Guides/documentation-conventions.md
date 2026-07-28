@@ -13,7 +13,7 @@ This guide describes the repository's documentation and naming conventions used 
 
 - Public JS/TS exports require JSDoc: include `@param`, `@returns`, and `@example` when applicable. ESLint `eslint-plugin-jsdoc` enforces this.
 - Public Rust exports require `rustdoc` comments with examples; doctests must compile (`cargo test --doc`) and docs are built with `RUSTDOCFLAGS="-D warnings"` in CI.
-- For complex logic, prefer short inline comments explaining *why* (not *what*).
+- For complex logic, prefer short inline comments explaining _why_ (not _what_).
 
 ## File-Size Guideline (200 lines)
 
@@ -28,7 +28,7 @@ To request an exception, add a record to `max-lines-exceptions.json` with `path`
 
 - Line length: ≤200 characters (code blocks exempt).
 - Use a single top-level `#` heading, then `##`, `###` as needed.
-- Use fenced code blocks with language (e.g., ```` ```bash ````).
+- Use fenced code blocks with language (e.g., ` ```bash `).
 - Avoid bare URLs; use `[text](url)`.
 - Run `npm run lint:md` to validate docs.
 
@@ -47,4 +47,5 @@ node scripts/check-max-lines.js --exceptions max-lines-exceptions.json
 # Rust checks
 cd wasm && cargo clippy --all-targets -- -D warnings && RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
 ```
+
 Keep documentation concise and prefer small, focused files; request exceptions when necessary.
