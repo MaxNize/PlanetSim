@@ -82,7 +82,7 @@ export function useSandbox(
   const addBody = useCallback(
     (body: SandboxBody) => {
       if (sandboxBodies.length >= 10) throw new Error('Maximum 10 bodies reached');
-      const latestBodies = currentState.bodies || [];
+      const latestBodies = currentState.bodies || sandboxBodies;
       for (const other of latestBodies) {
         const dx = body.position[0] - other.position[0];
         const dy = body.position[1] - other.position[1];
@@ -91,7 +91,7 @@ export function useSandbox(
         }
       }
       const updatedSandbox = sandboxBodies.map((sb, idx) => {
-        const simBody = latestBodies[idx];
+        const simBody = latestBodies.find((b: any) => b.id === sb.id) || latestBodies[idx];
         if (simBody) {
           return {
             ...sb,
@@ -118,10 +118,10 @@ export function useSandbox(
 
   const removeBody = useCallback(
     (id: string) => {
-      const latestBodies = currentState.bodies || [];
+      const latestBodies = currentState.bodies || sandboxBodies;
       const updatedSandbox = sandboxBodies
         .map((sb, idx) => {
-          const simBody = latestBodies[idx];
+          const simBody = latestBodies.find((b: any) => b.id === sb.id) || latestBodies[idx];
           if (simBody) {
             return {
               ...sb,
@@ -148,11 +148,26 @@ export function useSandbox(
 
   const updateBody = useCallback(
     (id: string, updates: Partial<SandboxBody>) => {
-      const latestBodies = currentState.bodies || [];
+      const latestBodies = currentState.bodies || sandboxBodies;
       const updatedSandbox = sandboxBodies.map((sb, idx) => {
-        const simBody = latestBodies[idx];
-        const currentBody = simBody ? { ...sb, position: simBody.position, velocity: simBody.velocity } : sb;
-        return sb.id === id ? { ...currentBody, ...updates } : currentBody;
+        const simBody = latestBodies.find((b: any) => b.id === sb.id) || latestBodies[idx];
+        const currentPos = simBody ? simBody.position : sb.position;
+        const currentVel = simBody ? simBody.velocity : sb.velocity;
+
+        if (sb.id !== id) {
+          return {
+            ...sb,
+            position: currentPos,
+            velocity: currentVel,
+          };
+        }
+
+        return {
+          ...sb,
+          ...updates,
+          position: currentPos,
+          velocity: updates.velocity !== undefined ? updates.velocity : currentVel,
+        };
       });
       setSandboxBodies(updatedSandbox);
       const nextState = { ...currentState, bodies: updatedSandbox };

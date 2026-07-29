@@ -1,7 +1,8 @@
-import React from 'react';
-import { SandboxControlsProps } from '../../types';
+import React, { useState } from 'react';
+import { SandboxControlsProps, SandboxBody } from '../../types';
 import { useSimulationContext } from '../../context/SimulationContext';
 import { useI18n } from '../../context/I18nContext';
+import { BodyEditDialog } from '../BodyEditDialog/BodyEditDialog';
 
 const SECTION_HEADER_STYLE = {
   fontSize: '12px',
@@ -29,35 +30,48 @@ const ADD_BUTTON_STYLE = (active: boolean) =>
     outline: 'none',
   }) as const;
 
-const BODY_ITEM_STYLE = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  background: 'rgba(255, 255, 255, 0.04)',
-  border: '1px solid rgba(255, 255, 255, 0.08)',
-  borderRadius: '6px',
-  padding: '8px 12px',
-  fontSize: '12px',
-} as const;
+const BODY_ITEM_STYLE = (selected: boolean) =>
+  ({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    background: selected ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+    border: selected ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '6px',
+    padding: '8px 12px',
+    fontSize: '12px',
+    cursor: 'pointer',
+    transition: 'all 0.15s ease',
+  }) as const;
 
-const DELETE_BUTTON_STYLE = {
+const ACTION_BUTTON_STYLE = {
   background: 'none',
   border: 'none',
-  color: '#ef4444',
+  color: '#94a3b8',
   cursor: 'pointer',
-  fontSize: '14px',
-  padding: '0 4px',
+  fontSize: '12px',
+  padding: '2px 4px',
   display: 'flex',
   alignItems: 'center',
   outline: 'none',
+  borderRadius: '4px',
 } as const;
 
 /**
- * Renders sandbox specific panel controls including custom bodies listing and active toggling.
+ * Renders sandbox specific panel controls including custom bodies listing, selection, editing, and active toggling.
  */
-export function SandboxControls({ placementActive, setPlacementActive }: SandboxControlsProps) {
-  const { sandboxBodies, removeBody, setMode } = useSimulationContext();
+export function SandboxControls({ placementActive, setPlacementActive, selectedBodyId: propsSelectedId, onSelectBody }: SandboxControlsProps) {
+  const { sandboxBodies, removeBody, updateBody, setMode, selectedBodyId: contextSelectedId, setSelectedBodyId } = useSimulationContext();
   const { t } = useI18n();
+  const [editingBody, setEditingBody] = useState<SandboxBody | null>(null);
+
+  const activeSelectedId = propsSelectedId !== undefined ? propsSelectedId : contextSelectedId;
+
+  const handleSelect = (id: string) => {
+    const nextId = activeSelectedId === id ? null : id;
+    if (onSelectBody) onSelectBody(nextId);
+    if (setSelectedBodyId) setSelectedBodyId(nextId);
+  };
 
   const handleReset = () => {
     if (window.confirm(t('sandbox.resetConfirm'))) {
@@ -79,22 +93,64 @@ export function SandboxControls({ placementActive, setPlacementActive }: Sandbox
         {t('sandbox.bodiesTitle')} ({sandboxBodies.length}/10)
       </h3>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto' }}>
-        {sandboxBodies.map((b) => (
-          <div key={b.id} style={BODY_ITEM_STYLE}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: b.color }} />
-              <span style={{ fontWeight: 500, maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.name || t('sandbox.defaultBodyName')}</span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
+        {sandboxBodies.map((b) => {
+          const isSelected = activeSelectedId === b.id;
+          return (
+            <div key={b.id} style={BODY_ITEM_STYLE(isSelected)} onClick={() => handleSelect(b.id)} data-testid={`body-item-${b.id}`}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: b.color }} />
+                <span style={{ fontWeight: 500, maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: isSelected ? '#38bdf8' : '#fff' }}>
+                  {b.name || t('sandbox.defaultBodyName')}
+                </span>
+                {b.locked && <span title={t('editDialog.locked')} style={{ fontSize: '11px' }}>🔒</span>}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', color: '#94a3b8' }}>{(b.mass / 5.9722e24).toFixed(1)} M⊕</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingBody(b);
+                  }}
+                  style={ACTION_BUTTON_STYLE}
+                  title={t('sandbox.editBody')}
+                  data-testid={`edit-btn-${b.id}`}
+                >
+                  ✏️
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!b.locked) removeBody(b.id);
+                  }}
+                  disabled={b.locked}
+                  style={{
+                    ...ACTION_BUTTON_STYLE,
+                    color: b.locked ? '#64748b' : '#ef4444',
+                    cursor: b.locked ? 'not-allowed' : 'pointer',
+                    opacity: b.locked ? 0.4 : 1,
+                  }}
+                  title={t('sandbox.deleteBody')}
+                  data-testid={`delete-btn-${b.id}`}
+                >
+                  ✕
+                </button>
+              </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', color: '#94a3b8' }}>{(b.mass / 5.9722e24).toFixed(1)} M⊕</span>
-              <button onClick={() => removeBody(b.id)} style={DELETE_BUTTON_STYLE} title={t('sandbox.deleteBody')}>
-                ✕
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+
+      {editingBody && (
+        <BodyEditDialog
+          body={editingBody}
+          onConfirm={(updated) => {
+            updateBody(updated.id, updated);
+            setEditingBody(null);
+          }}
+          onCancel={() => setEditingBody(null)}
+        />
+      )}
 
       {sandboxBodies.length >= 6 && (
         <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '6px', padding: '8px 12px', fontSize: '11px', color: '#f59e0b' }}>
@@ -122,3 +178,4 @@ export function SandboxControls({ placementActive, setPlacementActive }: Sandbox
     </div>
   );
 }
+

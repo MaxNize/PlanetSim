@@ -25,6 +25,7 @@ export class CanvasRenderer {
     lagrangePoints: LagrangePointSet | null,
     viewport: ViewportConfig,
     placementPreview?: { position: [number, number]; velocity: [number, number]; radius: number; color: string },
+    selectedBodyId?: string | null,
   ): void {
     const { width, height } = this.resize();
     this.clear();
@@ -40,10 +41,11 @@ export class CanvasRenderer {
     if (state.bodies) {
       state.bodies.forEach((b: any, idx: number) => {
         const bodyId = b.id || `body-${idx}`;
+        const isSelected = selectedBodyId === bodyId;
         if (showTrail && trailHistory.customBodies && trailHistory.customBodies[bodyId]) {
           drawTrail(ctx, trailHistory.customBodies[bodyId], b.color || '#fff', wtc);
         }
-        this.drawBody(b.position, b.radius, b.color || '#fff', viewport, width, height);
+        this.drawBody(b.position, b.radius, b.color || '#fff', viewport, width, height, false, isSelected, b.locked);
         if (b.name) {
           drawBodyLabel(ctx, b.position, b.name, wtc);
         }
@@ -54,9 +56,9 @@ export class CanvasRenderer {
         drawTrail(ctx, trailHistory.secondary, '#48dbfb', wtc);
         drawTrail(ctx, trailHistory.testParticle, '#2ed573', wtc);
       }
-      this.drawBody(state.primary.position, state.primary.radius, '#f0932b', viewport, width, height);
-      this.drawBody(state.secondary.position, state.secondary.radius, '#48dbfb', viewport, width, height);
-      this.drawBody(state.testParticle.position, state.testParticle.radius, '#2ed573', viewport, width, height);
+      this.drawBody(state.primary.position, state.primary.radius, '#f0932b', viewport, width, height, false, selectedBodyId === 'primary');
+      this.drawBody(state.secondary.position, state.secondary.radius, '#48dbfb', viewport, width, height, false, selectedBodyId === 'secondary');
+      this.drawBody(state.testParticle.position, state.testParticle.radius, '#2ed573', viewport, width, height, false, selectedBodyId === 'testParticle');
     }
 
     if (placementPreview) {
@@ -135,7 +137,17 @@ export class CanvasRenderer {
   }
 
   /** Draws a celestial body on the canvas. */
-  public drawBody(pos: [number, number], physicalRadius: number, color: string, viewport: ViewportConfig, width: number, height: number, isFixed = false): void {
+  public drawBody(
+    pos: [number, number],
+    physicalRadius: number,
+    color: string,
+    viewport: ViewportConfig,
+    width: number,
+    height: number,
+    isFixed = false,
+    isSelected = false,
+    isLocked = false,
+  ): void {
     if (!this.ctx) return;
     const { x, y } = this.worldToCanvas(pos, viewport, width, height);
     const radius = Math.max(4, physicalRadius * viewport.scale);
@@ -150,6 +162,22 @@ export class CanvasRenderer {
 
     this.ctx.fillStyle = gradient;
     this.ctx.fill();
+
+    if (isSelected) {
+      this.ctx.strokeStyle = '#38bdf8';
+      this.ctx.lineWidth = 2.5;
+      this.ctx.beginPath();
+      this.ctx.arc(x, y, radius + 5, 0, Math.PI * 2);
+      this.ctx.stroke();
+    }
+
+    if (isLocked) {
+      this.ctx.strokeStyle = '#f59e0b';
+      this.ctx.lineWidth = 1.5;
+      this.ctx.beginPath();
+      this.ctx.arc(x, y, radius + (isSelected ? 8 : 4), 0, Math.PI * 2);
+      this.ctx.stroke();
+    }
 
     if (isFixed) {
       this.ctx.strokeStyle = '#ffffff';
