@@ -35,6 +35,8 @@ export interface SimulationContextType {
   addBody: (body: SandboxBody) => void;
   removeBody: (id: string) => void;
   updateBody: (id: string, updates: Partial<SandboxBody>) => void;
+  selectedBodyId: string | null;
+  setSelectedBodyId: (id: string | null) => void;
 }
 
 export const simulationContext = createContext<SimulationContextType | null>(null);

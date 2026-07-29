@@ -70,4 +70,6 @@ export interface SandboxBody {
 export interface SandboxControlsProps {
   placementActive: boolean;
   setPlacementActive: (active: boolean) => void;
+  selectedBodyId?: string | null;
+  onSelectBody?: (id: string | null) => void;
 }

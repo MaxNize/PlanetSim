@@ -20,6 +20,7 @@ const initTrail = (s: SimulationState): TrailHistory => ({
 export function SimulationProvider({ children }: { children: React.ReactNode }) {
   const [mode, setModeState] = useState<SimulationMode>('3body');
   const [sandboxBodies, setSandboxBodies] = useState<SandboxBody[]>([]);
+  const [selectedBodyId, setSelectedBodyId] = useState<string | null>(null);
   const [initialState, setInitialState] = useState<SimulationState>(DEFAULT_INITIAL_STATE);
   const [currentState, setCurrentState] = useState<SimulationState>(DEFAULT_INITIAL_STATE);
   const [isPaused, setIsPaused] = useState<boolean>(true);
@@ -32,6 +33,12 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
   const [preset, setPresetState] = useState<PresetType>('earth-moon');
 
   const { simulator, error } = useSimulation(initialState, resetCounter);
+
+  useEffect(() => {
+    if (selectedBodyId && !sandboxBodies.some((b) => b.id === selectedBodyId)) {
+      setSelectedBodyId(null);
+    }
+  }, [sandboxBodies, selectedBodyId]);
 
   useEffect(() => {
     setCurrentState(initialState);
@@ -178,6 +185,8 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         addBody,
         removeBody,
         updateBody,
+        selectedBodyId,
+        setSelectedBodyId,
       }}
     >
       {children}
