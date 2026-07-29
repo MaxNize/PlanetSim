@@ -95,4 +95,40 @@ test.describe('Restricted 3-Body Planet Simulation E2E Tests', () => {
     // Verify canvas is still visible and functional
     await expect(canvas).toBeVisible();
   });
+
+  test('should support entering sandbox mode, placing a body, and configuring it', async ({ page }) => {
+    // 1. Assert sandbox button is visible and click it
+    const sandboxTab = page.getByRole('button', { name: 'Sandbox Mode' });
+    await expect(sandboxTab).toBeVisible();
+    await sandboxTab.click();
+
+    // 2. Assert sandbox controls are visible
+    const addBodyButton = page.getByRole('button', { name: '➕ Add Celestial Body' });
+    await expect(addBodyButton).toBeVisible();
+
+    // 3. Click add body to activate placement mode
+    await addBodyButton.click();
+    await expect(page.getByText('Clicking Places Body')).toBeVisible();
+
+    // 4. Click canvas to set position
+    const canvas = page.locator('canvas[aria-label="Celestial simulation rendering area"]');
+    await canvas.click({ position: { x: 400, y: 300 } });
+
+    // 5. Click canvas again to set velocity
+    await canvas.click({ position: { x: 450, y: 300 } });
+
+    // 6. Config modal should open
+    const modalHeader = page.getByRole('heading', { name: 'Configure New Body' });
+    await expect(modalHeader).toBeVisible();
+
+    // 7. Change body name and confirm
+    const nameInput = page.locator('input[type="text"]').first();
+    await nameInput.fill('E2E Test Star');
+
+    const confirmButton = page.getByRole('button', { name: 'Confirm' });
+    await confirmButton.click();
+
+    // 8. Verify the new body is listed in sidebar and telemetry
+    await expect(page.getByText('E2E Test Star').first()).toBeVisible();
+  });
 });

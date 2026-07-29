@@ -1,16 +1,20 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useSimulationContext } from '../../context/SimulationContext';
 import { CanvasRenderer, ViewportConfig } from '../../services/CanvasRenderer';
+import { BodyPlacementDialog } from '../BodyPlacementDialog/BodyPlacementDialog';
+import { SandboxBody } from '../../types';
 
 interface CanvasProps {
   showTrail?: boolean;
+  placementActive?: boolean;
+  onPlacementCancel?: () => void;
+  onPlacementComplete?: (body: SandboxBody) => void;
 }
 
 /**
- * Interactive Canvas component that renders the restricted 3-body planetary orbit simulation.
- * Manages pan/zoom interactions and redraws when the physics state updates.
+ * Renders the interactive simulation viewport canvas, handling panning, zooming, and sandbox body placements.
  */
-export function Canvas({ showTrail = true }: CanvasProps) {
+export function Canvas({ showTrail = true, placementActive = false, onPlacementCancel, onPlacementComplete }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<CanvasRenderer | null>(null);
   const lastMousePos = useRef({ x: 0, y: 0 });
@@ -18,17 +22,21 @@ export function Canvas({ showTrail = true }: CanvasProps) {
   const { currentState, lagrangePoints, trailHistory, showTrail: contextShowTrail } = useSimulationContext();
   const activeShowTrail = showTrail && contextShowTrail;
 
-  // Viewport configuration: scale (px/meter) and pan offset (meters)
   const [viewport, setViewport] = useState<ViewportConfig>({
-    scale: 1e-6, // Initial scale: 1 pixel represents 1,000,000 meters
-    pan: { x: 1.5e8, y: 0.0 }, // Offset pan slightly to center M1 and M2
+    scale: 1e-6,
+    pan: { x: 1.5e8, y: 0.0 },
   });
 
   const [isDragging, setIsDragging] = useState(false);
   const [isSpacePressed, setIsSpacePressed] = useState(false);
-
-  // Monitor window resize to trigger redraws
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+
+  // Placement State
+  const [hoverWorldPos, setHoverWorldPos] = useState<[number, number] | null>(null);
+  const [placementStage, setPlacementStage] = useState<'idle' | 'position' | 'velocity'>('idle');
+  const [placedWorldPos, setPlacedWorldPos] = useState<[number, number] | null>(null);
+  const [draggedVel, setDraggedVel] = useState<[number, number]>([0, 0]);
+  const [showDialog, setShowDialog] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -37,51 +45,78 @@ export function Canvas({ showTrail = true }: CanvasProps) {
         setDimensions({ width: rect.width, height: rect.height });
       }
     };
-
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Monitor Spacebar key state for panning cursor toggle
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKey = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
         e.preventDefault();
-        setIsSpacePressed(true);
+        setIsSpacePressed(e.type === 'keydown');
+      }
+      if (e.type === 'keydown' && e.key === 'Escape') {
+        setPlacementStage('idle');
+        setPlacedWorldPos(null);
+        setDraggedVel([0, 0]);
+        if (onPlacementCancel) onPlacementCancel();
       }
     };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        e.preventDefault();
-        setIsSpacePressed(false);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('keydown', handleKey);
+    window.addEventListener('keyup', handleKey);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('keydown', handleKey);
+      window.removeEventListener('keyup', handleKey);
     };
-  }, []);
+  }, [onPlacementCancel]);
 
-  // Redraw loop triggered when state or viewport changes
+  const screenToWorld = (screenX: number, screenY: number): [number, number] => {
+    if (!canvasRef.current) return [0, 0];
+    const rect = canvasRef.current.getBoundingClientRect();
+    const x = screenX - rect.left;
+    const y = screenY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    return [(x - centerX) / viewport.scale + viewport.pan.x, (centerY - y) / viewport.scale + viewport.pan.y];
+  };
+
   useEffect(() => {
     if (!canvasRef.current) return;
+    if (!rendererRef.current) rendererRef.current = new CanvasRenderer(canvasRef.current);
 
-    // Lazy load the renderer service
-    if (!rendererRef.current) {
-      rendererRef.current = new CanvasRenderer(canvasRef.current);
-    }
+    const preview =
+      placementActive && placedWorldPos
+        ? {
+            position: placedWorldPos,
+            velocity: draggedVel,
+            radius: 6.371e6, // Preview radius (Earth scale)
+            color: '#3b82f6',
+          }
+        : placementActive && hoverWorldPos
+          ? {
+              position: hoverWorldPos,
+              velocity: [0, 0] as [number, number],
+              radius: 6.371e6,
+              color: 'rgba(59, 130, 246, 0.4)',
+            }
+          : undefined;
 
-    rendererRef.current.draw(currentState, trailHistory, activeShowTrail, lagrangePoints, viewport);
-  }, [currentState, viewport, trailHistory, activeShowTrail, lagrangePoints, dimensions]);
+    rendererRef.current.draw(currentState, trailHistory, activeShowTrail, lagrangePoints, viewport, preview);
+  }, [currentState, viewport, trailHistory, activeShowTrail, lagrangePoints, dimensions, placementActive, hoverWorldPos, placedWorldPos, draggedVel]);
 
-  // Mouse interaction handlers
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    // Pan with middle mouse button OR space + left click
+    if (placementActive) {
+      const pos = screenToWorld(e.clientX, e.clientY);
+      if (placementStage === 'idle') {
+        setPlacedWorldPos(pos);
+        setPlacementStage('velocity');
+      } else if (placementStage === 'velocity') {
+        setPlacementStage('idle');
+        setShowDialog(true);
+      }
+      return;
+    }
     if (e.button === 1 || (e.button === 0 && isSpacePressed)) {
       setIsDragging(true);
       lastMousePos.current = { x: e.clientX, y: e.clientY };
@@ -89,52 +124,71 @@ export function Canvas({ showTrail = true }: CanvasProps) {
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const pos = screenToWorld(e.clientX, e.clientY);
+    setHoverWorldPos(pos);
+
+    if (placementActive && placementStage === 'velocity' && placedWorldPos) {
+      setDraggedVel([(pos[0] - placedWorldPos[0]) / 10, (pos[1] - placedWorldPos[1]) / 10]);
+      return;
+    }
+
     if (isDragging) {
       const dx = e.clientX - lastMousePos.current.x;
       const dy = e.clientY - lastMousePos.current.y;
-
       setViewport((prev) => ({
         ...prev,
-        pan: {
-          x: prev.pan.x - dx / prev.scale,
-          y: prev.pan.y + dy / prev.scale,
-        },
+        pan: { x: prev.pan.x - dx / prev.scale, y: prev.pan.y + dy / prev.scale },
       }));
-
       lastMousePos.current = { x: e.clientX, y: e.clientY };
     }
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+  const handleMouseUp = () => setIsDragging(false);
 
   const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
     const zoomFactor = e.deltaY > 0 ? 0.85 : 1.15;
-
     setViewport((prev) => ({
       ...prev,
-      // Clamp scale to prevent division by zero or excessive zooming
       scale: Math.max(1e-9, Math.min(1e-4, prev.scale * zoomFactor)),
     }));
   };
 
   return (
-    <canvas
-      ref={canvasRef}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      onWheel={handleWheel}
-      aria-label="Celestial simulation rendering area"
-      style={{
-        display: 'block',
-        width: '100%',
-        height: '100%',
-        cursor: isDragging ? 'grabbing' : isSpacePressed ? 'grab' : 'crosshair',
-        outline: 'none',
-      }}
-    />
+    <>
+      <canvas
+        ref={canvasRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onWheel={handleWheel}
+        aria-label="Celestial simulation rendering area"
+        style={{
+          display: 'block',
+          width: '100%',
+          height: '100%',
+          cursor: isDragging ? 'grabbing' : isSpacePressed ? 'grab' : placementActive ? 'crosshair' : 'default',
+          outline: 'none',
+        }}
+      />
+      {showDialog && placedWorldPos && (
+        <BodyPlacementDialog
+          position={placedWorldPos}
+          initialVelocity={draggedVel}
+          onConfirm={(body) => {
+            setShowDialog(false);
+            setPlacedWorldPos(null);
+            setDraggedVel([0, 0]);
+            if (onPlacementComplete) onPlacementComplete(body);
+          }}
+          onCancel={() => {
+            setShowDialog(false);
+            setPlacedWorldPos(null);
+            setDraggedVel([0, 0]);
+            if (onPlacementCancel) onPlacementCancel();
+          }}
+        />
+      )}
+    </>
   );
 }

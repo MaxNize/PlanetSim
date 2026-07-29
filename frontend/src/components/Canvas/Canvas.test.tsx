@@ -25,7 +25,7 @@ describe('Canvas component', () => {
 
   it('should render canvas element with appropriate attributes', () => {
     render(
-      <simulationContext.Provider value={mockContextValue}>
+      <simulationContext.Provider value={mockContextValue as any}>
         <Canvas showTrail={true} />
       </simulationContext.Provider>,
     );

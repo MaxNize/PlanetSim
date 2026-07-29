@@ -51,8 +51,9 @@ impl Simulator {
             ));
         }
         let result = integrate_step(&self.state, dt);
+        let val = serde_wasm_bindgen::to_value(&result).map_err(JsValue::from)?;
         self.state = result.new_state;
-        serde_wasm_bindgen::to_value(&result).map_err(|e| e.into())
+        Ok(val)
     }
 
     /// Returns the current simulation state serialized to JsValue.
