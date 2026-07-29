@@ -10,6 +10,7 @@ vi.mock('../../context/SimulationContext', () => ({
     trailLength: 1000,
     setTrailLength: vi.fn(),
     clearTrailHistory: vi.fn(),
+    mode: '3body',
   }),
 }));
 

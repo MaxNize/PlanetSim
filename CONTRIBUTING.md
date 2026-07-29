@@ -133,6 +133,13 @@ See [Docs/Guides/documentation-conventions.md](Docs/Guides/documentation-convent
 * Variables: `camelCase` (JS/TS), `snake_case` (Rust)
 * Functions: descriptive verbs (e.g., `calculateOrbitalVelocity`)
 
+### Internationalization (i18n)
+
+All user-facing UI text strings must be internationalized:
+* Supported languages: **English (EN)**, **German (DE)**, and **Italian (IT)**.
+* Add translation keys to `frontend/src/i18n/translations.ts` for all three languages.
+* Access translations in components using the `useI18n()` hook (`const { t } = useI18n()`). Do not hardcode user-facing strings directly in components.
+
 *
 
 ## Testing & Linting

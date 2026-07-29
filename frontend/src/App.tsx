@@ -1,4 +1,5 @@
 import { SimulationProvider } from './context/SimulationContext';
+import { I18nProvider } from './context/I18nContext';
 import { Layout } from './components/Layout/Layout';
 
 /**
@@ -9,8 +10,10 @@ import { Layout } from './components/Layout/Layout';
  */
 export default function App() {
   return (
-    <SimulationProvider>
-      <Layout />
-    </SimulationProvider>
+    <I18nProvider>
+      <SimulationProvider>
+        <Layout />
+      </SimulationProvider>
+    </I18nProvider>
   );
 }

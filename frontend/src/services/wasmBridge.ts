@@ -13,6 +13,7 @@ export interface SimulationState {
   testParticle: Body;
   time: number;
   gravitationalConstant: number;
+  bodies?: (Body & { id?: string; name?: string; color?: string; locked?: boolean })[];
 }
 
 export interface StepResult {

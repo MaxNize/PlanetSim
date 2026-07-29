@@ -3,6 +3,7 @@
 pub mod calculations;
 pub mod gravity;
 pub mod integrator;
+pub mod n_body;
 pub mod types;
 
 #[cfg(test)]
