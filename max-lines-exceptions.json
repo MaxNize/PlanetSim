@@ -16,6 +16,16 @@
             "approved_by": "arch-team"
         },
         {
+            "path": "wasm/src/physics/gravity.rs",
+            "reason": "API documentation and runnable doctests for gravitational calculations",
+            "approved_by": "arch-team"
+        },
+        {
+            "path": "wasm/src/physics/integrator.rs",
+            "reason": "API documentation and runnable doctests for Velocity-Verlet integration",
+            "approved_by": "arch-team"
+        },
+        {
             "path": "Docs/Management/Project-Management/Specs/SPEC-001-project-setup-guardrails.md",
             "reason": "Project spec — accepted length",
             "approved_by": "MaxNize"

@@ -1,0 +1,53 @@
+name: Generate Documentation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  rust-docs:
+    name: Build Rust API Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Rust Docs
+        run: |
+          cd wasm
+          cargo doc --no-deps
+
+      - name: Run Doctests
+        run: |
+          cd wasm
+          cargo test --doc
+
+      - name: Upload Rust Docs Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-api-docs
+          path: wasm/target/doc/
+
+  type-check:
+    name: Type Check & Verify Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify Code Structure & Line Limits
+        run: |
+          npm run check:structure
+          npm run check:max-lines

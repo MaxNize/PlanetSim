@@ -19,6 +19,27 @@ pub struct StepResult {
 }
 
 /// Advances the simulation by one step using a symplectic Velocity-Verlet integrator.
+///
+/// # Arguments
+/// * `state` - The current simulation state (3-body or N-body)
+/// * `dt` - Time step in simulation seconds ($0 < \text{dt} < 86400.0$)
+///
+/// # Returns
+/// A [`StepResult`] containing the updated state and mechanical energy values.
+///
+/// # Examples
+/// ```
+/// use planet_sim::physics::{Body, State, integrate_step};
+///
+/// let primary = Body::new((0.0, 0.0), (0.0, 0.0), 1.989e30, 6.96e8);
+/// let secondary = Body::new((1.496e11, 0.0), (0.0, 29780.0), 5.972e24, 6.371e6);
+/// let test_particle = Body::new((1.50e11, 0.0), (0.0, 30000.0), 1000.0, 10.0);
+/// let state = State::new(primary, secondary, test_particle, 0.0, 6.67430e-11);
+///
+/// let result = integrate_step(&state, 1.0);
+/// assert!(result.new_state.time > 0.0);
+/// assert!(result.kinetic_energy > 0.0);
+/// ```
 pub fn integrate_step(state: &State, dt: f64) -> StepResult {
     assert!(dt > 0.0, "dt must be positive");
     assert!(
