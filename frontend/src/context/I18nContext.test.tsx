@@ -15,6 +15,9 @@ function TestComponent() {
       <button data-testid="btn-it" onClick={() => setLanguage('it')}>
         IT
       </button>
+      <button data-testid="btn-tlh" onClick={() => setLanguage('tlh')}>
+        TLH
+      </button>
     </div>
   );
 }
@@ -43,5 +46,12 @@ describe('I18nContext and I18nProvider', () => {
 
     expect(screen.getByTestId('lang').textContent).toBe('it');
     expect(screen.getByTestId('title').textContent).toBe('Simulazione a 3 Corpi Ristretta');
+
+    act(() => {
+      screen.getByTestId('btn-tlh').click();
+    });
+
+    expect(screen.getByTestId('lang').textContent).toBe('tlh');
+    expect(screen.getByTestId('title').textContent).toBe('3-Hov System SeHlaw Quj');
   });
 });

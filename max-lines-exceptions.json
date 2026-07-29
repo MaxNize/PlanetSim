@@ -6,6 +6,11 @@
             "approved_by": "arch-team"
         },
         {
+            "path": "frontend/src/i18n/translations.ts",
+            "reason": "i18n translation dictionaries for multi-language support",
+            "approved_by": "arch-team"
+        },
+        {
             "path": "wasm/src/lib.rs",
             "reason": "rustdoc examples and WASM bindings - contains multiple documented exports with examples",
             "approved_by": "arch-team"
