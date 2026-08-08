@@ -21,6 +21,7 @@
     "check:rust-udeps": "cd wasm && cargo +nightly udeps --all-targets --all-features",
     "check:quality": "npm run check:fallow && npm run check:rust-udeps",
     "test": "npm --prefix frontend run test && (cd wasm && cargo test) && ./scripts/check_rust_line_count.sh && npm run check:structure && npm run check:max-lines",
+    "test:e2e": "npm --prefix frontend run test:e2e",
     "commit-lint": "commitlint --edit"
   },
   "devDependencies": {

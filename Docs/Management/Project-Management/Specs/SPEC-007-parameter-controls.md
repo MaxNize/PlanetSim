@@ -13,38 +13,38 @@ so that I can explore how mass and time scale affect orbits
 ## ✅ Acceptance Criteria
 
 ### Parameter Controls
-- [ ] AC 1.1: Mass slider for each body (range: 1e24 to 1e33 kg, default Earth/Sun)
-- [ ] AC 1.2: Time scale multiplier (range: 0.1x to 100x, default 1x)
-- [ ] AC 1.3: Numeric input fields for precise value entry
-- [ ] AC 1.4: Unit labels displayed (kg for mass, "x real-time" for scale)
+- [x] AC 1.1: Mass slider for each body (range: 1e24 to 1e33 kg, default Earth/Sun)
+- [x] AC 1.2: Time scale multiplier (range: 0.1x to 100x, default 1x)
+- [x] AC 1.3: Numeric input fields for precise value entry
+- [x] AC 1.4: Unit labels displayed (kg for mass, "x real-time" for scale)
 
 ### Validation
-- [ ] AC 2.1: Mass must be positive (>0)
-- [ ] AC 2.2: Time scale must be positive (>0)
-- [ ] AC 2.3: Invalid input shows error message, reverts to previous value
-- [ ] AC 2.4: Min/max constraints enforced
+- [x] AC 2.1: Mass must be positive (>0)
+- [x] AC 2.2: Time scale must be positive (>0)
+- [x] AC 2.3: Invalid input shows error message, reverts to previous value
+- [x] AC 2.4: Min/max constraints enforced
 
 ### Real-time Updates
-- [ ] AC 3.1: Slider change immediately updates simulation parameters
-- [ ] AC 3.2: No lag between slider movement and visual effect
-- [ ] AC 3.3: Numeric input updates on blur or Enter key
-- [ ] AC 3.4: WASM Simulator config updated before next step
+- [x] AC 3.1: Slider change immediately updates simulation parameters
+- [x] AC 3.2: No lag between slider movement and visual effect
+- [x] AC 3.3: Numeric input updates on blur or Enter key
+- [x] AC 3.4: WASM Simulator config updated before next step
 
 ### Presets
-- [ ] AC 4.1: "Earth-Moon" preset loads realistic values
-- [ ] AC 4.2: "Binary Stars" preset loads comparable-mass system
-- [ ] AC 4.3: "Custom" mode allows manual adjustment
-- [ ] AC 4.4: Preset changes all affected parameters at once
+- [x] AC 4.1: "Earth-Moon" preset loads realistic values
+- [x] AC 4.2: "Binary Stars" preset loads comparable-mass system
+- [x] AC 4.3: "Custom" mode allows manual adjustment
+- [x] AC 4.4: Preset changes all affected parameters at once
 
 ### UI/UX
-- [ ] AC 5.1: Controls arranged vertically or in logical groups
-- [ ] AC 5.2: Clear labels and help text
-- [ ] AC 5.3: Responsive on mobile (touch-friendly sliders)
-- [ ] AC 5.4: Disabled during animation transitions (optional)
+- [x] AC 5.1: Controls arranged vertically or in logical groups
+- [x] AC 5.2: Clear labels and help text
+- [x] AC 5.3: Responsive on mobile (touch-friendly sliders)
+- [x] AC 5.4: Disabled during animation transitions (optional)
 
 ### Reset
-- [ ] AC 6.1: Reset button returns to default configuration
-- [ ] AC 6.2: Confirmation dialog for destructive changes (optional)
+- [x] AC 6.1: Reset button returns to default configuration
+- [x] AC 6.2: Confirmation dialog for destructive changes (optional)
 
 -
 
@@ -229,25 +229,19 @@ export const DEFAULT_CONFIG: PhysicsConfig = EARTH_MOON_CONFIG;
 
 ## 🧪 Tests
 
-- [ ] Unit: Validation of mass and time scale inputs
-- [ ] Component: Slider change triggers callback with updated config
-- [ ] Integration: Config changes update WASM Simulator
-- [ ] Manual: Adjust sliders, verify orbit behavior changes
-
--
-
-## 🚀 Implementation Flow
-
-1. Spec Review → Component skeleton (RED) → Validation logic (GREEN) → Preset handling → Integration tests
+- [x] Unit: Validation of mass and time scale inputs
+- [x] Component: Slider change triggers callback with updated config
+- [x] Integration: Config changes update WASM Simulator
+- [x] Manual: Adjust sliders, verify orbit behavior changes
 
 -
 
 ## ✅ Definition of Done
 
-- [ ] DOD-Global: All criteria met
-- [ ] DOD-Validation: Invalid inputs rejected gracefully
-- [ ] DOD-UX: Sliders responsive and smooth
-- [ ] All preset tests passing
+- [x] DOD-Global: All criteria met
+- [x] DOD-Validation: Invalid inputs rejected gracefully
+- [x] DOD-UX: Sliders responsive and smooth
+- [x] All preset tests passing
 
 -
 
