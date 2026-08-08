@@ -6,26 +6,22 @@ import { useSimulationStep } from '../hooks/useSimulationStep';
 // Default gravitational constant
 const G = 6.6743e-11;
 
-// Default initial state: Earth-Moon system
 export const DEFAULT_INITIAL_STATE: SimulationState = {
-  primary: {
-    position: [0.0, 0.0],
-    velocity: [0.0, 0.0],
-    mass: 5.9722e24, // Earth mass in kg
-    radius: 6.371e6, // Earth radius in meters
-  },
-  secondary: {
-    position: [3.844e8, 0.0], // Earth-Moon distance in meters
-    velocity: [0.0, 1022.0], // Moon orbital speed in m/s
-    mass: 7.3477e22, // Moon mass in kg
-    radius: 1.737e6, // Moon radius in meters
-  },
-  testParticle: {
-    position: [3.0e8, 0.0], // Test particle position between Earth and Moon
-    velocity: [0.0, 800.0], // Test particle initial velocity
-    mass: 1.0, // Negligible mass
-    radius: 1.0,
-  },
+  primary: { position: [0.0, 0.0], velocity: [0.0, 0.0], mass: 5.9722e24, radius: 6.371e6 },
+  secondary: { position: [3.844e8, 0.0], velocity: [0.0, 1022.0], mass: 7.3477e22, radius: 1.737e6 },
+  testParticle: { position: [3.0e8, 0.0], velocity: [0.0, 800.0], mass: 1.0, radius: 1.0 },
+  time: 0.0,
+  gravitationalConstant: G,
+};
+
+export type PresetType = 'earth-moon' | 'binary-stars' | 'custom';
+
+export const EARTH_MOON_PRESET: SimulationState = DEFAULT_INITIAL_STATE;
+
+export const BINARY_STARS_PRESET: SimulationState = {
+  primary: { position: [-5.0e8, 0.0], velocity: [0.0, -257635.0], mass: 1.989e30, radius: 6.9634e7 },
+  secondary: { position: [5.0e8, 0.0], velocity: [0.0, 257635.0], mass: 1.989e30, radius: 6.9634e7 },
+  testParticle: { position: [0.0, 4.33e8], velocity: [223120.0, 0.0], mass: 1.0, radius: 1.0 },
   time: 0.0,
   gravitationalConstant: G,
 };
@@ -44,6 +40,8 @@ export interface SimulationContextType {
   clearHistory: () => void;
   resetSimulation: () => void;
   error: string | null;
+  preset: PresetType;
+  setPreset: (preset: PresetType) => void;
 }
 
 export const simulationContext = createContext<SimulationContextType | null>(null);
@@ -63,6 +61,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
   const [history, setHistory] = useState<[number, number][]>([]);
   const [lagrangePoints, setLagrangePoints] = useState<LagrangePointSet | null>(null);
   const [resetCounter, setResetCounter] = useState<number>(0);
+  const [preset, setPresetState] = useState<PresetType>('earth-moon');
 
   // Manage simulator lifecycle
   const { simulator, error } = useSimulation(initialState, resetCounter);
@@ -80,7 +79,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     } else {
       setLagrangePoints(null);
     }
-  }, [simulator, initialState]);
+  }, [simulator]);
 
   // Handle updates after each simulation step
   const handleStep = useCallback(
@@ -111,11 +110,54 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     setResetCounter((prev) => prev + 1);
   }, [initialState, setStepResult]);
 
+  // Set preset and reset simulator to the preset config
+  const setPreset = useCallback(
+    (p: PresetType) => {
+      setPresetState(p);
+      let newState: SimulationState;
+      if (p === 'earth-moon') {
+        newState = EARTH_MOON_PRESET;
+        setSpeedMultiplier(10000.0);
+      } else if (p === 'binary-stars') {
+        newState = BINARY_STARS_PRESET;
+        setSpeedMultiplier(20.0);
+      } else {
+        return;
+      }
+      setInitialState(newState);
+      setCurrentState(newState);
+      setHistory([newState.testParticle.position]);
+      setIsPaused(true);
+      setStepResult(null);
+      setResetCounter((prev) => prev + 1);
+    },
+    [setStepResult],
+  );
+
+  // Custom setInitialState that marks preset as custom and syncs current state & WASM engine in-place
+  const setInitialStateAndSync = useCallback(
+    (state: SimulationState) => {
+      setPresetState('custom');
+      setInitialState(state);
+      setCurrentState(state);
+      if (simulator) {
+        try {
+          simulator.setState(state);
+          // Force immediate recalculation of Lagrange points when masses update
+          setLagrangePoints(simulator.getLagrangePoints());
+        } catch (err) {
+          console.error('Failed to update simulator state in-place:', err);
+        }
+      }
+    },
+    [simulator],
+  );
+
   return (
     <simulationContext.Provider
       value={{
         initialState,
-        setInitialState,
+        setInitialState: setInitialStateAndSync,
         currentState,
         stepResult,
         isPaused,
@@ -127,6 +169,8 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         clearHistory,
         resetSimulation,
         error,
+        preset,
+        setPreset,
       }}
     >
       {children}

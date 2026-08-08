@@ -17,23 +17,27 @@ describe('ParameterControls component', () => {
       isPaused: true,
       setIsPaused: vi.fn(),
       onReset: vi.fn(),
+      preset: 'earth-moon' as const,
+      setPreset: vi.fn(),
     };
 
     render(<ParameterControls {...props} />);
 
     // Assert headings
-    expect(screen.getByText('Simulation Controls')).toBeDefined();
+    expect(screen.getByText('Simulation System')).toBeDefined();
 
     // Assert buttons
     expect(screen.getByText('▶ Play')).toBeDefined();
     expect(screen.getByText('🔄 Reset')).toBeDefined();
+    expect(screen.getByText('🌍 Earth-Moon')).toBeDefined();
+    expect(screen.getByText('✨ Binary Stars')).toBeDefined();
 
-    // Assert inputs
-    const inputs = screen.getAllByRole('spinbutton');
-    expect(inputs.length).toBe(4); // 4 numeric inputs
+    // Assert text inputs (role textbox)
+    const inputs = screen.getAllByRole('textbox');
+    expect(inputs.length).toBe(4);
   });
 
-  it('should trigger callbacks when sliders or buttons are interacted with', () => {
+  it('should trigger callbacks when sliders, buttons, or presets are interacted with', () => {
     const props = {
       massM1: 1e24,
       setMassM1: vi.fn(),
@@ -46,6 +50,8 @@ describe('ParameterControls component', () => {
       isPaused: true,
       setIsPaused: vi.fn(),
       onReset: vi.fn(),
+      preset: 'earth-moon' as const,
+      setPreset: vi.fn(),
     };
 
     render(<ParameterControls {...props} />);
@@ -57,5 +63,9 @@ describe('ParameterControls component', () => {
     // Trigger Reset click
     fireEvent.click(screen.getByText('🔄 Reset'));
     expect(props.onReset).toHaveBeenCalled();
+
+    // Trigger Preset click
+    fireEvent.click(screen.getByText('✨ Binary Stars'));
+    expect(props.setPreset).toHaveBeenCalledWith('binary-stars');
   });
 });

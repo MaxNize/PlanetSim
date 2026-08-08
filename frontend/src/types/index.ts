@@ -13,6 +13,8 @@ export interface ParameterControlsProps {
   isPaused: boolean;
   setIsPaused: (paused: boolean) => void;
   onReset: () => void;
+  preset: 'earth-moon' | 'binary-stars' | 'custom';
+  setPreset: (preset: 'earth-moon' | 'binary-stars' | 'custom') => void;
 }
 
 /**

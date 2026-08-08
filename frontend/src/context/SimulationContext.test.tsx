@@ -5,7 +5,7 @@ import { SimulationProvider, useSimulationContext } from './SimulationContext';
 
 // Helper component to consume context and expose fields for assertion
 function TestConsumer() {
-  const { currentState, isPaused, setIsPaused, speedMultiplier, setSpeedMultiplier, resetSimulation, history } = useSimulationContext();
+  const { currentState, initialState, isPaused, setIsPaused, speedMultiplier, setSpeedMultiplier, resetSimulation, history, preset, setPreset } = useSimulationContext();
 
   return (
     <div>
@@ -13,6 +13,8 @@ function TestConsumer() {
       <span data-testid="paused">{isPaused ? 'paused' : 'running'}</span>
       <span data-testid="speed">{speedMultiplier}</span>
       <span data-testid="history-len">{history.length}</span>
+      <span data-testid="preset">{preset}</span>
+      <span data-testid="mass1">{initialState.primary.mass}</span>
       <button data-testid="btn-toggle" onClick={() => setIsPaused(!isPaused)}>
         Toggle
       </button>
@@ -21,6 +23,9 @@ function TestConsumer() {
       </button>
       <button data-testid="btn-reset" onClick={resetSimulation}>
         Reset
+      </button>
+      <button data-testid="btn-preset-binary" onClick={() => setPreset('binary-stars')}>
+        Binary
       </button>
     </div>
   );
@@ -39,6 +44,7 @@ describe('SimulationContext and SimulationProvider', () => {
     expect(screen.getByTestId('paused').textContent).toBe('paused'); // Default is paused (true)
     expect(screen.getByTestId('speed').textContent).toBe('10000');
     expect(screen.getByTestId('history-len').textContent).toBe('1'); // Initial particle position
+    expect(screen.getByTestId('preset').textContent).toBe('earth-moon');
 
     // Toggle paused state
     act(() => {
@@ -57,5 +63,13 @@ describe('SimulationContext and SimulationProvider', () => {
       screen.getByTestId('btn-reset').click();
     });
     expect(screen.getByTestId('history-len').textContent).toBe('1');
+
+    // Set preset to binary-stars
+    act(() => {
+      screen.getByTestId('btn-preset-binary').click();
+    });
+    expect(screen.getByTestId('preset').textContent).toBe('binary-stars');
+    expect(screen.getByTestId('mass1').textContent).toBe('1.989e+30');
+    expect(screen.getByTestId('speed').textContent).toBe('20');
   });
 });
