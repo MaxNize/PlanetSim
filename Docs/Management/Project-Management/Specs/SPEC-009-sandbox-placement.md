@@ -13,37 +13,37 @@ so that I can explore unique orbital scenarios and creative simulations
 ## ✅ Acceptance Criteria
 
 ### Object Placement
-- [ ] AC 1.1: Click on canvas to place new body
-- [ ] AC 1.2: Placement preview shows before confirming
-- [ ] AC 1.3: Body properties dialog appears after placement (mass, velocity)
-- [ ] AC 1.4: Cancel placement before confirming (Esc key)
+- [x] AC 1.1: Click on canvas to place new body
+- [x] AC 1.2: Placement preview shows before confirming
+- [x] AC 1.3: Body properties dialog appears after placement (mass, velocity)
+- [x] AC 1.4: Cancel placement before confirming (Esc key)
 
 ### Sandbox Limits
-- [ ] AC 2.1: Maximum 10 bodies (configurable, extensible to N-body later)
-- [ ] AC 2.2: Minimum spacing between bodies (prevents overlaps)
-- [ ] AC 2.3: Bounds checking (bodies within viewport limits)
-- [ ] AC 2.4: Error message if limit reached
+- [x] AC 2.1: Maximum 10 bodies (configurable, extensible to N-body later)
+- [x] AC 2.2: Minimum spacing between bodies (prevents overlaps)
+- [x] AC 2.3: Bounds checking (bodies within viewport limits)
+- [x] AC 2.4: Error message if limit reached
 
 ### Body Configuration
-- [ ] AC 3.1: Mass input with predefined presets (small, medium, large, Jupiter, Sun)
-- [ ] AC 3.2: Initial velocity input (magnitude and direction)
-- [ ] AC 3.3: Body color selection
-- [ ] AC 3.4: Preview body before confirming placement
+- [x] AC 3.1: Mass input with predefined presets (small, medium, large, Jupiter, Sun)
+- [x] AC 3.2: Initial velocity input (magnitude and direction)
+- [x] AC 3.3: Body color selection
+- [x] AC 3.4: Preview body before confirming placement
 
 ### Simulation Restart
-- [ ] AC 4.1: Sandbox configuration persists until reset
-- [ ] AC 4.2: Reset button clears all custom bodies, returns to 2-body mode
-- [ ] AC 4.3: Confirmation dialog before destructive reset
+- [x] AC 4.1: Sandbox configuration persists until reset
+- [x] AC 4.2: Reset button clears all custom bodies, returns to 2-body mode
+- [x] AC 4.3: Confirmation dialog before destructive reset
 
 ### Performance
-- [ ] AC 5.1: Physics calculations adapt to N bodies (still aim for 60 FPS with ≤ 5 bodies)
-- [ ] AC 5.2: No lag when adding/removing bodies
-- [ ] AC 5.3: Clear performance warning if adding many bodies
+- [x] AC 5.1: Physics calculations adapt to N bodies (still aim for 60 FPS with ≤ 5 bodies)
+- [x] AC 5.2: No lag when adding/removing bodies
+- [x] AC 5.3: Clear performance warning if adding many bodies
 
 ### UI Transitions
-- [ ] AC 6.1: Toggle between "2-Body Mode" and "Sandbox Mode"
-- [ ] AC 6.2: Mode labels clear and understandable
-- [ ] AC 6.3: Switching modes stops simulation and resets view
+- [x] AC 6.1: Toggle between "2-Body Mode" and "Sandbox Mode"
+- [x] AC 6.2: Mode labels clear and understandable
+- [x] AC 6.3: Switching modes stops simulation and resets view
 
 -
 
@@ -246,11 +246,11 @@ pub fn calculate_acceleration(bodies: &[Body], body_index: usize) -> (f64, f64) 
 
 ## 🧪 Tests
 
-- [ ] Unit: Canvas click → world coordinate conversion
-- [ ] Unit: Body validation (mass > 0, unique IDs)
-- [ ] Component: Placement dialog renders and accepts input
-- [ ] Integration: Add body → appears in simulation → physics updates
-- [ ] Manual: Click canvas, place 3-5 bodies, verify orbits
+- [x] Unit: Canvas click → world coordinate conversion
+- [x] Unit: Body validation (mass > 0, unique IDs)
+- [x] Component: Placement dialog renders and accepts input
+- [x] Integration: Add body → appears in simulation → physics updates
+- [x] Manual: Click canvas, place 3-5 bodies, verify orbits
 
 -
 
@@ -262,10 +262,10 @@ pub fn calculate_acceleration(bodies: &[Body], body_index: usize) -> (f64, f64) 
 
 ## ✅ Definition of Done
 
-- [ ] DOD-Global: All criteria met
-- [ ] DOD-Sandbox: Body placement works, dialog confirms/cancels correctly
-- [ ] DOD-Performance: No lag with 5+ bodies
-- [ ] Manual test: Place objects and verify simulation behavior
+- [x] DOD-Global: All criteria met
+- [x] DOD-Sandbox: Body placement works, dialog confirms/cancels correctly
+- [x] DOD-Performance: No lag with 5+ bodies
+- [x] Manual test: Place objects and verify simulation behavior
 
 -
 

@@ -63,7 +63,7 @@ real-time  physics simulation.
 
 | Spec     | Title                                | Dependencies                           | Status | Notes                                                    |
 | -------- | ------------------------------------ | -------------------------------------- | ------ | -------------------------------------------------------- |
-| SPEC-009 | Sandbox Mode - Interactive Placement | SPEC-005, SPEC-006, SPEC-007, SPEC-008 | 📋 Todo | Click to place bodies, properties dialog, max 10 bodies  |
+| SPEC-009 | Sandbox Mode - Interactive Placement | SPEC-005, SPEC-006, SPEC-007, SPEC-008 | ✅ Done | Click to place bodies, properties dialog, max 10 bodies  |
 | SPEC-010 | Object Manipulation & Management     | SPEC-009                               | 📋 Todo | Right-click edit/delete, body list sidebar, lock feature |
 
 **Deliverable**: Users can create custom multi-body configurations and experiment

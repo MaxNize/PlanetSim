@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useSimulationContext } from '../../context/SimulationContext';
 import { ParameterControls } from '../ParameterControls/ParameterControls';
 import { StateDisplay } from '../StateDisplay/StateDisplay';
@@ -8,8 +8,25 @@ import { Canvas } from '../Canvas/Canvas';
  * Container component that connects the global simulation context to presentational children.
  */
 export function Simulator() {
-  const { initialState, setInitialState, currentState, stepResult, isPaused, setIsPaused, speedMultiplier, setSpeedMultiplier, lagrangePoints, resetSimulation, error, preset, setPreset } =
-    useSimulationContext();
+  const {
+    initialState,
+    setInitialState,
+    currentState,
+    stepResult,
+    isPaused,
+    setIsPaused,
+    speedMultiplier,
+    setSpeedMultiplier,
+    lagrangePoints,
+    resetSimulation,
+    error,
+    preset,
+    setPreset,
+    mode,
+    addBody,
+  } = useSimulationContext();
+
+  const [placementActive, setPlacementActive] = useState(false);
 
   const setMassM1 = useCallback(
     (m: number) => {
@@ -33,11 +50,10 @@ export function Simulator() {
 
   const setDistanceR = useCallback(
     (d: number) => {
-      // When distanceR changes, update secondary body position x coordinate
       setInitialState({
         ...initialState,
         secondary: { ...initialState.secondary, position: [d, 0.0] },
-        testParticle: { ...initialState.testParticle, position: [d * 0.78, 0.0] }, // shift test particle position proportionally
+        testParticle: { ...initialState.testParticle, position: [d * 0.78, 0.0] },
       });
     },
     [initialState, setInitialState],
@@ -47,7 +63,15 @@ export function Simulator() {
     <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden' }}>
       {/* Simulation Area (Fullscreen Background Canvas) */}
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}>
-        <Canvas showTrail={true} />
+        <Canvas
+          showTrail={true}
+          placementActive={placementActive}
+          onPlacementCancel={() => setPlacementActive(false)}
+          onPlacementComplete={(body) => {
+            addBody(body);
+            setPlacementActive(false);
+          }}
+        />
       </div>
 
       {/* Floating Legend Overlay */}
@@ -69,10 +93,16 @@ export function Simulator() {
           fontFamily: 'sans-serif',
         }}
       >
-        <span>🟡 M1 (Primary)</span>
-        <span>🔵 M2 (Secondary)</span>
-        <span>🟢 Test Particle</span>
-        {lagrangePoints && <span>🔴 Lagrange Points (L1-L5 computed)</span>}
+        {mode === 'sandbox' ? (
+          <span>🌌 Custom Bodies Active (Verlet N-Body Simulator)</span>
+        ) : (
+          <>
+            <span>🟡 M1 (Primary)</span>
+            <span>🔵 M2 (Secondary)</span>
+            <span>🟢 Test Particle</span>
+            {lagrangePoints && <span>🔴 Lagrange Points (L1-L5 computed)</span>}
+          </>
+        )}
       </div>
 
       {/* Floating Control Sidebar */}
@@ -116,6 +146,8 @@ export function Simulator() {
             onReset={resetSimulation}
             preset={preset}
             setPreset={setPreset}
+            placementActive={placementActive}
+            setPlacementActive={setPlacementActive}
           />
         </div>
 

@@ -34,7 +34,7 @@ describe('Simulator container component', () => {
     };
 
     render(
-      <simulationContext.Provider value={mockContextValue}>
+      <simulationContext.Provider value={mockContextValue as any}>
         <Simulator />
       </simulationContext.Provider>,
     );

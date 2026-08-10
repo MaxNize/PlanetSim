@@ -21,3 +21,12 @@ export const BINARY_STARS_PRESET: SimulationState = {
   time: 0.0,
   gravitationalConstant: G,
 };
+
+/**
+ * Returns the state and recommended speed configuration for the given preset type.
+ */
+export function getPresetState(p: PresetType): { state: SimulationState; speed: number } | null {
+  if (p === 'earth-moon') return { state: EARTH_MOON_PRESET, speed: 10000.0 };
+  if (p === 'binary-stars') return { state: BINARY_STARS_PRESET, speed: 20.0 };
+  return null;
+}
