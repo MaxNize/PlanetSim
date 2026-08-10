@@ -5,6 +5,22 @@ use super::types::Body;
 use super::integrator::advance_pos;
 
 /// Symplectic Velocity-Verlet integration for N arbitrary bodies.
+///
+/// Computes mutual gravitational forces between all pairs of $N$ bodies and advances positions
+/// and velocities in $\mathcal{O}(N^2)$ time per step.
+///
+/// # Examples
+/// ```
+/// use planet_sim::physics::{Body, n_body::integrate_n_body};
+///
+/// let b1 = Body::new((0.0, 0.0), (0.0, 0.0), 1.989e30, 6.96e8);
+/// let b2 = Body::new((1.496e11, 0.0), (0.0, 29780.0), 5.972e24, 6.371e6);
+/// let bodies = vec![b1, b2];
+///
+/// let next_bodies = integrate_n_body(&bodies, 6.67430e-11, 1.0);
+/// assert_eq!(next_bodies.len(), 2);
+/// assert!(next_bodies[1].position.1 > 0.0);
+/// ```
 pub fn integrate_n_body(bodies: &[Body], g: f64, dt: f64) -> Vec<Body> {
     let n = bodies.len();
     if n == 0 {
