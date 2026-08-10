@@ -1,192 +1,116 @@
-# SPEC-012: Documentation Deployment
+# SPEC-012: Deployment Strategy
 
 -
 
 ## 📝 User Story
 ```text
-As a maintainer
-I want automated deployment of project documentation
-so that the team and community always have access to current specs, guides, and architecture
+As a developer/maintainer
+I want the planet simulation application container and its documentation to deploy automatically
+so that users always access the latest stable version and maintainers have clear setup guides
 ```
 -
 
 ## ✅ Acceptance Criteria
 
-### Documentation Build & Publishing
-- [ ] AC 1.1: All Markdown files build without errors
-- [ ] AC 1.2: Documentation indexes and navigation generated automatically
-- [ ] AC 1.3: Specs, DoDs, Guides organized by category
-- [ ] AC 1.4: README and project structure documented
+### Application Containerization
+- [x] AC 1.1: Web app built and packaged inside a lightweight Alpine Nginx Docker image
+- [x] AC 1.2: Port mapping (`APP_PORT`) and external docker network (`NPM_NETWORK_NAME`) configurable via environment variables
+- [x] AC 1.3: Support for single-page application (SPA) routing redirects in Nginx conf
 
-### Documentation Release Process
-- [ ] AC 2.1: Version bumping automated (Conventional Commits → docs version)
-- [ ] AC 2.2: Release notes generated from specs changes
-- [ ] AC 2.3: Git tags created for documentation releases
-- [ ] AC 2.4: Documentation changelog published
+### Automated CI/CD Deployment
+- [x] AC 2.1: Automatic deployment triggered upon successful `CI Pipeline` workflow run on `main` branch
+- [x] AC 2.2: Build and deploy execution runs on a `self-hosted` GitHub Actions runner
+- [x] AC 2.3: Automatically stops and rebuilds the container using Docker Compose
 
-### Documentation Deployment
-- [ ] AC 3.1: Documentation published to GitHub Pages (docs site)
-- [ ] AC 3.2: Auto-deploy on push to main branch
-- [ ] AC 3.3: Documentation accessible at predictable URL
-- [ ] AC 3.4: Deployment logs visible and auditable
+### DNS & Reverse Proxy Integration
+- [x] AC 3.1: Server exposed publicly using DynDNS / CDN (ipv64.net) mapping
+- [x] AC 3.2: Reverse proxy routes traffic to the container using Nginx Proxy Manager (NPM) on the shared external network
+- [x] AC 3.3: Let's Encrypt SSL certificates managed by Nginx Proxy Manager
 
-### Documentation History & Rollback
-- [ ] AC 4.1: Documentation versions accessible (GitHub Releases)
-- [ ] AC 4.2: Documentation build history tracked
-- [ ] AC 4.3: Rollback to previous documentation version possible
-
-### Documentation Monitoring
-- [ ] AC 5.1: Documentation deployment status visible (badge in README)
-- [ ] AC 5.2: Build failures alerted and visible
-- [ ] AC 5.3: Documentation links are valid (link checker in CI)
+### Documentation Validation & Publishing
+- [x] AC 4.1: Documentation published to GitHub Pages (docs site)
+- [x] AC 4.2: Auto-deploy on push to `main` branch for changes under `Docs/**`
+- [x] AC 4.3: Documentation links validated via link checkers in CI/CD pipeline
 
 -
 
 ## 🔧 Technical Solution
 
-### Documentation Build
+### Container Configurations
 
-**`Docs/index.md` (Documentation homepage)**
-```markdown
-# Planet Simulation - Project Documentation
+#### docker-compose.yml
+Deploys the service attached to the external Nginx Proxy Manager network:
+```yaml
+services:
+  planet-simulation:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: planet-simulation
+    ports:
+      - "${APP_PORT:-8080}:80"
+    restart: unless-stopped
+    networks:
+      - npm_network
 
-## Quick Navigation
-
-- **[Project Overview](./Project-Overview.md)** - Vision and scope
-- **[Management](./Management/)** - Roadmap, specs, DoDs
- - [Roadmap](./Management/Roadmap.md)
- - [Specifications](./Management/Specs/)
- - [Definitions of Done](./Management/DoDs/)
-- **[Guides](./Guides/)** - How-to documentation
-- **[Architecture](./Architecture/)** - System design decisions
+networks:
+  npm_network:
+    name: ${NPM_NETWORK_NAME:-bridge}
+    external: true
 ```
-### GitHub Pages Deployment
 
-**`.github/workflows/deploy-docs.yml`**
+### GitHub Actions Workflows
+
+#### Application Deployment (`.github/workflows/deploy.yml`)
+Triggers on `workflow_run` of the `CI Pipeline`:
+1. Checkout repository.
+2. Build WASM target and compile frontend production bundle.
+3. Deploy application via `docker compose down && docker compose up -d --build`.
+
+#### Documentation Deployment (`.github/workflows/deploy-docs.yml`)
+Triggers on push to `main` for `Docs/**` changes:
 ```yaml
 name: Deploy Documentation
-
 on:
   push:
     branches: [main]
-    paths:
- - 'planet-simulation/Docs/**'
- - '.github/workflows/deploy-docs.yml'
-  workflow_dispatch:
-
+    paths: ['Docs/**', '.github/workflows/deploy-docs.yml']
+permissions:
+  contents: write
 jobs:
   deploy-docs:
     runs-on: ubuntu-latest
     steps:
- - uses: actions/checkout@v4
-
- - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - uses: actions/checkout@v4
+      - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./planet-simulation/Docs
-          cname: planet-sim-docs.example.com  # Optional custom domain
+          publish_dir: ./Docs
 ```
-### Documentation Structure
 
-```text
-Docs/
-  index.md              # Documentation homepage
-  Project-Overview.md   # Vision and scope
-  Management/
-    Roadmap.md
-    Specs/              # All SPEC-*.md files
-    DoDs/               # All DOD-*.md files
-  Guides/
-    documentation-conventions.md
-    contributing-guide.md
-    project-setup.md
-  Architecture/
-    system-design.md
-    component-diagram.md
-```
-### Link Validation in CI
-
-**`.github/workflows/validate-docs.yml`**
-```yaml
-name: Validate Documentation
-
-on:
-  pull_request:
-    paths:
- - 'planet-simulation/Docs/**'
-  push:
-    branches: [main]
-    paths:
- - 'planet-simulation/Docs/**'
-
-jobs:
-  markdown-lint:
-    runs-on: ubuntu-latest
-    steps:
- - uses: actions/checkout@v4
- - uses: nosborn/github-action-markdown-cli@v3.3.0
-        with:
-          files: planet-simulation/Docs
-
-  link-check:
-    runs-on: ubuntu-latest
-    steps:
- - uses: actions/checkout@v4
- - uses: gaurav-nelson/github-action-markdown-link-check@v1
-        with:
-          use-quiet-mode: 'yes'
-          folder-path: 'planet-simulation/Docs'
-```
-### Documentation versioning
-
-**`Docs/CHANGELOG.md`**
-```markdown
-# Documentation Changelog
-
-## [2.0.0] - 2026-05-18
-- Added SPEC-001 through SPEC-012 complete spec suite
-- Added 200-line maximum file size guidelines
-- Added documentation conventions guide
-
-## [1.0.0] - 2026-05-01
-- Initial project documentation structure
-```
 -
 
 ## 🧪 Tests
 
-- [ ] Build: All Markdown files pass linting
-- [ ] Links: All documentation links are valid (no broken links)
-- [ ] Deployment: Manual deploy to GitHub Pages succeeds
-- [ ] Manual: Deployed docs site loads and navigates correctly
-
--
-
-## 🚀 Implementation Flow
-
-1. Spec Review
-2. Create documentation structure and index
-3. Set up GitHub Pages deployment workflow
-4. Configure link validation in CI (markdown lint + link check)
-5. Set up automatic documentation versioning
-6. Manual validation: push to main → docs deploy to GitHub Pages
-7. Verify docs site accessibility and navigation
+- [x] Build: Docker image builds successfully and fits within standard sizes
+- [x] Routing: Accessing virtual paths redirects to `index.html` (SPA routing)
+- [x] E2E Deployment: Verifying that push to `main` starts container on runner
+- [x] Link check: Link validation action verifies markdown links
+- [x] Pages: Documentation compiles and deploys to GitHub Pages branch
 
 -
 
 ## ✅ Definition of Done
 
-- [ ] DOD-Global: All criteria met
-- [ ] Documentation deployment fully automated
-- [ ] GitHub Pages site live and accessible
-- [ ] Link validation enabled in CI
-- [ ] Documentation changelog maintained
-- [ ] All specs and guides accessible from deployed docs
+- [x] DOD-Global: All criteria met
+- [x] Dockerfile and docker-compose.yml operational
+- [x] GitHub deployment workflows configured (Application and Documentation)
+- [x] Shared NPM external network config functional
+- [x] Deployment guide documented
 
 -
 
 ## 📚 Related Specs
 
-**Depends on**: SPEC-001, SPEC-011 (CI/CD)
-**Complements**: All other specs (documentation for entire project)
+**Depends on**: SPEC-001, SPEC-011
+**Required by**: Production accessibility

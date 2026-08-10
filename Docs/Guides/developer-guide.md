@@ -101,6 +101,10 @@ The project uses semantic versioning (`MAJOR.MINOR.PATCH`) automated by Conventi
 
 ## ❓ Frequently Asked Questions (FAQ)
 
+### Q: How do I deploy the application to production?
+
+A: See the [Deployment Guide](./deployment-guide.md) for full instructions on setting up a self-hosted runner, containerizing with Docker, and routing through Nginx Proxy Manager.
+
 ### Q: How do I build the optimized WASM package?
 
 A: Run `npm run build` or `make build`. This compiles the WebAssembly target in release mode, applying optimizations like dead-code elimination and size shrinking.
