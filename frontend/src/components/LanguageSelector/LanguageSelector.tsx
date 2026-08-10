@@ -29,6 +29,9 @@ export function LanguageSelector() {
       <option value="it" style={{ background: '#0f172a' }}>
         🇮🇹 Italiano
       </option>
+      <option value="tlh" style={{ background: '#0f172a' }}>
+        🖖 tlhIngan Hol (Klingon)
+      </option>
     </select>
   );
 }
