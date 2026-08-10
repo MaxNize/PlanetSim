@@ -15,6 +15,8 @@ export interface ParameterControlsProps {
   onReset: () => void;
   preset: 'earth-moon' | 'binary-stars' | 'custom';
   setPreset: (preset: 'earth-moon' | 'binary-stars' | 'custom') => void;
+  placementActive?: boolean;
+  setPlacementActive?: (active: boolean) => void;
 }
 
 /**
@@ -40,4 +42,32 @@ export interface TrailHistory {
   primary: [number, number][];
   secondary: [number, number][];
   testParticle: [number, number][];
+  customBodies?: { [bodyId: string]: [number, number][] };
+}
+
+/**
+ * Modes of simulation: standard restricted 3-body or generalized sandbox mode.
+ */
+export type SimulationMode = '3body' | 'sandbox';
+
+/**
+ * Representation of a customizable body placed in sandbox mode.
+ */
+export interface SandboxBody {
+  id: string;
+  position: [number, number];
+  velocity: [number, number];
+  mass: number;
+  radius: number;
+  color: string;
+  name?: string;
+  locked?: boolean;
+}
+
+/**
+ * Props for the SandboxControls component.
+ */
+export interface SandboxControlsProps {
+  placementActive: boolean;
+  setPlacementActive: (active: boolean) => void;
 }

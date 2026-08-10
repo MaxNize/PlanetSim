@@ -99,6 +99,16 @@ The project uses semantic versioning (`MAJOR.MINOR.PATCH`) automated by Conventi
 
 ---
 
+## 🌐 Internationalization (i18n)
+
+The application supports tri-lingual internationalization (**English (EN)**, **German (DE)**, and **Italian (IT)**):
+
+- **Dictionaries**: Translation mappings are stored in [translations.ts](file:///home/max/root/Code-Root/fortgeschrittene-programmierung/frontend/src/i18n/translations.ts).
+- **Context & Hook**: Use the `useI18n()` hook (`const { t } = useI18n()`) to access translation strings dynamically.
+- **Adding New Keys**: When adding new UI components or text labels, add matching keys for `'en'`, `'de'`, and `'it'` in `translations.ts`.
+
+---
+
 ## ❓ Frequently Asked Questions (FAQ)
 
 ### Q: How do I deploy the application to production?

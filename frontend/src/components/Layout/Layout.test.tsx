@@ -25,7 +25,7 @@ describe('Layout component', () => {
     };
 
     render(
-      <simulationContext.Provider value={mockContextValue}>
+      <simulationContext.Provider value={mockContextValue as any}>
         <Layout />
       </simulationContext.Provider>,
     );

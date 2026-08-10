@@ -1,10 +1,14 @@
 import React from 'react';
 import { Simulator } from '../Simulator/Simulator';
+import { useI18n } from '../../context/I18nContext';
+import { LanguageSelector } from '../LanguageSelector/LanguageSelector';
 
 /**
  * Layout component providing a responsive structure for the application.
  */
 export function Layout() {
+  const { t } = useI18n();
+
   return (
     <main
       style={{
@@ -27,12 +31,15 @@ export function Layout() {
           padding: '16px 20px',
           borderRadius: '12px',
           border: '1px solid rgba(255, 255, 255, 0.1)',
-          maxWidth: '400px',
+          maxWidth: '420px',
           color: '#fff',
         }}
       >
-        <h1 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', color: '#fff' }}>Restricted 3-Body Planet Simulation</h1>
-        <p style={{ margin: '6px 0 0 0', fontSize: '13px', color: '#aaa', lineHeight: '1.4' }}>Simulates orbital mechanics of a test particle in a primary/secondary gravitational system.</p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+          <h1 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#fff' }}>{t('header.title')}</h1>
+          <LanguageSelector />
+        </div>
+        <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: '#aaa', lineHeight: '1.4' }}>{t('header.subtitle')}</p>
       </header>
 
       <Simulator />

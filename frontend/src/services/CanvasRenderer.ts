@@ -1,5 +1,6 @@
 import { SimulationState, LagrangePointSet } from './wasmBridge';
 import { TrailHistory } from '../types';
+import { drawTrail, drawLagrangePoints, drawOverlay, drawBodyLabel } from './canvasHelpers';
 
 export interface ViewportConfig {
   scale: number; // pixels per meter
@@ -17,26 +18,78 @@ export class CanvasRenderer {
   }
 
   /** Main render method that coordinates drawing the entire simulation state. */
-  public draw(state: SimulationState, trailHistory: TrailHistory, showTrail: boolean, lagrangePoints: LagrangePointSet | null, viewport: ViewportConfig): void {
+  public draw(
+    state: SimulationState,
+    trailHistory: TrailHistory,
+    showTrail: boolean,
+    lagrangePoints: LagrangePointSet | null,
+    viewport: ViewportConfig,
+    placementPreview?: { position: [number, number]; velocity: [number, number]; radius: number; color: string },
+  ): void {
     const { width, height } = this.resize();
     this.clear();
+    const ctx = this.ctx;
+    if (!ctx) return;
+
+    const wtc = (pos: [number, number]) => this.worldToCanvas(pos, viewport, width, height);
 
     if (lagrangePoints) {
-      this.drawLagrangePoints(lagrangePoints, viewport, width, height);
+      drawLagrangePoints(ctx, lagrangePoints, wtc);
     }
 
-    if (showTrail) {
-      this.drawTrail(trailHistory.primary, '#f0932b', viewport, width, height);
-      this.drawTrail(trailHistory.secondary, '#48dbfb', viewport, width, height);
-      this.drawTrail(trailHistory.testParticle, '#2ed573', viewport, width, height);
+    if (state.bodies) {
+      state.bodies.forEach((b: any, idx: number) => {
+        const bodyId = b.id || `body-${idx}`;
+        if (showTrail && trailHistory.customBodies && trailHistory.customBodies[bodyId]) {
+          drawTrail(ctx, trailHistory.customBodies[bodyId], b.color || '#fff', wtc);
+        }
+        this.drawBody(b.position, b.radius, b.color || '#fff', viewport, width, height);
+        if (b.name) {
+          drawBodyLabel(ctx, b.position, b.name, wtc);
+        }
+      });
+    } else {
+      if (showTrail) {
+        drawTrail(ctx, trailHistory.primary, '#f0932b', wtc);
+        drawTrail(ctx, trailHistory.secondary, '#48dbfb', wtc);
+        drawTrail(ctx, trailHistory.testParticle, '#2ed573', wtc);
+      }
+      this.drawBody(state.primary.position, state.primary.radius, '#f0932b', viewport, width, height);
+      this.drawBody(state.secondary.position, state.secondary.radius, '#48dbfb', viewport, width, height);
+      this.drawBody(state.testParticle.position, state.testParticle.radius, '#2ed573', viewport, width, height);
     }
 
-    // Draw primary (M1), secondary (M2), and test particle
-    this.drawBody(state.primary.position, state.primary.radius, '#f0932b', viewport, width, height);
-    this.drawBody(state.secondary.position, state.secondary.radius, '#48dbfb', viewport, width, height);
-    this.drawBody(state.testParticle.position, state.testParticle.radius, '#2ed573', viewport, width, height);
+    if (placementPreview) {
+      const p = placementPreview;
+      this.drawBody(p.position, p.radius, p.color, viewport, width, height);
 
-    this.drawOverlay(state, viewport);
+      const velMag = Math.hypot(...p.velocity);
+      if (velMag > 0) {
+        const start = wtc(p.position);
+        const scaleVel = 1e1;
+        const endPos: [number, number] = [p.position[0] + p.velocity[0] * scaleVel, p.position[1] + p.velocity[1] * scaleVel];
+        const end = wtc(endPos);
+
+        ctx.beginPath();
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(end.x, end.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        const angle = Math.atan2(end.y - start.y, end.x - start.x);
+        ctx.beginPath();
+        ctx.fillStyle = '#3b82f6';
+        ctx.moveTo(end.x, end.y);
+        ctx.lineTo(end.x - 8 * Math.cos(angle - Math.PI / 6), end.y - 8 * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(end.x - 8 * Math.cos(angle + Math.PI / 6), end.y - 8 * Math.sin(angle + Math.PI / 6));
+        ctx.fill();
+      }
+    }
+
+    drawOverlay(ctx, state, viewport.scale);
   }
 
   /** Resizes canvas to match client dimensions, accounting for high-DPI screens. */
@@ -105,75 +158,5 @@ export class CanvasRenderer {
       this.ctx.arc(x, y, radius + 2, 0, Math.PI * 2);
       this.ctx.stroke();
     }
-  }
-
-  /** Draws the historical trajectory trail of a body with a fading alpha gradient. */
-  public drawTrail(history: [number, number][], color: string, viewport: ViewportConfig, width: number, height: number): void {
-    if (!this.ctx) return;
-    const len = history.length;
-    if (len < 2) return;
-
-    const numSections = Math.min(10, len - 1);
-    const sectionSize = Math.ceil(len / numSections);
-
-    for (let s = 0; s < numSections; s++) {
-      const startIdx = s * sectionSize;
-      const endIdx = Math.min(len - 1, (s + 1) * sectionSize);
-
-      if (startIdx >= endIdx) continue;
-
-      this.ctx.beginPath();
-      const firstPoint = this.worldToCanvas(history[startIdx], viewport, width, height);
-      this.ctx.moveTo(firstPoint.x, firstPoint.y);
-
-      for (let i = startIdx + 1; i <= endIdx; i++) {
-        const pt = this.worldToCanvas(history[i], viewport, width, height);
-        this.ctx.lineTo(pt.x, pt.y);
-      }
-
-      this.ctx.globalAlpha = ((s + 1) / numSections) * 0.45;
-      this.ctx.strokeStyle = color;
-      this.ctx.lineWidth = 1.5;
-      this.ctx.stroke();
-    }
-    this.ctx.globalAlpha = 1.0;
-  }
-
-  /** Draws Lagrange points L1 to L5 as markers. */
-  public drawLagrangePoints(points: LagrangePointSet, viewport: ViewportConfig, width: number, height: number): void {
-    const ctx = this.ctx;
-    if (!ctx) return;
-    const labels: (keyof LagrangePointSet)[] = ['l1', 'l2', 'l3', 'l4', 'l5'];
-
-    ctx.fillStyle = '#ff4757';
-    ctx.font = '10px sans-serif';
-
-    labels.forEach((label) => {
-      const pt = points[label];
-      const { x, y } = this.worldToCanvas(pt, viewport, width, height);
-
-      ctx.strokeStyle = 'rgba(255, 71, 87, 0.8)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(x - 5, y);
-      ctx.lineTo(x + 5, y);
-      ctx.moveTo(x, y - 5);
-      ctx.lineTo(x, y + 5);
-      ctx.stroke();
-
-      ctx.fillText(label.toUpperCase(), x + 6, y - 4);
-    });
-  }
-
-  /** Draws text telemetry overlays in the viewport. */
-  public drawOverlay(state: SimulationState, viewport: ViewportConfig): void {
-    if (!this.ctx) return;
-    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-    this.ctx.font = '11px monospace';
-
-    const scaleString = `${(1 / viewport.scale).toExponential(3)} m/px`;
-    // Offset Y coordinates to Y: 140/156 and X to 44px to clear the floating header card (top: 24px, padding: 16px)
-    this.ctx.fillText(`Time: ${state.time.toFixed(1)} s`, 44, 140);
-    this.ctx.fillText(`Scale: ${scaleString}`, 44, 156);
   }
 }
