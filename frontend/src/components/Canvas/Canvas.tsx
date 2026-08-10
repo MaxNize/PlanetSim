@@ -15,7 +15,8 @@ export function Canvas({ showTrail = true }: CanvasProps) {
   const rendererRef = useRef<CanvasRenderer | null>(null);
   const lastMousePos = useRef({ x: 0, y: 0 });
 
-  const { currentState, lagrangePoints, history } = useSimulationContext();
+  const { currentState, lagrangePoints, trailHistory, showTrail: contextShowTrail } = useSimulationContext();
+  const activeShowTrail = showTrail && contextShowTrail;
 
   // Viewport configuration: scale (px/meter) and pan offset (meters)
   const [viewport, setViewport] = useState<ViewportConfig>({
@@ -75,8 +76,8 @@ export function Canvas({ showTrail = true }: CanvasProps) {
       rendererRef.current = new CanvasRenderer(canvasRef.current);
     }
 
-    rendererRef.current.draw(currentState, history, showTrail, lagrangePoints, viewport);
-  }, [currentState, viewport, history, showTrail, lagrangePoints, dimensions]);
+    rendererRef.current.draw(currentState, trailHistory, activeShowTrail, lagrangePoints, viewport);
+  }, [currentState, viewport, trailHistory, activeShowTrail, lagrangePoints, dimensions]);
 
   // Mouse interaction handlers
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {

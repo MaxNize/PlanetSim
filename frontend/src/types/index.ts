@@ -32,3 +32,12 @@ export interface StateDisplayProps {
   potentialEnergy: number | undefined;
   error: string | null;
 }
+
+/**
+ * Historical coordinates structure for drawing trajectory trails of all celestial bodies.
+ */
+export interface TrailHistory {
+  primary: [number, number][];
+  secondary: [number, number][];
+  testParticle: [number, number][];
+}
