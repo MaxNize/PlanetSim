@@ -1,18 +1,26 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { SimulationState, StepResult, LagrangePointSet } from '../services/wasmBridge';
+import { SimulationState, StepResult, LagrangePointSet, Body } from '../services/wasmBridge';
 import { useSimulation } from '../hooks/useSimulation';
 import { useSimulationStep } from '../hooks/useSimulationStep';
-import { TrailHistory, SimulationMode, SandboxBody } from '../types';
+import { SimulationMode, SandboxBody } from '../types';
 import { DEFAULT_INITIAL_STATE, PresetType, getPresetState } from './presets';
 import { simulationContext } from './SimulationContext';
 import { useSandbox } from './useSandbox';
+import { useTrailHistory } from './useTrailHistory';
 
-const initTrail = (s: SimulationState): TrailHistory => ({
-  primary: [s.primary.position],
-  secondary: [s.secondary.position],
-  testParticle: [s.testParticle.position],
-  customBodies: {},
-});
+/** Overlays each enriched body's persisted sandbox id/name/color/locked onto the raw simulator output. */
+function enrichBodies(
+  bodies: (Body & { id?: string; name?: string; color?: string; locked?: boolean })[],
+  sandboxBodies: SandboxBody[],
+): (Body & { id: string; name?: string; color?: string; locked?: boolean })[] {
+  return bodies.map((b, idx) => ({
+    ...b,
+    id: sandboxBodies[idx]?.id || `body-${idx}`,
+    name: sandboxBodies[idx]?.name || b.name,
+    color: sandboxBodies[idx]?.color || b.color,
+    locked: sandboxBodies[idx]?.locked ?? b.locked,
+  }));
+}
 
 /**
  * Context provider that manages the simulation engine state and lifecycle.
@@ -25,14 +33,13 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
   const [currentState, setCurrentState] = useState<SimulationState>(DEFAULT_INITIAL_STATE);
   const [isPaused, setIsPaused] = useState<boolean>(true);
   const [speedMultiplier, setSpeedMultiplier] = useState<number>(10000.0);
-  const [trailHistory, setTrailHistory] = useState<TrailHistory>(() => initTrail(DEFAULT_INITIAL_STATE));
   const [showTrail, setShowTrail] = useState<boolean>(true);
-  const [trailLength, setTrailLengthState] = useState<number>(1000);
   const [lagrangePoints, setLagrangePoints] = useState<LagrangePointSet | null>(null);
   const [resetCounter, setResetCounter] = useState<number>(0);
   const [preset, setPresetState] = useState<PresetType>('earth-moon');
 
   const { simulator, error } = useSimulation(initialState, resetCounter);
+  const { trailHistory, trailLength, recordStep, resetTrail, setTrailLength } = useTrailHistory(DEFAULT_INITIAL_STATE);
 
   useEffect(() => {
     if (selectedBodyId && !sandboxBodies.some((b) => b.id === selectedBodyId)) {
@@ -42,7 +49,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     setCurrentState(initialState);
-    setTrailHistory(initTrail(initialState));
+    resetTrail(initialState);
     if (simulator && mode === '3body') {
       try {
         setLagrangePoints(simulator.getLagrangePoints());
@@ -52,35 +59,16 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     } else {
       setLagrangePoints(null);
     }
-  }, [simulator, mode]);
+  }, [simulator, mode, initialState, resetTrail]);
 
   const handleStep = useCallback(
     (result: StepResult) => {
       const enriched = { ...result.newState };
       if (enriched.bodies) {
-        enriched.bodies = enriched.bodies.map((b: any, idx: number) => ({
-          ...b,
-          id: sandboxBodies[idx]?.id || `body-${idx}`,
-          name: sandboxBodies[idx]?.name || b.name,
-          color: sandboxBodies[idx]?.color || b.color,
-          locked: sandboxBodies[idx]?.locked ?? b.locked,
-        }));
+        enriched.bodies = enrichBodies(enriched.bodies, sandboxBodies);
       }
       setCurrentState(enriched);
-      setTrailHistory((prev) => {
-        const nextCustom: { [bodyId: string]: [number, number][] } = { ...(prev.customBodies || {}) };
-        if (enriched.bodies) {
-          enriched.bodies.forEach((b: any) => {
-            nextCustom[b.id] = [...(nextCustom[b.id] || []), b.position].slice(-trailLength);
-          });
-        }
-        return {
-          primary: [...prev.primary, enriched.primary.position].slice(-trailLength),
-          secondary: [...prev.secondary, enriched.secondary.position].slice(-trailLength),
-          testParticle: [...prev.testParticle, enriched.testParticle.position].slice(-trailLength),
-          customBodies: nextCustom,
-        };
-      });
+      recordStep(enriched);
       if (simulator && mode === '3body') {
         try {
           setLagrangePoints(simulator.getLagrangePoints());
@@ -89,36 +77,18 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         }
       }
     },
-    [simulator, trailLength, sandboxBodies, mode],
+    [simulator, sandboxBodies, mode, recordStep],
   );
 
   const { stepResult, setStepResult } = useSimulationStep(simulator, isPaused, speedMultiplier, handleStep);
 
-  const clearTrailHistory = useCallback(() => setTrailHistory(initTrail(currentState)), [currentState]);
-
-  const setTrailLength = useCallback((len: number) => {
-    setTrailLengthState(len);
-    setTrailHistory((prev) => {
-      const nextCustom: { [bodyId: string]: [number, number][] } = {};
-      if (prev.customBodies) {
-        Object.keys(prev.customBodies).forEach((k) => {
-          nextCustom[k] = prev.customBodies![k].slice(-len);
-        });
-      }
-      return {
-        primary: prev.primary.slice(-len),
-        secondary: prev.secondary.slice(-len),
-        testParticle: prev.testParticle.slice(-len),
-        customBodies: nextCustom,
-      };
-    });
-  }, []);
+  const clearTrailHistory = useCallback(() => resetTrail(currentState), [currentState, resetTrail]);
 
   const resetSimulation = useCallback(() => {
-    setTrailHistory(initTrail(initialState));
+    resetTrail(initialState);
     setStepResult(null);
     setResetCounter((prev) => prev + 1);
-  }, [initialState, setStepResult]);
+  }, [initialState, setStepResult, resetTrail]);
 
   const setPreset = useCallback(
     (p: PresetType) => {
@@ -128,12 +98,12 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       setSpeedMultiplier(data.speed);
       setInitialState(data.state);
       setCurrentState(data.state);
-      setTrailHistory(initTrail(data.state));
+      resetTrail(data.state);
       setIsPaused(true);
       setStepResult(null);
       setResetCounter((prev) => prev + 1);
     },
-    [setStepResult],
+    [setStepResult, resetTrail],
   );
 
   const setInitialStateAndSync = useCallback(
