@@ -9,3 +9,8 @@
 # - wasm/src/physics/gravity.rs
 # - wasm/src/wasm/mod.rs
 
+# clippy::cognitive_complexity is a `nursery`-group lint (off by default) and is
+# explicitly enabled via `#![warn(clippy::cognitive_complexity)]` in wasm/src/lib.rs.
+# This is the Rust-side analog to Fallow's `complexity-hotspots` rule for the frontend.
+cognitive-complexity-threshold = 25
+

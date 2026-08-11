@@ -19,7 +19,8 @@
     "check:max-lines": "node scripts/check-max-lines.js --exceptions max-lines-exceptions.json",
     "check:fallow": "fallow audit --base origin/main --fail-on-issues",
     "check:rust-udeps": "cd wasm && cargo +nightly udeps --all-targets --all-features",
-    "check:quality": "npm run check:fallow && npm run check:rust-udeps",
+    "check:rust-orphans": "cd wasm && cargo modules orphans --cfg-test --deny",
+    "check:quality": "npm run check:fallow && npm run check:rust-udeps && npm run check:rust-orphans",
     "test": "npm --prefix frontend run test && (cd wasm && cargo test) && ./scripts/check_rust_line_count.sh && npm run check:structure && npm run check:max-lines",
     "test:e2e": "npm --prefix frontend run test:e2e",
     "commit-lint": "commitlint --edit"
