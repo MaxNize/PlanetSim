@@ -20,14 +20,7 @@ describe('BodyContextMenu Component', () => {
   it('renders menu items and body title correctly', () => {
     render(
       <I18nProvider>
-        <BodyContextMenu
-          body={mockBody}
-          position={{ x: 100, y: 100 }}
-          onEdit={vi.fn()}
-          onLockToggle={vi.fn()}
-          onDelete={vi.fn()}
-          onClose={vi.fn()}
-        />
+        <BodyContextMenu body={mockBody} position={{ x: 100, y: 100 }} onEdit={vi.fn()} onLockToggle={vi.fn()} onDelete={vi.fn()} onClose={vi.fn()} />
       </I18nProvider>,
     );
 
@@ -43,14 +36,7 @@ describe('BodyContextMenu Component', () => {
 
     render(
       <I18nProvider>
-        <BodyContextMenu
-          body={mockBody}
-          position={{ x: 100, y: 100 }}
-          onEdit={handleEdit}
-          onLockToggle={vi.fn()}
-          onDelete={vi.fn()}
-          onClose={handleClose}
-        />
+        <BodyContextMenu body={mockBody} position={{ x: 100, y: 100 }} onEdit={handleEdit} onLockToggle={vi.fn()} onDelete={vi.fn()} onClose={handleClose} />
       </I18nProvider>,
     );
 
@@ -64,14 +50,7 @@ describe('BodyContextMenu Component', () => {
 
     render(
       <I18nProvider>
-        <BodyContextMenu
-          body={mockBody}
-          position={{ x: 100, y: 100 }}
-          onEdit={vi.fn()}
-          onLockToggle={handleLock}
-          onDelete={vi.fn()}
-          onClose={vi.fn()}
-        />
+        <BodyContextMenu body={mockBody} position={{ x: 100, y: 100 }} onEdit={vi.fn()} onLockToggle={handleLock} onDelete={vi.fn()} onClose={vi.fn()} />
       </I18nProvider>,
     );
 
@@ -84,14 +63,7 @@ describe('BodyContextMenu Component', () => {
 
     render(
       <I18nProvider>
-        <BodyContextMenu
-          body={{ ...mockBody, locked: true }}
-          position={{ x: 100, y: 100 }}
-          onEdit={vi.fn()}
-          onLockToggle={vi.fn()}
-          onDelete={handleDelete}
-          onClose={vi.fn()}
-        />
+        <BodyContextMenu body={{ ...mockBody, locked: true }} position={{ x: 100, y: 100 }} onEdit={vi.fn()} onLockToggle={vi.fn()} onDelete={handleDelete} onClose={vi.fn()} />
       </I18nProvider>,
     );
 
@@ -106,14 +78,7 @@ describe('BodyContextMenu Component', () => {
 
     render(
       <I18nProvider>
-        <BodyContextMenu
-          body={mockBody}
-          position={{ x: 100, y: 100 }}
-          onEdit={vi.fn()}
-          onLockToggle={vi.fn()}
-          onDelete={vi.fn()}
-          onClose={handleClose}
-        />
+        <BodyContextMenu body={mockBody} position={{ x: 100, y: 100 }} onEdit={vi.fn()} onLockToggle={vi.fn()} onDelete={vi.fn()} onClose={handleClose} />
       </I18nProvider>,
     );
 

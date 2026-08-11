@@ -119,29 +119,17 @@ export function BodyEditDialog({ body, onConfirm, onCancel }: BodyEditDialogProp
         />
 
         <div style={{ ...FIELD_STYLE, flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
-          <input
-            type="checkbox"
-            id="lockCheckbox"
-            checked={locked}
-            onChange={(e) => setLocked(e.target.checked)}
-            style={{ width: '16px', height: '16px', cursor: 'pointer' }}
-          />
+          <input type="checkbox" id="lockCheckbox" checked={locked} onChange={(e) => setLocked(e.target.checked)} style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
           <label htmlFor="lockCheckbox" style={{ ...LABEL_STYLE, cursor: 'pointer' }}>
             🔒 {t('editDialog.locked')}
           </label>
         </div>
 
         <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-          <button
-            onClick={onCancel}
-            style={{ ...BUTTON_STYLE, flex: 1, background: 'rgba(255, 255, 255, 0.08)', color: '#94a3b8' }}
-          >
+          <button onClick={onCancel} style={{ ...BUTTON_STYLE, flex: 1, background: 'rgba(255, 255, 255, 0.08)', color: '#94a3b8' }}>
             {t('dialog.cancel')}
           </button>
-          <button
-            onClick={handleConfirm}
-            style={{ ...BUTTON_STYLE, flex: 1, background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)', color: '#ffffff' }}
-          >
+          <button onClick={handleConfirm} style={{ ...BUTTON_STYLE, flex: 1, background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)', color: '#ffffff' }}>
             {t('dialog.confirm')}
           </button>
         </div>

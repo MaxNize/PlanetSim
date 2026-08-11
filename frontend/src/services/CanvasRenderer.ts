@@ -155,17 +155,7 @@ export class CanvasRenderer {
   }
 
   /** Draws a celestial body on the canvas. */
-  public drawBody(
-    pos: [number, number],
-    physicalRadius: number,
-    color: string,
-    viewport: ViewportConfig,
-    width: number,
-    height: number,
-    isFixed = false,
-    isSelected = false,
-    isLocked = false,
-  ): void {
+  public drawBody(pos: [number, number], physicalRadius: number, color: string, viewport: ViewportConfig, width: number, height: number, isFixed = false, isSelected = false, isLocked = false): void {
     if (!this.ctx) return;
     const { x, y } = this.worldToCanvas(pos, viewport, width, height);
     const radius = Math.max(4, physicalRadius * viewport.scale);
