@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { SandboxControlsProps, SandboxBody } from '../../types';
 import { useSimulationContext } from '../../context/SimulationContext';
 import { useI18n } from '../../context/I18nContext';
@@ -15,20 +15,33 @@ const SECTION_HEADER_STYLE = {
   margin: 0,
 } as const;
 
-const ADD_BUTTON_STYLE = (active: boolean) =>
-  ({
-    width: '100%',
-    padding: '10px 16px',
-    borderRadius: '6px',
-    fontWeight: 600,
-    fontSize: '13px',
-    cursor: 'pointer',
-    border: active ? '1px solid #10b981' : 'none',
-    background: active ? 'rgba(16, 185, 129, 0.15)' : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-    color: active ? '#10b981' : '#fff',
-    boxShadow: active ? 'none' : '0 4px 12px rgba(59, 130, 246, 0.3)',
-    outline: 'none',
-  }) as const;
+const ADD_BUTTON_BASE_STYLE = {
+  width: '100%',
+  padding: '10px 16px',
+  borderRadius: '6px',
+  fontWeight: 600,
+  fontSize: '13px',
+  cursor: 'pointer',
+  outline: 'none',
+} as const;
+
+const ADD_BUTTON_ACTIVE_STYLE = {
+  ...ADD_BUTTON_BASE_STYLE,
+  border: '1px solid #10b981',
+  background: 'rgba(16, 185, 129, 0.15)',
+  color: '#10b981',
+  boxShadow: 'none',
+} as const;
+
+const ADD_BUTTON_INACTIVE_STYLE = {
+  ...ADD_BUTTON_BASE_STYLE,
+  border: 'none',
+  background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+  color: '#fff',
+  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+} as const;
+
+const ADD_BUTTON_STYLE = (active: boolean) => (active ? ADD_BUTTON_ACTIVE_STYLE : ADD_BUTTON_INACTIVE_STYLE);
 
 const BODY_ITEM_STYLE = (selected: boolean) =>
   ({
@@ -56,6 +69,67 @@ const ACTION_BUTTON_STYLE = {
   outline: 'none',
   borderRadius: '4px',
 } as const;
+
+interface SandboxBodyItemProps {
+  body: SandboxBody;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
+  onEdit: (body: SandboxBody) => void;
+  onDelete: (id: string) => void;
+  editLabel: string;
+  deleteLabel: string;
+  defaultNameLabel: string;
+  lockedLabel: string;
+}
+
+function SandboxBodyItem({ body, isSelected, onSelect, onEdit, onDelete, editLabel, deleteLabel, defaultNameLabel, lockedLabel }: SandboxBodyItemProps) {
+  return (
+    <div style={BODY_ITEM_STYLE(isSelected)} onClick={() => onSelect(body.id)} data-testid={`body-item-${body.id}`}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: body.color }} />
+        <span style={{ fontWeight: 500, maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: isSelected ? '#38bdf8' : '#fff' }}>
+          {body.name || defaultNameLabel}
+        </span>
+        {body.locked && (
+          <span title={lockedLabel} style={{ fontSize: '11px' }}>
+            🔒
+          </span>
+        )}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', color: '#94a3b8' }}>{(body.mass / 5.9722e24).toFixed(1)} M⊕</span>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(body);
+          }}
+          style={ACTION_BUTTON_STYLE}
+          title={editLabel}
+          data-testid={`edit-btn-${body.id}`}
+        >
+          ✏️
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!body.locked) onDelete(body.id);
+          }}
+          disabled={body.locked}
+          style={{
+            ...ACTION_BUTTON_STYLE,
+            color: body.locked ? '#64748b' : '#ef4444',
+            cursor: body.locked ? 'not-allowed' : 'pointer',
+            opacity: body.locked ? 0.4 : 1,
+          }}
+          title={deleteLabel}
+          data-testid={`delete-btn-${body.id}`}
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  );
+}
 
 /**
  * Renders sandbox specific panel controls including custom bodies listing, selection, editing, and active toggling.
@@ -94,51 +168,20 @@ export function SandboxControls({ placementActive, setPlacementActive, selectedB
       </h3>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
-        {sandboxBodies.map((b) => {
-          const isSelected = activeSelectedId === b.id;
-          return (
-            <div key={b.id} style={BODY_ITEM_STYLE(isSelected)} onClick={() => handleSelect(b.id)} data-testid={`body-item-${b.id}`}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: b.color }} />
-                <span style={{ fontWeight: 500, maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: isSelected ? '#38bdf8' : '#fff' }}>
-                  {b.name || t('sandbox.defaultBodyName')}
-                </span>
-                {b.locked && <span title={t('editDialog.locked')} style={{ fontSize: '11px' }}>🔒</span>}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', color: '#94a3b8' }}>{(b.mass / 5.9722e24).toFixed(1)} M⊕</span>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setEditingBody(b);
-                  }}
-                  style={ACTION_BUTTON_STYLE}
-                  title={t('sandbox.editBody')}
-                  data-testid={`edit-btn-${b.id}`}
-                >
-                  ✏️
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!b.locked) removeBody(b.id);
-                  }}
-                  disabled={b.locked}
-                  style={{
-                    ...ACTION_BUTTON_STYLE,
-                    color: b.locked ? '#64748b' : '#ef4444',
-                    cursor: b.locked ? 'not-allowed' : 'pointer',
-                    opacity: b.locked ? 0.4 : 1,
-                  }}
-                  title={t('sandbox.deleteBody')}
-                  data-testid={`delete-btn-${b.id}`}
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-          );
-        })}
+        {sandboxBodies.map((b) => (
+          <SandboxBodyItem
+            key={b.id}
+            body={b}
+            isSelected={activeSelectedId === b.id}
+            onSelect={handleSelect}
+            onEdit={setEditingBody}
+            onDelete={removeBody}
+            editLabel={t('sandbox.editBody')}
+            deleteLabel={t('sandbox.deleteBody')}
+            defaultNameLabel={t('sandbox.defaultBodyName')}
+            lockedLabel={t('editDialog.locked')}
+          />
+        ))}
       </div>
 
       {editingBody && (
@@ -178,4 +221,3 @@ export function SandboxControls({ placementActive, setPlacementActive, selectedB
     </div>
   );
 }
-
