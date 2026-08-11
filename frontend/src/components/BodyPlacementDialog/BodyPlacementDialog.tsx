@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { SandboxBody } from '../../types';
 import { useI18n } from '../../context/I18nContext';
-import { OVERLAY_STYLE, DIALOG_STYLE, FIELD_STYLE, LABEL_STYLE, BUTTON_STYLE } from './styles';
+import { OVERLAY_STYLE, DIALOG_STYLE, BUTTON_STYLE } from './styles';
 import { BodyFieldsForm, BodyPresetOption } from '../BodyFieldsForm/BodyFieldsForm';
 
 interface BodyPlacementDialogProps {
@@ -95,6 +95,7 @@ export function BodyPlacementDialog({ position, onConfirm, onCancel, initialVelo
             presetTemplate: t('dialog.presetTemplate'),
             mass: t('dialog.mass'),
             velMag: t('dialog.velMag'),
+            velDir: t('dialog.velDir'),
             color: t('dialog.color'),
           }}
           name={name}
@@ -112,20 +113,14 @@ export function BodyPlacementDialog({ position, onConfirm, onCancel, initialVelo
           }}
           velMag={velMag}
           onVelMagChange={setVelMag}
+          velDir={velDir}
+          onVelDirChange={setVelDir}
           color={color}
           onColorChange={(c) => {
             setColor(c);
             setPreset('custom');
           }}
         />
-
-        <div style={FIELD_STYLE}>
-          <span style={LABEL_STYLE}>{t('dialog.velDir')}</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <input type="range" min={0} max={360} value={velDir} onChange={(e) => setVelDir(parseInt(e.target.value, 10))} style={{ flex: 1, cursor: 'pointer' }} />
-            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '13px', width: '45px', textAlign: 'right' }}>{Math.round(velDir)}°</span>
-          </div>
-        </div>
 
         <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
           <button onClick={onCancel} style={{ ...BUTTON_STYLE, flex: 1, background: 'rgba(255, 255, 255, 0.08)', color: '#fff' }}>

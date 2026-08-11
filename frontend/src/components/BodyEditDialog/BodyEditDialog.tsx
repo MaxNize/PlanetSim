@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { SandboxBody } from '../../types';
 import { useI18n } from '../../context/I18nContext';
-import { OVERLAY_STYLE, DIALOG_STYLE, FIELD_STYLE, LABEL_STYLE, INPUT_STYLE, BUTTON_STYLE } from '../BodyPlacementDialog/styles';
+import { OVERLAY_STYLE, DIALOG_STYLE, FIELD_STYLE, LABEL_STYLE, BUTTON_STYLE } from '../BodyPlacementDialog/styles';
 import { BodyFieldsForm, BodyPresetOption } from '../BodyFieldsForm/BodyFieldsForm';
 
 interface BodyEditDialogProps {
@@ -94,6 +94,7 @@ export function BodyEditDialog({ body, onConfirm, onCancel }: BodyEditDialogProp
             presetTemplate: t('dialog.presetTemplate'),
             mass: t('dialog.mass'),
             velMag: t('dialog.velMag'),
+            velDir: t('dialog.velDir'),
             color: t('dialog.color'),
           }}
           name={name}
@@ -108,25 +109,14 @@ export function BodyEditDialog({ body, onConfirm, onCancel }: BodyEditDialogProp
           }}
           velMag={velMag}
           onVelMagChange={setVelMag}
+          velDir={velDir}
+          onVelDirChange={setVelDir}
           color={color}
           onColorChange={(c) => {
             setColor(c);
             setPreset('custom');
           }}
         />
-
-        <div style={FIELD_STYLE}>
-          <span style={LABEL_STYLE}>{t('dialog.velDir')}</span>
-          <input
-            type="number"
-            min="0"
-            max="360"
-            step="1"
-            value={velDir}
-            onChange={(e) => setVelDir(parseFloat(e.target.value) || 0)}
-            style={INPUT_STYLE}
-          />
-        </div>
 
         <div style={{ ...FIELD_STYLE, flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
           <input

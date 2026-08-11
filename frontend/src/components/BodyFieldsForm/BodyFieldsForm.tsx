@@ -11,6 +11,7 @@ interface BodyFieldsFormProps {
     presetTemplate: string;
     mass: string;
     velMag: string;
+    velDir: string;
     color: string;
   };
   name: string;
@@ -22,12 +23,14 @@ interface BodyFieldsFormProps {
   onMassChange: (value: number) => void;
   velMag: number;
   onVelMagChange: (value: number) => void;
+  velDir: number;
+  onVelDirChange: (value: number) => void;
   color: string;
   onColorChange: (value: string) => void;
 }
 
 /**
- * Shared labeled-field layout for configuring a celestial body's name, preset, mass, and velocity magnitude.
+ * Shared labeled-field layout for configuring a celestial body's name, preset, mass, and velocity.
  */
 export function BodyFieldsForm({
   labels,
@@ -40,6 +43,8 @@ export function BodyFieldsForm({
   onMassChange,
   velMag,
   onVelMagChange,
+  velDir,
+  onVelDirChange,
   color,
   onColorChange,
 }: BodyFieldsFormProps) {
@@ -69,6 +74,19 @@ export function BodyFieldsForm({
       <div style={FIELD_STYLE}>
         <span style={LABEL_STYLE}>{labels.velMag}</span>
         <input type="number" step="any" value={velMag} onChange={(e) => onVelMagChange(parseFloat(e.target.value) || 0)} style={INPUT_STYLE} />
+      </div>
+
+      <div style={FIELD_STYLE}>
+        <span style={LABEL_STYLE}>{labels.velDir}</span>
+        <input
+          type="number"
+          min="0"
+          max="360"
+          step="1"
+          value={velDir}
+          onChange={(e) => onVelDirChange(parseFloat(e.target.value) || 0)}
+          style={INPUT_STYLE}
+        />
       </div>
 
       <div style={FIELD_STYLE}>
