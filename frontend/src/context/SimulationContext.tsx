@@ -46,5 +46,3 @@ export const useSimulationContext = () => {
   if (!context) throw new Error('useSimulationContext must be used within a SimulationProvider');
   return context;
 };
-
-export { SimulationProvider } from './SimulationProvider';
