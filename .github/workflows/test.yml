@@ -124,6 +124,14 @@ jobs:
       - name: Run cargo-udeps
         run: npm run check:rust-udeps
 
+      - name: Install cargo-modules
+        uses: taiki-e/cache-cargo-install-action@v3
+        with:
+          tool: cargo-modules
+
+      - name: Run cargo-modules orphans
+        run: npm run check:rust-orphans
+
   typescript-tests:
     name: TypeScript Tests & Coverage
     needs: build-wasm
