@@ -1,4 +1,4 @@
-import { SimulationState, LagrangePointSet } from './wasmBridge';
+import { SimulationState, LagrangePointSet, Body } from './wasmBridge';
 import { TrailHistory } from '../types';
 import { drawTrail, drawLagrangePoints, drawOverlay, drawBodyLabel } from './canvasHelpers';
 
@@ -39,17 +39,7 @@ export class CanvasRenderer {
     }
 
     if (state.bodies) {
-      state.bodies.forEach((b: any, idx: number) => {
-        const bodyId = b.id || `body-${idx}`;
-        const isSelected = selectedBodyId === bodyId;
-        if (showTrail && trailHistory.customBodies && trailHistory.customBodies[bodyId]) {
-          drawTrail(ctx, trailHistory.customBodies[bodyId], b.color || '#fff', wtc);
-        }
-        this.drawBody(b.position, b.radius, b.color || '#fff', viewport, width, height, false, isSelected, b.locked);
-        if (b.name) {
-          drawBodyLabel(ctx, b.position, b.name, wtc);
-        }
-      });
+      this.drawSandboxBodies(ctx, state.bodies, trailHistory, showTrail, viewport, width, height, selectedBodyId, wtc);
     } else {
       if (showTrail) {
         drawTrail(ctx, trailHistory.primary, '#f0932b', wtc);
@@ -70,28 +60,56 @@ export class CanvasRenderer {
         const start = wtc(p.position);
         const scaleVel = 1e1;
         const endPos: [number, number] = [p.position[0] + p.velocity[0] * scaleVel, p.position[1] + p.velocity[1] * scaleVel];
-        const end = wtc(endPos);
-
-        ctx.beginPath();
-        ctx.strokeStyle = '#3b82f6';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([4, 4]);
-        ctx.moveTo(start.x, start.y);
-        ctx.lineTo(end.x, end.y);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        const angle = Math.atan2(end.y - start.y, end.x - start.x);
-        ctx.beginPath();
-        ctx.fillStyle = '#3b82f6';
-        ctx.moveTo(end.x, end.y);
-        ctx.lineTo(end.x - 8 * Math.cos(angle - Math.PI / 6), end.y - 8 * Math.sin(angle - Math.PI / 6));
-        ctx.lineTo(end.x - 8 * Math.cos(angle + Math.PI / 6), end.y - 8 * Math.sin(angle + Math.PI / 6));
-        ctx.fill();
+        this.drawVelocityArrow(ctx, start, wtc(endPos));
       }
     }
 
     drawOverlay(ctx, state, viewport.scale);
+  }
+
+  /** Renders each sandbox body's trail, disc, and optional name label. */
+  private drawSandboxBodies(
+    ctx: CanvasRenderingContext2D,
+    bodies: (Body & { id?: string; name?: string; color?: string; locked?: boolean })[],
+    trailHistory: TrailHistory,
+    showTrail: boolean,
+    viewport: ViewportConfig,
+    width: number,
+    height: number,
+    selectedBodyId: string | null | undefined,
+    wtc: (pos: [number, number]) => { x: number; y: number },
+  ): void {
+    bodies.forEach((b, idx) => {
+      const bodyId = b.id || `body-${idx}`;
+      const isSelected = selectedBodyId === bodyId;
+      if (showTrail && trailHistory.customBodies && trailHistory.customBodies[bodyId]) {
+        drawTrail(ctx, trailHistory.customBodies[bodyId], b.color || '#fff', wtc);
+      }
+      this.drawBody(b.position, b.radius, b.color || '#fff', viewport, width, height, false, isSelected, b.locked);
+      if (b.name) {
+        drawBodyLabel(ctx, b.position, b.name, wtc);
+      }
+    });
+  }
+
+  /** Draws a directional arrow representing a velocity vector preview. */
+  private drawVelocityArrow(ctx: CanvasRenderingContext2D, start: { x: number; y: number }, end: { x: number; y: number }): void {
+    ctx.beginPath();
+    ctx.strokeStyle = '#3b82f6';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 4]);
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const angle = Math.atan2(end.y - start.y, end.x - start.x);
+    ctx.beginPath();
+    ctx.fillStyle = '#3b82f6';
+    ctx.moveTo(end.x, end.y);
+    ctx.lineTo(end.x - 8 * Math.cos(angle - Math.PI / 6), end.y - 8 * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(end.x - 8 * Math.cos(angle + Math.PI / 6), end.y - 8 * Math.sin(angle + Math.PI / 6));
+    ctx.fill();
   }
 
   /** Resizes canvas to match client dimensions, accounting for high-DPI screens. */
