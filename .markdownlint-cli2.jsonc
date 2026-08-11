@@ -1,5 +1,6 @@
 {
   "ignores": [
-    "Docs/Wireframe/**"
+    "Docs/Wireframe/**",
+    "Docs/Guides/testing/reports/**"
   ]
 }

@@ -16,5 +16,7 @@ yarn-debug.log*
 yarn-error.log*
 /.cache
 coverage/
+playwright-report/
+test-results/
 ./examples
 examples/

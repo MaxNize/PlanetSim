@@ -28,7 +28,7 @@ so that I can verify physics accuracy and UI behavior with confidence
 - [ ] AC 3.3: Tests verify Canvas rendering receives correct coordinates
 
 ### Coverage & CI
-- [x] AC 4.1: Test coverage reports generated (target: >80% for critical paths)
+- [x] AC 4.1: Test coverage reports generated (target: >80% for critical paths) — see [Test Report](../../../Guides/testing/test-report.md); currently 53% statements, below target
 - [x] AC 4.2: All tests run in CI on every commit
 - [x] AC 4.3: Coverage reports visible in CI logs
 

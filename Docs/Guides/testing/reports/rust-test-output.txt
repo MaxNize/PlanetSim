@@ -1,0 +1,50 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.32s
+     Running unittests src/lib.rs (/home/max/root/Code-Root/fortgeschrittene-programmierung/target/debug/deps/planet_sim_wasm-9a68504cd3d130ae)
+
+running 12 tests
+test physics::calculations::tests::calculate_force_earth_moon ... ok
+test physics::gravity::tests::acceleration_is_force_divided_by_mass ... ok
+test physics::calculations::tests::calculate_force_negative_distance_panics - should panic ... ok
+test physics::calculations::tests::calculate_force_zero_distance_panics - should panic ... ok
+test physics::gravity::tests::distance_between_earth_and_moon_matches_fixture ... ok
+test physics::gravity::tests::force_between_earth_and_moon_matches_expected_value ... ok
+test physics::gravity::tests::gravitational_force_uses_default_constant ... ok
+test physics::gravity::tests::lagrange_points_return_equilateral_l4_l5 ... ok
+test physics::integrator::tests::integrate_step_n_body_test ... ok
+test physics::integrator::tests::integrate_step_advances_time_and_preserves_circular_orbit_energy_reasonably ... ok
+test wasm::tests::hello_returns_expected_message ... ok
+test wasm::tests::test_simulator_set_state ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests planet_sim_wasm
+
+running 8 tests
+test wasm/src/physics/gravity.rs - physics::gravity::distance (line 11) ... ok
+test wasm/src/physics/gravity.rs - physics::gravity::acceleration_from_force (line 51) ... ok
+test wasm/src/physics/gravity.rs - physics::gravity::gravitational_force (line 64) ... ok
+test wasm/src/physics/gravity.rs - physics::gravity::force_between (line 33) ... ok
+test wasm/src/physics/n_body.rs - physics::n_body::integrate_n_body (line 13) ... ok
+test wasm/src/wasm/mod.rs - wasm::_::__wasm_bindgen_generated_hello (line 9) ... ok
+test wasm/src/wasm/mod.rs - wasm::hello (line 9) ... ok
+test wasm/src/physics/integrator.rs - physics::integrator::integrate_step (line 31) ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.82s
+
+
+--- Doctests ---
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s
+   Doc-tests planet_sim_wasm
+
+running 8 tests
+test wasm/src/physics/gravity.rs - physics::gravity::gravitational_force (line 64) ... ok
+test wasm/src/physics/gravity.rs - physics::gravity::acceleration_from_force (line 51) ... ok
+test wasm/src/physics/gravity.rs - physics::gravity::distance (line 11) ... ok
+test wasm/src/physics/gravity.rs - physics::gravity::force_between (line 33) ... ok
+test wasm/src/wasm/mod.rs - wasm::hello (line 9) ... ok
+test wasm/src/physics/n_body.rs - physics::n_body::integrate_n_body (line 13) ... ok
+test wasm/src/wasm/mod.rs - wasm::_::__wasm_bindgen_generated_hello (line 9) ... ok
+test wasm/src/physics/integrator.rs - physics::integrator::integrate_step (line 31) ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.55s
+
