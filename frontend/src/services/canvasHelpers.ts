@@ -1,5 +1,29 @@
 import { LagrangePointSet, SimulationState } from './wasmBridge';
 
+function drawTrailSection(
+  ctx: CanvasRenderingContext2D,
+  points: [number, number][],
+  startIdx: number,
+  endIdx: number,
+  color: string,
+  alpha: number,
+  worldToCanvas: (pos: [number, number]) => { x: number; y: number },
+): void {
+  ctx.beginPath();
+  const firstPoint = worldToCanvas(points[startIdx]);
+  ctx.moveTo(firstPoint.x, firstPoint.y);
+
+  for (let i = startIdx + 1; i <= endIdx; i++) {
+    const pt = worldToCanvas(points[i]);
+    ctx.lineTo(pt.x, pt.y);
+  }
+
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
 /**
  * Draws a fading trajectory trail for a celestial body.
  */
@@ -10,26 +34,16 @@ export function drawTrail(ctx: CanvasRenderingContext2D, history: [number, numbe
   const numSections = Math.min(10, len - 1);
   const sectionSize = Math.ceil(len / numSections);
 
-  for (let s = 0; s < numSections; s++) {
-    const startIdx = s * sectionSize;
-    const endIdx = Math.min(len - 1, (s + 1) * sectionSize);
+  const sections = Array.from({ length: numSections }, (index, s) => ({
+    s,
+    startIdx: s * sectionSize,
+    endIdx: Math.min(len - 1, (s + 1) * sectionSize),
+  })).filter(({ startIdx, endIdx }) => startIdx < endIdx);
 
-    if (startIdx >= endIdx) continue;
+  sections.forEach(({ s, startIdx, endIdx }) => {
+    drawTrailSection(ctx, history, startIdx, endIdx, color, ((s + 1) / numSections) * 0.45, worldToCanvas);
+  });
 
-    ctx.beginPath();
-    const firstPoint = worldToCanvas(history[startIdx]);
-    ctx.moveTo(firstPoint.x, firstPoint.y);
-
-    for (let i = startIdx + 1; i <= endIdx; i++) {
-      const pt = worldToCanvas(history[i]);
-      ctx.lineTo(pt.x, pt.y);
-    }
-
-    ctx.globalAlpha = ((s + 1) / numSections) * 0.45;
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-  }
   ctx.globalAlpha = 1.0;
 }
 
