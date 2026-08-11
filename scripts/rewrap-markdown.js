@@ -5,20 +5,37 @@ const MAX = 200;
 const patterns = ['Docs/**/*.md', 'README.md', 'CONTRIBUTING.md'];
 let changed = 0;
 
-function wrapLine(line, prefix = '') {
-    const words = line.split(' ');
-    let out = '';
-    let cur = prefix;
+// Wraps plain content (no prefix/marker) into lines that fit within `MAX` once
+// `prefixLength` characters of leading marker/indent are added back by the caller.
+// Returns an array of content-only lines -- the caller is responsible for
+// prepending the prefix (first line) or matching indentation (continuation
+// lines), so the prefix is never embedded here and never duplicated.
+function wrapLine(content, prefixLength = 0) {
+    const budget = Math.max(1, MAX - prefixLength);
+    const words = content.split(' ');
+    const lines = [];
+    let cur = '';
     for (const w of words) {
-        if (cur.length + (cur.trim() ? 1 : 0) + w.length > MAX) {
-            out += cur.trimRight() + '\n';
-            cur = prefix + w + ' ';
+        if (cur.length > 0 && cur.length + 1 + w.length > budget) {
+            lines.push(cur);
+            cur = w;
         } else {
-            cur += (cur.trim() ? ' ' : '') + w;
+            cur = cur.length > 0 ? `${cur} ${w}` : w;
         }
     }
-    out += cur.trimRight();
-    return out;
+    if (cur.length > 0) {
+        lines.push(cur);
+    }
+    return lines;
+}
+
+// Mirrors markdownlint's MD013 default (non-strict) exemption: a line isn't
+// actually flagged if everything past column MAX has no whitespace to break
+// at (e.g. a single long inline-code span at the end). Rewrapping such lines
+// anyway would just create diff noise for something the linter never complained
+// about, so we only touch lines markdownlint would truly flag.
+function markdownlintWouldFlag(line) {
+    return line.length > MAX && /\s/.test(line.slice(MAX));
 }
 
 patterns.forEach(pattern => {
@@ -56,13 +73,14 @@ patterns.forEach(pattern => {
                 const indentMatch = line.match(/^(\s+)/);
                 prefix = indentMatch ? indentMatch[1] : '';
             }
-            if (content.length > MAX || line.length > MAX) {
+            if (markdownlintWouldFlag(line)) {
                 // wrap content into paragraphs preserving prefix on first line
-                const wrapped = wrapLine(content.trim(), prefix).split('\n');
-                // first line should include marker if any
+                const wrapped = wrapLine(content.trim(), prefix.length);
+                // first line should include marker if any; continuation lines
+                // are indented to align with the first line's content, not the marker
                 wrapped.forEach((l, idx) => {
-                    if (idx === 0) outLines.push((prefix || '') + l.trim());
-                    else outLines.push((prefix ? ' '.repeat(prefix.length) : '') + l.trim());
+                    if (idx === 0) outLines.push(prefix + l);
+                    else outLines.push(' '.repeat(prefix.length) + l);
                 });
                 modified = true;
             } else {
