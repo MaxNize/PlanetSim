@@ -2,6 +2,41 @@ import { useCallback } from 'react';
 import { SandboxBody, SimulationMode } from '../types';
 import { SimulationState } from '../services/wasmBridge';
 
+interface LatestBody {
+  id?: string;
+  position: [number, number];
+  velocity: [number, number];
+}
+
+/** Reconciles sandbox body definitions with their latest simulated position/velocity. */
+function syncBodyKinematics(sandboxBodies: SandboxBody[], latestBodies: LatestBody[]): SandboxBody[] {
+  return sandboxBodies.map((sb, idx) => {
+    const simBody = latestBodies.find((b) => b.id === sb.id) || latestBodies[idx];
+    if (!simBody) return sb;
+    return { ...sb, position: simBody.position, velocity: simBody.velocity };
+  });
+}
+
+/** Persists a new sandbox body list into both React state and the running simulator. */
+function commitSandboxBodies(
+  bodies: SandboxBody[],
+  currentState: SimulationState,
+  setSandboxBodies: React.Dispatch<React.SetStateAction<SandboxBody[]>>,
+  setCurrentState: React.Dispatch<React.SetStateAction<SimulationState>>,
+  simulator: any,
+): void {
+  setSandboxBodies(bodies);
+  const nextState = { ...currentState, bodies };
+  setCurrentState(nextState);
+  if (simulator) {
+    try {
+      simulator.setState(nextState);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+}
+
 /**
  * Hook that manages the state transitions and body updates for the Sandbox simulation mode.
  */
@@ -54,16 +89,7 @@ export function useSandbox(
             locked: false,
           },
         ];
-        setSandboxBodies(initialSandbox);
-        const nextState = { ...currentState, bodies: initialSandbox };
-        setCurrentState(nextState);
-        if (simulator) {
-          try {
-            simulator.setState(nextState);
-          } catch (e) {
-            console.error(e);
-          }
-        }
+        commitSandboxBodies(initialSandbox, currentState, setSandboxBodies, setCurrentState, simulator);
       } else {
         const nextState = { ...currentState, bodies: undefined };
         setCurrentState(nextState);
@@ -90,28 +116,8 @@ export function useSandbox(
           throw new Error('Overlap detected with another body');
         }
       }
-      const updatedSandbox = sandboxBodies.map((sb, idx) => {
-        const simBody = latestBodies.find((b: any) => b.id === sb.id) || latestBodies[idx];
-        if (simBody) {
-          return {
-            ...sb,
-            position: simBody.position,
-            velocity: simBody.velocity,
-          };
-        }
-        return sb;
-      });
-      const nextSandboxBodies = [...updatedSandbox, body];
-      setSandboxBodies(nextSandboxBodies);
-      const nextState = { ...currentState, bodies: nextSandboxBodies };
-      setCurrentState(nextState);
-      if (simulator) {
-        try {
-          simulator.setState(nextState);
-        } catch (e) {
-          console.error(e);
-        }
-      }
+      const updatedSandbox = syncBodyKinematics(sandboxBodies, latestBodies);
+      commitSandboxBodies([...updatedSandbox, body], currentState, setSandboxBodies, setCurrentState, simulator);
     },
     [sandboxBodies, currentState, simulator, setSandboxBodies, setCurrentState],
   );
@@ -119,29 +125,8 @@ export function useSandbox(
   const removeBody = useCallback(
     (id: string) => {
       const latestBodies = currentState.bodies || sandboxBodies;
-      const updatedSandbox = sandboxBodies
-        .map((sb, idx) => {
-          const simBody = latestBodies.find((b: any) => b.id === sb.id) || latestBodies[idx];
-          if (simBody) {
-            return {
-              ...sb,
-              position: simBody.position,
-              velocity: simBody.velocity,
-            };
-          }
-          return sb;
-        })
-        .filter((b) => b.id !== id);
-      setSandboxBodies(updatedSandbox);
-      const nextState = { ...currentState, bodies: updatedSandbox };
-      setCurrentState(nextState);
-      if (simulator) {
-        try {
-          simulator.setState(nextState);
-        } catch (e) {
-          console.error(e);
-        }
-      }
+      const updatedSandbox = syncBodyKinematics(sandboxBodies, latestBodies).filter((b) => b.id !== id);
+      commitSandboxBodies(updatedSandbox, currentState, setSandboxBodies, setCurrentState, simulator);
     },
     [sandboxBodies, currentState, simulator, setSandboxBodies, setCurrentState],
   );
@@ -150,18 +135,13 @@ export function useSandbox(
     (id: string, updates: Partial<SandboxBody>) => {
       const latestBodies = currentState.bodies || sandboxBodies;
       const updatedSandbox = sandboxBodies.map((sb, idx) => {
-        const simBody = latestBodies.find((b: any) => b.id === sb.id) || latestBodies[idx];
+        const simBody = latestBodies.find((b) => b.id === sb.id) || latestBodies[idx];
         const currentPos = simBody ? simBody.position : sb.position;
         const currentVel = simBody ? simBody.velocity : sb.velocity;
 
         if (sb.id !== id) {
-          return {
-            ...sb,
-            position: currentPos,
-            velocity: currentVel,
-          };
+          return { ...sb, position: currentPos, velocity: currentVel };
         }
-
         return {
           ...sb,
           ...updates,
@@ -169,16 +149,7 @@ export function useSandbox(
           velocity: updates.velocity !== undefined ? updates.velocity : currentVel,
         };
       });
-      setSandboxBodies(updatedSandbox);
-      const nextState = { ...currentState, bodies: updatedSandbox };
-      setCurrentState(nextState);
-      if (simulator) {
-        try {
-          simulator.setState(nextState);
-        } catch (e) {
-          console.error(e);
-        }
-      }
+      commitSandboxBodies(updatedSandbox, currentState, setSandboxBodies, setCurrentState, simulator);
     },
     [sandboxBodies, currentState, simulator, setSandboxBodies, setCurrentState],
   );
