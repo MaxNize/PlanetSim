@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { SandboxBody } from '../../types';
 import { useI18n } from '../../context/I18nContext';
-import { OVERLAY_STYLE, DIALOG_STYLE, FIELD_STYLE, LABEL_STYLE, INPUT_STYLE, BUTTON_STYLE } from './styles';
+import { OVERLAY_STYLE, DIALOG_STYLE, FIELD_STYLE, LABEL_STYLE, BUTTON_STYLE } from './styles';
+import { BodyFieldsForm, BodyPresetOption } from '../BodyFieldsForm/BodyFieldsForm';
 
 interface BodyPlacementDialogProps {
   position: [number, number];
@@ -48,23 +49,6 @@ export function BodyPlacementDialog({ position, onConfirm, onCancel, initialVelo
     }
   }, [preset, t]);
 
-  const handleConfirm = () => {
-    const rad = radiusFromMass(mass);
-    const radAngle = (velDir * Math.PI) / 180;
-    const vx = velMag * Math.cos(radAngle);
-    const vy = velMag * Math.sin(radAngle);
-    onConfirm({
-      id: `body-${Date.now()}`,
-      position,
-      velocity: [vx, vy],
-      mass,
-      radius: rad,
-      color,
-      name,
-      locked: false,
-    });
-  };
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onCancel();
@@ -72,6 +56,23 @@ export function BodyPlacementDialog({ position, onConfirm, onCancel, initialVelo
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onCancel]);
+
+  const handleConfirm = () => {
+    const rad = radiusFromMass(mass);
+    const radAngle = (velDir * Math.PI) / 180;
+    const vx = velMag * Math.cos(radAngle);
+    const vy = velMag * Math.sin(radAngle);
+    onConfirm({ id: `body-${Date.now()}`, position, velocity: [vx, vy], mass, radius: rad, color, name, locked: false });
+  };
+
+  const presetOptions: BodyPresetOption[] = [
+    { value: 'earth', label: t('dialog.presets.earth') },
+    { value: 'sun', label: t('dialog.presets.sun') },
+    { value: 'jupiter', label: t('dialog.presets.jupiter') },
+    { value: 'moon', label: t('dialog.presets.moon') },
+    { value: 'asteroid', label: t('dialog.presets.asteroid') },
+    { value: 'custom', label: t('dialog.presets.custom') },
+  ];
 
   return (
     <div style={OVERLAY_STYLE} onClick={onCancel}>
@@ -88,70 +89,41 @@ export function BodyPlacementDialog({ position, onConfirm, onCancel, initialVelo
           {t('dialog.title')}
         </h3>
 
-        <div style={FIELD_STYLE}>
-          <span style={LABEL_STYLE}>{t('dialog.name')}</span>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-              setPreset('custom');
-            }}
-            style={INPUT_STYLE}
-          />
-        </div>
-
-        <div style={FIELD_STYLE}>
-          <span style={LABEL_STYLE}>{t('dialog.presetTemplate')}</span>
-          <select value={preset} onChange={(e) => setPreset(e.target.value as any)} style={{ ...INPUT_STYLE, background: 'rgba(15, 23, 42, 0.95)', cursor: 'pointer' }}>
-            <option value="earth">{t('dialog.presets.earth')}</option>
-            <option value="sun">{t('dialog.presets.sun')}</option>
-            <option value="jupiter">{t('dialog.presets.jupiter')}</option>
-            <option value="moon">{t('dialog.presets.moon')}</option>
-            <option value="asteroid">{t('dialog.presets.asteroid')}</option>
-            <option value="custom">{t('dialog.presets.custom')}</option>
-          </select>
-        </div>
-
-        <div style={FIELD_STYLE}>
-          <span style={LABEL_STYLE}>{t('dialog.mass')}</span>
-          <input
-            type="number"
-            value={mass}
-            onChange={(e) => {
-              setMass(parseFloat(e.target.value) || 0);
-              setPreset('custom');
-            }}
-            style={INPUT_STYLE}
-          />
-        </div>
-
-        <div style={FIELD_STYLE}>
-          <span style={LABEL_STYLE}>{t('dialog.velMag')}</span>
-          <input type="number" value={velMag} onChange={(e) => setVelMag(parseFloat(e.target.value) || 0)} style={INPUT_STYLE} />
-        </div>
+        <BodyFieldsForm
+          labels={{
+            name: t('dialog.name'),
+            presetTemplate: t('dialog.presetTemplate'),
+            mass: t('dialog.mass'),
+            velMag: t('dialog.velMag'),
+            color: t('dialog.color'),
+          }}
+          name={name}
+          onNameChange={(n) => {
+            setName(n);
+            setPreset('custom');
+          }}
+          preset={preset}
+          presetOptions={presetOptions}
+          onPresetChange={(p) => setPreset(p as keyof typeof CONFIRM_PRESETS | 'custom')}
+          mass={mass}
+          onMassChange={(m) => {
+            setMass(m);
+            setPreset('custom');
+          }}
+          velMag={velMag}
+          onVelMagChange={setVelMag}
+          color={color}
+          onColorChange={(c) => {
+            setColor(c);
+            setPreset('custom');
+          }}
+        />
 
         <div style={FIELD_STYLE}>
           <span style={LABEL_STYLE}>{t('dialog.velDir')}</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <input type="range" min={0} max={360} value={velDir} onChange={(e) => setVelDir(parseInt(e.target.value, 10))} style={{ flex: 1, cursor: 'pointer' }} />
             <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '13px', width: '45px', textAlign: 'right' }}>{Math.round(velDir)}°</span>
-          </div>
-        </div>
-
-        <div style={FIELD_STYLE}>
-          <span style={LABEL_STYLE}>{t('dialog.color')}</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <input
-              type="color"
-              value={color}
-              onChange={(e) => {
-                setColor(e.target.value);
-                setPreset('custom');
-              }}
-              style={{ cursor: 'pointer', border: 'none', background: 'none', width: '32px', height: '32px', padding: 0 }}
-            />
-            <span style={{ fontSize: '12px', fontFamily: "'JetBrains Mono', monospace" }}>{color.toUpperCase()}</span>
           </div>
         </div>
 
