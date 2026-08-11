@@ -86,20 +86,18 @@ export function useCanvasInteraction({ canvasRef, placementActive, onPlacementCa
     return null;
   };
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    setContextMenu(null);
-    if (placementActive) {
-      const pos = screenToWorld(e.clientX, e.clientY);
-      if (placementStage === 'idle') {
-        setPlacedWorldPos(pos);
-        setPlacementStage('velocity');
-      } else if (placementStage === 'velocity') {
-        setPlacementStage('idle');
-        setShowDialog(true);
-      }
-      return;
+  const handlePlacementClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const pos = screenToWorld(e.clientX, e.clientY);
+    if (placementStage === 'idle') {
+      setPlacedWorldPos(pos);
+      setPlacementStage('velocity');
+    } else if (placementStage === 'velocity') {
+      setPlacementStage('idle');
+      setShowDialog(true);
     }
+  };
 
+  const handleSelectionOrDrag = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (e.button === 0 && !isSpacePressed) {
       const hit = findBodyAtPosition(screenToWorld(e.clientX, e.clientY));
       setSelectedBodyId(hit ? hit.id : null);
@@ -108,6 +106,15 @@ export function useCanvasInteraction({ canvasRef, placementActive, onPlacementCa
       setIsDragging(true);
       lastMousePos.current = { x: e.clientX, y: e.clientY };
     }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    setContextMenu(null);
+    if (placementActive) {
+      handlePlacementClick(e);
+      return;
+    }
+    handleSelectionOrDrag(e);
   };
 
   const handleContextMenu = (e: React.MouseEvent<HTMLCanvasElement>) => {
