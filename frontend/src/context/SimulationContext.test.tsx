@@ -1,7 +1,8 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
-import { SimulationProvider, useSimulationContext } from './SimulationContext';
+import { useSimulationContext } from './SimulationContext';
+import { SimulationProvider } from './SimulationProvider';
 
 // Helper component to consume context and expose fields for assertion
 function TestConsumer() {

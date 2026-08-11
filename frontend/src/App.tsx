@@ -1,4 +1,4 @@
-import { SimulationProvider } from './context/SimulationContext';
+import { SimulationProvider } from './context/SimulationProvider';
 import { I18nProvider } from './context/I18nContext';
 import { Layout } from './components/Layout/Layout';
 
