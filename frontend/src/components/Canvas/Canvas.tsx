@@ -14,6 +14,21 @@ interface CanvasProps {
   onPlacementComplete?: (body: SandboxBody) => void;
 }
 
+function computePlacementPreview(
+  placementActive: boolean,
+  placedWorldPos: [number, number] | null,
+  draggedVel: [number, number],
+  hoverWorldPos: [number, number] | null,
+): { position: [number, number]; velocity: [number, number]; radius: number; color: string } | undefined {
+  if (placementActive && placedWorldPos) {
+    return { position: placedWorldPos, velocity: draggedVel, radius: 6.371e6, color: '#3b82f6' };
+  }
+  if (placementActive && hoverWorldPos) {
+    return { position: hoverWorldPos, velocity: [0, 0], radius: 6.371e6, color: 'rgba(59, 130, 246, 0.4)' };
+  }
+  return undefined;
+}
+
 /**
  * Renders the interactive simulation viewport canvas.
  */
@@ -59,12 +74,7 @@ export function Canvas({ showTrail = true, placementActive = false, onPlacementC
     if (!canvasRef.current) return;
     if (!rendererRef.current) rendererRef.current = new CanvasRenderer(canvasRef.current);
 
-    const preview =
-      placementActive && placedWorldPos
-        ? { position: placedWorldPos, velocity: draggedVel, radius: 6.371e6, color: '#3b82f6' }
-        : placementActive && hoverWorldPos
-          ? { position: hoverWorldPos, velocity: [0, 0] as [number, number], radius: 6.371e6, color: 'rgba(59, 130, 246, 0.4)' }
-          : undefined;
+    const preview = computePlacementPreview(placementActive, placedWorldPos, draggedVel, hoverWorldPos);
 
     rendererRef.current.draw(
       currentState,
