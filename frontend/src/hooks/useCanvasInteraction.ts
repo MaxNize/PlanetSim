@@ -74,7 +74,8 @@ export function useCanvasInteraction({ canvasRef, placementActive, onPlacementCa
   };
 
   const findBodyAtPosition = (worldPos: [number, number]): SandboxBody | null => {
-    const bodies: SandboxBody[] = currentState.bodies || sandboxBodies;
+    // currentState.bodies is always fully enriched with id/color by the time it's set (see SimulationProvider.handleStep and useSandbox).
+    const bodies = (currentState.bodies || sandboxBodies) as SandboxBody[];
     if (!bodies || bodies.length === 0) return null;
     const minHitRadiusMeters = 15 / viewport.scale;
 
