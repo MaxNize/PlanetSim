@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { SandboxBody } from '../../types';
 import { useI18n } from '../../context/I18nContext';
 import { OVERLAY_STYLE, DIALOG_STYLE, FIELD_STYLE, LABEL_STYLE, INPUT_STYLE, BUTTON_STYLE } from '../BodyPlacementDialog/styles';
+import { BodyFieldsForm, BodyPresetOption } from '../BodyFieldsForm/BodyFieldsForm';
 
 interface BodyEditDialogProps {
   body: SandboxBody;
@@ -47,22 +48,6 @@ export function BodyEditDialog({ body, onConfirm, onCancel }: BodyEditDialogProp
     }
   }, [preset]);
 
-  const handleConfirm = () => {
-    const rad = radiusFromMass(mass);
-    const radAngle = (velDir * Math.PI) / 180;
-    const vx = velMag * Math.cos(radAngle);
-    const vy = velMag * Math.sin(radAngle);
-    onConfirm({
-      ...body,
-      name,
-      mass,
-      radius: rad,
-      velocity: [vx, vy],
-      color,
-      locked,
-    });
-  };
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onCancel();
@@ -70,6 +55,23 @@ export function BodyEditDialog({ body, onConfirm, onCancel }: BodyEditDialogProp
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onCancel]);
+
+  const handleConfirm = () => {
+    const rad = radiusFromMass(mass);
+    const radAngle = (velDir * Math.PI) / 180;
+    const vx = velMag * Math.cos(radAngle);
+    const vy = velMag * Math.sin(radAngle);
+    onConfirm({ ...body, name, mass, radius: rad, velocity: [vx, vy], color, locked });
+  };
+
+  const presetOptions: BodyPresetOption[] = [
+    { value: 'custom', label: t('dialog.presets.custom') },
+    { value: 'earth', label: t('dialog.presets.earth') },
+    { value: 'sun', label: t('dialog.presets.sun') },
+    { value: 'jupiter', label: t('dialog.presets.jupiter') },
+    { value: 'moon', label: t('dialog.presets.moon') },
+    { value: 'asteroid', label: t('dialog.presets.asteroid') },
+  ];
 
   return (
     <div style={OVERLAY_STYLE} onClick={onCancel} data-testid="body-edit-dialog">
@@ -86,56 +88,32 @@ export function BodyEditDialog({ body, onConfirm, onCancel }: BodyEditDialogProp
           {t('editDialog.editTitle')}
         </h3>
 
-        <div style={FIELD_STYLE}>
-          <span style={LABEL_STYLE}>{t('dialog.name')}</span>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={INPUT_STYLE}
-          />
-        </div>
-
-        <div style={FIELD_STYLE}>
-          <span style={LABEL_STYLE}>{t('dialog.presetTemplate')}</span>
-          <select
-            value={preset}
-            onChange={(e) => setPreset(e.target.value as any)}
-            style={{ ...INPUT_STYLE, cursor: 'pointer' }}
-          >
-            <option value="custom" style={{ background: '#0f172a' }}>{t('dialog.presets.custom')}</option>
-            <option value="earth" style={{ background: '#0f172a' }}>{t('dialog.presets.earth')}</option>
-            <option value="sun" style={{ background: '#0f172a' }}>{t('dialog.presets.sun')}</option>
-            <option value="jupiter" style={{ background: '#0f172a' }}>{t('dialog.presets.jupiter')}</option>
-            <option value="moon" style={{ background: '#0f172a' }}>{t('dialog.presets.moon')}</option>
-            <option value="asteroid" style={{ background: '#0f172a' }}>{t('dialog.presets.asteroid')}</option>
-          </select>
-        </div>
-
-        <div style={FIELD_STYLE}>
-          <span style={LABEL_STYLE}>{t('dialog.mass')}</span>
-          <input
-            type="number"
-            step="any"
-            value={mass}
-            onChange={(e) => {
-              setMass(parseFloat(e.target.value) || 0);
-              setPreset('custom');
-            }}
-            style={INPUT_STYLE}
-          />
-        </div>
-
-        <div style={FIELD_STYLE}>
-          <span style={LABEL_STYLE}>{t('dialog.velMag')}</span>
-          <input
-            type="number"
-            step="any"
-            value={velMag}
-            onChange={(e) => setVelMag(parseFloat(e.target.value) || 0)}
-            style={INPUT_STYLE}
-          />
-        </div>
+        <BodyFieldsForm
+          labels={{
+            name: t('dialog.name'),
+            presetTemplate: t('dialog.presetTemplate'),
+            mass: t('dialog.mass'),
+            velMag: t('dialog.velMag'),
+            color: t('dialog.color'),
+          }}
+          name={name}
+          onNameChange={setName}
+          preset={preset}
+          presetOptions={presetOptions}
+          onPresetChange={(p) => setPreset(p as keyof typeof CONFIRM_PRESETS | 'custom')}
+          mass={mass}
+          onMassChange={(m) => {
+            setMass(m);
+            setPreset('custom');
+          }}
+          velMag={velMag}
+          onVelMagChange={setVelMag}
+          color={color}
+          onColorChange={(c) => {
+            setColor(c);
+            setPreset('custom');
+          }}
+        />
 
         <div style={FIELD_STYLE}>
           <span style={LABEL_STYLE}>{t('dialog.velDir')}</span>
@@ -148,22 +126,6 @@ export function BodyEditDialog({ body, onConfirm, onCancel }: BodyEditDialogProp
             onChange={(e) => setVelDir(parseFloat(e.target.value) || 0)}
             style={INPUT_STYLE}
           />
-        </div>
-
-        <div style={FIELD_STYLE}>
-          <span style={LABEL_STYLE}>{t('dialog.color')}</span>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <input
-              type="color"
-              value={color}
-              onChange={(e) => {
-                setColor(e.target.value);
-                setPreset('custom');
-              }}
-              style={{ ...INPUT_STYLE, padding: '2px 4px', width: '48px', height: '36px', cursor: 'pointer' }}
-            />
-            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '12px', color: '#94a3b8' }}>{color}</span>
-          </div>
         </div>
 
         <div style={{ ...FIELD_STYLE, flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
