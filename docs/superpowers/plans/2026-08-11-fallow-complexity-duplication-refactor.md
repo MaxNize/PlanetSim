@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- No behavior change unless explicitly called out in a task (two are: Task 2 removes duplicate JSX by consolidating five of six form fields into a shared component; VelDir controls are intentionally left untouched per-dialog to avoid an unverified UI change on `BodyPlacementDialog`, which has no dedicated test file).
+- No behavior change unless explicitly called out in a task (two are: Task 2 removes duplicate JSX by consolidating five of six form fields into a shared component, initially leaving VelDir controls dialog-specific; Task 14, a later follow-up, reversed that and unified VelDir into the shared `BodyFieldsForm`, changing `BodyPlacementDialog`'s VelDir control from a slider to a number input — see Task 14 below).
 - Every task must leave `npm --prefix frontend run test`, `npm --prefix frontend run lint`, and `cd frontend && npx tsc --noEmit` green before moving to the next task.
 - Do not change any exported prop types consumed outside the file being edited (`SimulationContextType`, `ParameterControlsProps`, `StateDisplayProps`, `SandboxControlsProps` all keep their existing shape).
 - Preserve all existing `data-testid` attributes verbatim — tests query by them.
@@ -2234,3 +2234,462 @@ git commit -m "chore: final fallow verification pass"
 ```
 
 (Skip this step if Steps 1-5 required no changes.)
+
+---
+
+### Task 14 (follow-up, added after fallow re-check): Unify VelDir into BodyFieldsForm
+
+**Context:** After Tasks 1-13, `npm run check:fallow` still reports 3 duplication clone groups (276 lines) concentrated entirely in `BodyEditDialog.tsx`/`BodyPlacementDialog.tsx`, centered on the VelDir input block that Task 2 deliberately left dialog-specific. The human has approved unifying VelDir into the shared `BodyFieldsForm`, using `BodyEditDialog`'s existing number-input control (min=0, max=360, step=1) for both dialogs. This means `BodyPlacementDialog`'s VelDir control changes from a `type="range"` slider with a rounded-degree readout to a `type="number"` input — a deliberate, approved UI change, consistent with the visual-unification precedent already accepted in Task 2. No existing test asserts on the slider's control type (confirmed via grep across `Canvas.test.tsx` and `SimulationShell.test.tsx`), so this is safe to change.
+
+**Files:**
+- Modify: `frontend/src/components/BodyFieldsForm/BodyFieldsForm.tsx`
+- Modify: `frontend/src/components/BodyEditDialog/BodyEditDialog.tsx`
+- Modify: `frontend/src/components/BodyPlacementDialog/BodyPlacementDialog.tsx`
+- Test: `frontend/src/components/BodyEditDialog/BodyEditDialog.test.tsx`, `frontend/src/components/Canvas/Canvas.test.tsx`, `frontend/src/components/SimulationShell.test.tsx`
+
+**Interfaces:**
+- `BodyFieldsFormProps` gains `labels.velDir: string`, `velDir: number`, `onVelDirChange: (value: number) => void`.
+
+- [ ] **Step 1: Confirm green baseline**
+
+Run: `npm --prefix frontend run test -- BodyEditDialog Canvas SimulationShell`
+Expected: PASS
+
+- [ ] **Step 2: Replace `BodyFieldsForm.tsx`**
+
+Replace the full contents of `frontend/src/components/BodyFieldsForm/BodyFieldsForm.tsx` with:
+
+```tsx
+import { FIELD_STYLE, LABEL_STYLE, INPUT_STYLE } from '../BodyPlacementDialog/styles';
+
+export interface BodyPresetOption {
+  value: string;
+  label: string;
+}
+
+interface BodyFieldsFormProps {
+  labels: {
+    name: string;
+    presetTemplate: string;
+    mass: string;
+    velMag: string;
+    velDir: string;
+    color: string;
+  };
+  name: string;
+  onNameChange: (value: string) => void;
+  preset: string;
+  presetOptions: BodyPresetOption[];
+  onPresetChange: (value: string) => void;
+  mass: number;
+  onMassChange: (value: number) => void;
+  velMag: number;
+  onVelMagChange: (value: number) => void;
+  velDir: number;
+  onVelDirChange: (value: number) => void;
+  color: string;
+  onColorChange: (value: string) => void;
+}
+
+/**
+ * Shared labeled-field layout for configuring a celestial body's name, preset, mass, and velocity.
+ */
+export function BodyFieldsForm({
+  labels,
+  name,
+  onNameChange,
+  preset,
+  presetOptions,
+  onPresetChange,
+  mass,
+  onMassChange,
+  velMag,
+  onVelMagChange,
+  velDir,
+  onVelDirChange,
+  color,
+  onColorChange,
+}: BodyFieldsFormProps) {
+  return (
+    <>
+      <div style={FIELD_STYLE}>
+        <span style={LABEL_STYLE}>{labels.name}</span>
+        <input type="text" value={name} onChange={(e) => onNameChange(e.target.value)} style={INPUT_STYLE} />
+      </div>
+
+      <div style={FIELD_STYLE}>
+        <span style={LABEL_STYLE}>{labels.presetTemplate}</span>
+        <select value={preset} onChange={(e) => onPresetChange(e.target.value)} style={{ ...INPUT_STYLE, cursor: 'pointer' }}>
+          {presetOptions.map((opt) => (
+            <option key={opt.value} value={opt.value} style={{ background: '#0f172a' }}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div style={FIELD_STYLE}>
+        <span style={LABEL_STYLE}>{labels.mass}</span>
+        <input type="number" step="any" value={mass} onChange={(e) => onMassChange(parseFloat(e.target.value) || 0)} style={INPUT_STYLE} />
+      </div>
+
+      <div style={FIELD_STYLE}>
+        <span style={LABEL_STYLE}>{labels.velMag}</span>
+        <input type="number" step="any" value={velMag} onChange={(e) => onVelMagChange(parseFloat(e.target.value) || 0)} style={INPUT_STYLE} />
+      </div>
+
+      <div style={FIELD_STYLE}>
+        <span style={LABEL_STYLE}>{labels.velDir}</span>
+        <input
+          type="number"
+          min="0"
+          max="360"
+          step="1"
+          value={velDir}
+          onChange={(e) => onVelDirChange(parseFloat(e.target.value) || 0)}
+          style={INPUT_STYLE}
+        />
+      </div>
+
+      <div style={FIELD_STYLE}>
+        <span style={LABEL_STYLE}>{labels.color}</span>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <input
+            type="color"
+            value={color}
+            onChange={(e) => onColorChange(e.target.value)}
+            style={{ ...INPUT_STYLE, padding: '2px 4px', width: '48px', height: '36px', cursor: 'pointer' }}
+          />
+          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '12px', color: '#94a3b8' }}>{color}</span>
+        </div>
+      </div>
+    </>
+  );
+}
+```
+
+- [ ] **Step 3: Replace `BodyEditDialog.tsx`**
+
+Replace the full contents of `frontend/src/components/BodyEditDialog/BodyEditDialog.tsx` with:
+
+```tsx
+import { useState, useEffect } from 'react';
+import { SandboxBody } from '../../types';
+import { useI18n } from '../../context/I18nContext';
+import { OVERLAY_STYLE, DIALOG_STYLE, FIELD_STYLE, LABEL_STYLE, BUTTON_STYLE } from '../BodyPlacementDialog/styles';
+import { BodyFieldsForm, BodyPresetOption } from '../BodyFieldsForm/BodyFieldsForm';
+
+interface BodyEditDialogProps {
+  body: SandboxBody;
+  onConfirm: (updatedBody: SandboxBody) => void;
+  onCancel: () => void;
+}
+
+const CONFIRM_PRESETS = {
+  sun: { mass: 1.989e30, radius: 6.9634e8, color: '#fbc531' },
+  jupiter: { mass: 1.898e27, radius: 7.1492e7, color: '#e1b12c' },
+  earth: { mass: 5.9722e24, radius: 6.371e6, color: '#00a8ff' },
+  moon: { mass: 7.348e22, radius: 1.737e6, color: '#dcdde1' },
+  asteroid: { mass: 1.0e15, radius: 1.0e4, color: '#7f8fa6' },
+} as const;
+
+const radiusFromMass = (mass: number) => {
+  if (mass >= 1e30) return 6.9634e8 * Math.pow(mass / 1.989e30, 1 / 3);
+  if (mass >= 1e27) return 7.1492e7 * Math.pow(mass / 1.898e27, 1 / 3);
+  return 6.371e6 * Math.pow(mass / 5.9722e24, 1 / 3);
+};
+
+/**
+ * Renders a properties dialog modal for editing an existing body's parameters.
+ */
+export function BodyEditDialog({ body, onConfirm, onCancel }: BodyEditDialogProps) {
+  const { t } = useI18n();
+  const [name, setName] = useState(body.name || t('sandbox.defaultBodyName'));
+  const [preset, setPreset] = useState<keyof typeof CONFIRM_PRESETS | 'custom'>('custom');
+  const [mass, setMass] = useState(body.mass);
+  const [velMag, setVelMag] = useState(() => Math.hypot(...body.velocity));
+  const [velDir, setVelDir] = useState(() => {
+    const angle = Math.atan2(body.velocity[1], body.velocity[0]) * (180 / Math.PI);
+    return angle < 0 ? angle + 360 : angle;
+  });
+  const [color, setColor] = useState(body.color);
+  const [locked, setLocked] = useState(Boolean(body.locked));
+
+  useEffect(() => {
+    if (preset !== 'custom') {
+      const data = CONFIRM_PRESETS[preset];
+      setMass(data.mass);
+      setColor(data.color);
+    }
+  }, [preset]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onCancel]);
+
+  const handleConfirm = () => {
+    const rad = radiusFromMass(mass);
+    const radAngle = (velDir * Math.PI) / 180;
+    const vx = velMag * Math.cos(radAngle);
+    const vy = velMag * Math.sin(radAngle);
+    onConfirm({ ...body, name, mass, radius: rad, velocity: [vx, vy], color, locked });
+  };
+
+  const presetOptions: BodyPresetOption[] = [
+    { value: 'custom', label: t('dialog.presets.custom') },
+    { value: 'earth', label: t('dialog.presets.earth') },
+    { value: 'sun', label: t('dialog.presets.sun') },
+    { value: 'jupiter', label: t('dialog.presets.jupiter') },
+    { value: 'moon', label: t('dialog.presets.moon') },
+    { value: 'asteroid', label: t('dialog.presets.asteroid') },
+  ];
+
+  return (
+    <div style={OVERLAY_STYLE} onClick={onCancel} data-testid="body-edit-dialog">
+      <div style={DIALOG_STYLE} onClick={(e) => e.stopPropagation()}>
+        <h3
+          style={{
+            margin: 0,
+            fontSize: '16px',
+            fontWeight: 600,
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            paddingBottom: '12px',
+          }}
+        >
+          {t('editDialog.editTitle')}
+        </h3>
+
+        <BodyFieldsForm
+          labels={{
+            name: t('dialog.name'),
+            presetTemplate: t('dialog.presetTemplate'),
+            mass: t('dialog.mass'),
+            velMag: t('dialog.velMag'),
+            velDir: t('dialog.velDir'),
+            color: t('dialog.color'),
+          }}
+          name={name}
+          onNameChange={setName}
+          preset={preset}
+          presetOptions={presetOptions}
+          onPresetChange={(p) => setPreset(p as keyof typeof CONFIRM_PRESETS | 'custom')}
+          mass={mass}
+          onMassChange={(m) => {
+            setMass(m);
+            setPreset('custom');
+          }}
+          velMag={velMag}
+          onVelMagChange={setVelMag}
+          velDir={velDir}
+          onVelDirChange={setVelDir}
+          color={color}
+          onColorChange={(c) => {
+            setColor(c);
+            setPreset('custom');
+          }}
+        />
+
+        <div style={{ ...FIELD_STYLE, flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+          <input
+            type="checkbox"
+            id="lockCheckbox"
+            checked={locked}
+            onChange={(e) => setLocked(e.target.checked)}
+            style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+          />
+          <label htmlFor="lockCheckbox" style={{ ...LABEL_STYLE, cursor: 'pointer' }}>
+            🔒 {t('editDialog.locked')}
+          </label>
+        </div>
+
+        <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+          <button
+            onClick={onCancel}
+            style={{ ...BUTTON_STYLE, flex: 1, background: 'rgba(255, 255, 255, 0.08)', color: '#94a3b8' }}
+          >
+            {t('dialog.cancel')}
+          </button>
+          <button
+            onClick={handleConfirm}
+            style={{ ...BUTTON_STYLE, flex: 1, background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)', color: '#ffffff' }}
+          >
+            {t('dialog.confirm')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+Note: `INPUT_STYLE` is dropped from the import list (it was only used by the standalone VelDir block, now removed — leaving it imported would be an unused-import lint error).
+
+- [ ] **Step 4: Replace `BodyPlacementDialog.tsx`**
+
+Replace the full contents of `frontend/src/components/BodyPlacementDialog/BodyPlacementDialog.tsx` with:
+
+```tsx
+import { useState, useEffect } from 'react';
+import { SandboxBody } from '../../types';
+import { useI18n } from '../../context/I18nContext';
+import { OVERLAY_STYLE, DIALOG_STYLE, BUTTON_STYLE } from './styles';
+import { BodyFieldsForm, BodyPresetOption } from '../BodyFieldsForm/BodyFieldsForm';
+
+interface BodyPlacementDialogProps {
+  position: [number, number];
+  onConfirm: (body: SandboxBody) => void;
+  onCancel: () => void;
+  initialVelocity?: [number, number];
+}
+
+const CONFIRM_PRESETS = {
+  sun: { mass: 1.989e30, radius: 6.9634e8, color: '#fbc531', name: 'Sun-like Star' },
+  jupiter: { mass: 1.898e27, radius: 7.1492e7, color: '#e1b12c', name: 'Gas Giant' },
+  earth: { mass: 5.9722e24, radius: 6.371e6, color: '#00a8ff', name: 'Terrestrial Planet' },
+  moon: { mass: 7.348e22, radius: 1.737e6, color: '#dcdde1', name: 'Moon-like Satellite' },
+  asteroid: { mass: 1.0e15, radius: 1.0e4, color: '#7f8fa6', name: 'Asteroid' },
+} as const;
+
+const radiusFromMass = (mass: number) => {
+  if (mass >= 1e30) return 6.9634e8 * Math.pow(mass / 1.989e30, 1 / 3);
+  if (mass >= 1e27) return 7.1492e7 * Math.pow(mass / 1.898e27, 1 / 3);
+  return 6.371e6 * Math.pow(mass / 5.9722e24, 1 / 3);
+};
+
+/**
+ * Renders a properties dialog modal for configuring a new body's parameters.
+ */
+export function BodyPlacementDialog({ position, onConfirm, onCancel, initialVelocity = [0, 0] }: BodyPlacementDialogProps) {
+  const { t } = useI18n();
+  const [name, setName] = useState(() => t('dialog.defaultBodyName'));
+  const [preset, setPreset] = useState<keyof typeof CONFIRM_PRESETS | 'custom'>('earth');
+  const [mass, setMass] = useState(5.9722e24);
+  const [velMag, setVelMag] = useState(() => Math.hypot(...initialVelocity));
+  const [velDir, setVelDir] = useState(() => {
+    const angle = Math.atan2(initialVelocity[1], initialVelocity[0]) * (180 / Math.PI);
+    return angle < 0 ? angle + 360 : angle;
+  });
+  const [color, setColor] = useState('#00a8ff');
+
+  useEffect(() => {
+    if (preset !== 'custom') {
+      const data = CONFIRM_PRESETS[preset];
+      setMass(data.mass);
+      setColor(data.color);
+      setName(t(`dialog.presets.${preset}`));
+    }
+  }, [preset, t]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onCancel]);
+
+  const handleConfirm = () => {
+    const rad = radiusFromMass(mass);
+    const radAngle = (velDir * Math.PI) / 180;
+    const vx = velMag * Math.cos(radAngle);
+    const vy = velMag * Math.sin(radAngle);
+    onConfirm({ id: `body-${Date.now()}`, position, velocity: [vx, vy], mass, radius: rad, color, name, locked: false });
+  };
+
+  const presetOptions: BodyPresetOption[] = [
+    { value: 'earth', label: t('dialog.presets.earth') },
+    { value: 'sun', label: t('dialog.presets.sun') },
+    { value: 'jupiter', label: t('dialog.presets.jupiter') },
+    { value: 'moon', label: t('dialog.presets.moon') },
+    { value: 'asteroid', label: t('dialog.presets.asteroid') },
+    { value: 'custom', label: t('dialog.presets.custom') },
+  ];
+
+  return (
+    <div style={OVERLAY_STYLE} onClick={onCancel}>
+      <div style={DIALOG_STYLE} onClick={(e) => e.stopPropagation()}>
+        <h3
+          style={{
+            margin: 0,
+            fontSize: '16px',
+            fontWeight: 600,
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            paddingBottom: '12px',
+          }}
+        >
+          {t('dialog.title')}
+        </h3>
+
+        <BodyFieldsForm
+          labels={{
+            name: t('dialog.name'),
+            presetTemplate: t('dialog.presetTemplate'),
+            mass: t('dialog.mass'),
+            velMag: t('dialog.velMag'),
+            velDir: t('dialog.velDir'),
+            color: t('dialog.color'),
+          }}
+          name={name}
+          onNameChange={(n) => {
+            setName(n);
+            setPreset('custom');
+          }}
+          preset={preset}
+          presetOptions={presetOptions}
+          onPresetChange={(p) => setPreset(p as keyof typeof CONFIRM_PRESETS | 'custom')}
+          mass={mass}
+          onMassChange={(m) => {
+            setMass(m);
+            setPreset('custom');
+          }}
+          velMag={velMag}
+          onVelMagChange={setVelMag}
+          velDir={velDir}
+          onVelDirChange={setVelDir}
+          color={color}
+          onColorChange={(c) => {
+            setColor(c);
+            setPreset('custom');
+          }}
+        />
+
+        <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+          <button onClick={onCancel} style={{ ...BUTTON_STYLE, flex: 1, background: 'rgba(255, 255, 255, 0.08)', color: '#fff' }}>
+            {t('dialog.cancel')}
+          </button>
+          <button
+            onClick={handleConfirm}
+            style={{
+              ...BUTTON_STYLE,
+              flex: 1,
+              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              color: '#fff',
+              boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+            }}
+          >
+            {t('dialog.confirm')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+Note: `FIELD_STYLE` and `LABEL_STYLE` are dropped from the import list (they were only used by the standalone VelDir slider block, now removed).
+
+- [ ] **Step 5: Verify tests still pass**
+
+Run: `npm --prefix frontend run test -- BodyEditDialog Canvas SimulationShell`
+Expected: PASS
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add frontend/src/components/BodyFieldsForm/BodyFieldsForm.tsx frontend/src/components/BodyEditDialog/BodyEditDialog.tsx frontend/src/components/BodyPlacementDialog/BodyPlacementDialog.tsx
+git commit -m "refactor(dialogs): unify VelDir into shared BodyFieldsForm to finish deduplicating BodyEditDialog/BodyPlacementDialog"
+```
