@@ -9,7 +9,7 @@ pub const DEFAULT_GRAVITATIONAL_CONSTANT: f64 = 6.67430e-11;
 ///
 /// # Examples
 /// ```
-/// use planet_sim::physics::gravity::distance;
+/// use planet_sim_wasm::physics::gravity::distance;
 /// let d = distance((0.0, 0.0), (3.0, 4.0));
 /// assert_eq!(d, 5.0);
 /// ```
@@ -31,7 +31,7 @@ pub fn distance(position1: (f64, f64), position2: (f64, f64)) -> f64 {
 ///
 /// # Examples
 /// ```
-/// use planet_sim::physics::gravity::force_between;
+/// use planet_sim_wasm::physics::gravity::force_between;
 /// let force = force_between(5.9722e24, 7.348e22, 3.844e8, 6.67430e-11);
 /// assert!((force - 1.982e20).abs() < 1e18);
 /// ```
@@ -49,7 +49,7 @@ pub fn force_between(mass1: f64, mass2: f64, distance: f64, gravitational_consta
 ///
 /// # Examples
 /// ```
-/// use planet_sim::physics::gravity::acceleration_from_force;
+/// use planet_sim_wasm::physics::gravity::acceleration_from_force;
 /// let accel = acceleration_from_force(100.0, 20.0);
 /// assert_eq!(accel, 5.0);
 /// ```
@@ -62,7 +62,7 @@ pub fn acceleration_from_force(force: f64, mass: f64) -> f64 {
 ///
 /// # Examples
 /// ```
-/// use planet_sim::physics::gravity::gravitational_force;
+/// use planet_sim_wasm::physics::gravity::gravitational_force;
 /// let force = gravitational_force(5.9722e24, 7.348e22, 3.844e8);
 /// assert!(force > 1.9e20);
 /// ```

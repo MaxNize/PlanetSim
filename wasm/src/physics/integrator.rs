@@ -29,7 +29,7 @@ pub struct StepResult {
 ///
 /// # Examples
 /// ```
-/// use planet_sim::physics::{Body, State, integrate_step};
+/// use planet_sim_wasm::physics::{Body, State, integrate_step};
 ///
 /// let primary = Body::new((0.0, 0.0), (0.0, 0.0), 1.989e30, 6.96e8);
 /// let secondary = Body::new((1.496e11, 0.0), (0.0, 29780.0), 5.972e24, 6.371e6);

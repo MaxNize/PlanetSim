@@ -11,7 +11,7 @@ use super::integrator::advance_pos;
 ///
 /// # Examples
 /// ```
-/// use planet_sim::physics::{Body, n_body::integrate_n_body};
+/// use planet_sim_wasm::physics::{Body, n_body::integrate_n_body};
 ///
 /// let b1 = Body::new((0.0, 0.0), (0.0, 0.0), 1.989e30, 6.96e8);
 /// let b2 = Body::new((1.496e11, 0.0), (0.0, 29780.0), 5.972e24, 6.371e6);
