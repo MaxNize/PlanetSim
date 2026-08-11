@@ -2,7 +2,8 @@
 
 ## 1. Overview
 
-The **Planet Simulation** monorepo consists of a high-performance Rust/WASM physics library (`planet-sim-wasm`) and a modern React/TypeScript frontend. This guide provides full API references for both Rust and TypeScript interfaces.
+The **Planet Simulation** monorepo consists of a high-performance Rust/WASM physics library (`planet-sim-wasm`) and a modern React/TypeScript frontend.
+This guide provides full API references for both Rust and TypeScript interfaces.
 
 ---
 

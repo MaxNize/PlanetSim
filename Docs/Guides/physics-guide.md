@@ -2,7 +2,8 @@
 
 ## 1. Overview
 
-The Planet Simulation engine models the gravitational orbital mechanics of celestial bodies using classical Newtonian mechanics. The core engine supports both the **Restricted Three-Body Problem** and generalized **$N$-Body gravitational interactions**, compiled to WebAssembly for 60 FPS real-time web performance.
+The Planet Simulation engine models the gravitational orbital mechanics of celestial bodies using classical Newtonian mechanics.
+The core engine supports both the **Restricted Three-Body Problem** and generalized **$N$-Body gravitational interactions**, compiled to WebAssembly for 60 FPS real-time web performance.
 
 ---
 
@@ -60,8 +61,8 @@ Given position $\mathbf{r}_n$, velocity $\mathbf{v}_n$, acceleration $\mathbf{a}
 
 In a restricted 3-body system (Primary mass $M_1$, Secondary mass $M_2$), there exist 5 equilibrium positions where gravitational and centrifugal forces balance in the rotating reference frame:
 
-- **Collinear Points ($L_1, L_2, L_3$):** Located along the line connecting $M_1$ and $M_2$. Found numerically using Newton-Raphson root finding on the effective potential derivative.
-- **Triangular Points ($L_4, L_5$):** Located at the vertices of equilateral triangles forming $60^\circ$ angles ahead and behind $M_2$ in its orbit.
+* **Collinear Points ($L_1, L_2, L_3$):** Located along the line connecting $M_1$ and $M_2$. Found numerically using Newton-Raphson root finding on the effective potential derivative.
+* **Triangular Points ($L_4, L_5$):** Located at the vertices of equilateral triangles forming $60^\circ$ angles ahead and behind $M_2$ in its orbit.
 
 ---
 
@@ -74,9 +75,9 @@ In a restricted 3-body system (Primary mass $M_1$, Secondary mass $M_2$), there 
 | Mass ($m$) | Kilograms ($\text{kg}$) | $10^{15} \text{ kg}$ (Asteroid) to $10^{30} \text{ kg}$ (Star) |
 | Time step ($\Delta t$) | Seconds ($\text{s}$) | $1.0 \text{ s}$ to $86,400 \text{ s}$ |
 
-### Precision & Limits:
-- **Floating-point Format:** IEEE 754 double precision (`f64`), relative error $\sim 10^{-16}$.
-- **Softening Radius:** A minimum threshold $r_{\text{safe}} = 1000 \text{ m}$ avoids infinite forces during near-collision encounters.
+### Precision & Limits
+* **Floating-point Format:** IEEE 754 double precision (`f64`), relative error $\sim 10^{-16}$.
+* **Softening Radius:** A minimum threshold $r_{\text{safe}} = 1000 \text{ m}$ avoids infinite forces during near-collision encounters.
 
 ---
 
