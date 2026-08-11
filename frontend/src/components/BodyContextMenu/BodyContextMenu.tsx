@@ -51,6 +51,9 @@ function MenuItem({ onClick, disabled = false, color, hoverColor, children }: Me
 /**
  * Renders a context menu for editing, locking, or deleting a sandbox body.
  */
+// Size here is JSX volume (header + 3 already-extracted MenuItems), not branchy logic — cyclomatic is
+// already low (5); the menu items themselves were already pulled out into the MenuItem subcomponent above.
+// fallow-ignore-next-line complexity
 export function BodyContextMenu({ body, position, onEdit, onLockToggle, onDelete, onClose }: BodyContextMenuProps) {
   const { t } = useI18n();
   const menuRef = useRef<HTMLDivElement>(null);

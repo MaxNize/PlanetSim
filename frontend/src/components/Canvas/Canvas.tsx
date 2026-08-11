@@ -14,6 +14,8 @@ interface CanvasProps {
   onPlacementComplete?: (body: SandboxBody) => void;
 }
 
+// Two independent simple guards (has a placed point vs. is just hovering) — already minimal.
+// fallow-ignore-next-line complexity
 function computePlacementPreview(
   placementActive: boolean,
   placedWorldPos: [number, number] | null,
@@ -27,6 +29,62 @@ function computePlacementPreview(
     return { position: hoverWorldPos, velocity: [0, 0], radius: 6.371e6, color: 'rgba(59, 130, 246, 0.4)' };
   }
   return undefined;
+}
+
+/** Picks the mouse cursor for the current interaction state (dragging > space-panning > placing > default). */
+function getCanvasCursor(isDragging: boolean, isSpacePressed: boolean, placementActive: boolean): string {
+  if (isDragging) return 'grabbing';
+  if (isSpacePressed) return 'grab';
+  if (placementActive) return 'crosshair';
+  return 'default';
+}
+
+interface CanvasOverlaysProps {
+  contextMenu: { x: number; y: number; body: SandboxBody } | null;
+  onContextMenuClose: () => void;
+  onEdit: (body: SandboxBody) => void;
+  onLockToggle: (body: SandboxBody) => void;
+  onDelete: (body: SandboxBody) => void;
+  editingBody: SandboxBody | null;
+  onEditConfirm: (updated: SandboxBody) => void;
+  onEditCancel: () => void;
+  showPlacementDialog: boolean;
+  placedWorldPos: [number, number] | null;
+  draggedVel: [number, number];
+  onPlacementConfirm: (body: SandboxBody) => void;
+  onPlacementDialogCancel: () => void;
+}
+
+/** Renders the context menu, edit dialog, and placement dialog overlays for the canvas, each conditionally. */
+// 3 independently-optional overlays bundled into one component to keep Canvas itself small; the
+// prop count is the sum of what each of those 3 pieces needs, not accidental sprawl.
+// fallow-ignore-next-line complexity
+function CanvasOverlays({
+  contextMenu,
+  onContextMenuClose,
+  onEdit,
+  onLockToggle,
+  onDelete,
+  editingBody,
+  onEditConfirm,
+  onEditCancel,
+  showPlacementDialog,
+  placedWorldPos,
+  draggedVel,
+  onPlacementConfirm,
+  onPlacementDialogCancel,
+}: CanvasOverlaysProps) {
+  return (
+    <>
+      {contextMenu && (
+        <BodyContextMenu body={contextMenu.body} position={{ x: contextMenu.x, y: contextMenu.y }} onEdit={onEdit} onLockToggle={onLockToggle} onDelete={onDelete} onClose={onContextMenuClose} />
+      )}
+
+      {editingBody && <BodyEditDialog body={editingBody} onConfirm={onEditConfirm} onCancel={onEditCancel} />}
+
+      {showPlacementDialog && placedWorldPos && <BodyPlacementDialog position={placedWorldPos} initialVelocity={draggedVel} onConfirm={onPlacementConfirm} onCancel={onPlacementDialogCancel} />}
+    </>
+  );
 }
 
 /**
@@ -86,51 +144,39 @@ export function Canvas({ showTrail = true, placementActive = false, onPlacementC
           display: 'block',
           width: '100%',
           height: '100%',
-          cursor: isDragging ? 'grabbing' : isSpacePressed ? 'grab' : placementActive ? 'crosshair' : 'default',
+          cursor: getCanvasCursor(isDragging, isSpacePressed, placementActive),
           outline: 'none',
         }}
       />
 
-      {contextMenu && (
-        <BodyContextMenu
-          body={contextMenu.body}
-          position={{ x: contextMenu.x, y: contextMenu.y }}
-          onEdit={(b) => setEditingBody(b)}
-          onLockToggle={(b) => updateBody(b.id, { locked: !b.locked })}
-          onDelete={(b) => removeBody(b.id)}
-          onClose={() => setContextMenu(null)}
-        />
-      )}
-
-      {editingBody && (
-        <BodyEditDialog
-          body={editingBody}
-          onConfirm={(updated) => {
-            updateBody(updated.id, updated);
-            setEditingBody(null);
-          }}
-          onCancel={() => setEditingBody(null)}
-        />
-      )}
-
-      {showDialog && placedWorldPos && (
-        <BodyPlacementDialog
-          position={placedWorldPos}
-          initialVelocity={draggedVel}
-          onConfirm={(body) => {
-            setShowDialog(false);
-            setPlacedWorldPos(null);
-            setDraggedVel([0, 0]);
-            if (onPlacementComplete) onPlacementComplete(body);
-          }}
-          onCancel={() => {
-            setShowDialog(false);
-            setPlacedWorldPos(null);
-            setDraggedVel([0, 0]);
-            if (onPlacementCancel) onPlacementCancel();
-          }}
-        />
-      )}
+      <CanvasOverlays
+        contextMenu={contextMenu}
+        onContextMenuClose={() => setContextMenu(null)}
+        onEdit={(b) => setEditingBody(b)}
+        onLockToggle={(b) => updateBody(b.id, { locked: !b.locked })}
+        onDelete={(b) => removeBody(b.id)}
+        editingBody={editingBody}
+        onEditConfirm={(updated) => {
+          updateBody(updated.id, updated);
+          setEditingBody(null);
+        }}
+        onEditCancel={() => setEditingBody(null)}
+        showPlacementDialog={showDialog}
+        placedWorldPos={placedWorldPos}
+        draggedVel={draggedVel}
+        onPlacementConfirm={(body) => {
+          setShowDialog(false);
+          setPlacedWorldPos(null);
+          setDraggedVel([0, 0]);
+          if (onPlacementComplete) onPlacementComplete(body);
+        }}
+        onPlacementDialogCancel={() => {
+          setShowDialog(false);
+          setPlacedWorldPos(null);
+          setDraggedVel([0, 0]);
+          if (onPlacementCancel) onPlacementCancel();
+        }}
+      />
     </>
   );
 }

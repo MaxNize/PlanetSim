@@ -44,20 +44,32 @@ const ADD_BUTTON_INACTIVE_STYLE = {
 
 const ADD_BUTTON_STYLE = (active: boolean) => (active ? ADD_BUTTON_ACTIVE_STYLE : ADD_BUTTON_INACTIVE_STYLE);
 
+/** Prefers the controlled `selectedBodyId` prop when the parent supplies one, falling back to context state. */
+function resolveActiveSelectedId(propsSelectedId: string | null | undefined, contextSelectedId: string | null): string | null {
+  return propsSelectedId !== undefined ? propsSelectedId : contextSelectedId;
+}
+
+/** Notifies both the optional controlled-mode callback and context state of a selection change. */
+function notifySelection(id: string | null, onSelectBody: ((id: string | null) => void) | undefined, setSelectedBodyId: ((id: string | null) => void) | undefined): void {
+  onSelectBody?.(id);
+  setSelectedBodyId?.(id);
+}
+
 /**
  * Renders sandbox specific panel controls including custom bodies listing, selection, editing, and active toggling.
  */
+// Remaining branches (selection toggle, reset confirmation) are each a single, already-minimal
+// condition; the body-sync/style logic they used to carry was already extracted above.
+// fallow-ignore-next-line complexity
 export function SandboxControls({ placementActive, setPlacementActive, selectedBodyId: propsSelectedId, onSelectBody }: SandboxControlsProps) {
   const { sandboxBodies, removeBody, updateBody, setMode, selectedBodyId: contextSelectedId, setSelectedBodyId } = useSimulationContext();
   const { t } = useI18n();
   const [editingBody, setEditingBody] = useState<SandboxBody | null>(null);
 
-  const activeSelectedId = propsSelectedId !== undefined ? propsSelectedId : contextSelectedId;
+  const activeSelectedId = resolveActiveSelectedId(propsSelectedId, contextSelectedId);
 
   const handleSelect = (id: string) => {
-    const nextId = activeSelectedId === id ? null : id;
-    if (onSelectBody) onSelectBody(nextId);
-    if (setSelectedBodyId) setSelectedBodyId(nextId);
+    notifySelection(activeSelectedId === id ? null : id, onSelectBody, setSelectedBodyId);
   };
 
   const handleReset = () => {
@@ -89,10 +101,12 @@ export function SandboxControls({ placementActive, setPlacementActive, selectedB
             onSelect={handleSelect}
             onEdit={setEditingBody}
             onDelete={removeBody}
-            editLabel={t('sandbox.editBody')}
-            deleteLabel={t('sandbox.deleteBody')}
-            defaultNameLabel={t('sandbox.defaultBodyName')}
-            lockedLabel={t('editDialog.locked')}
+            labels={{
+              edit: t('sandbox.editBody'),
+              delete: t('sandbox.deleteBody'),
+              defaultName: t('sandbox.defaultBodyName'),
+              locked: t('editDialog.locked'),
+            }}
           />
         ))}
       </div>

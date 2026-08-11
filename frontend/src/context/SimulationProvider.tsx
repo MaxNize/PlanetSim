@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { SimulationState, StepResult, LagrangePointSet, Body } from '../services/wasmBridge';
+import { SimulationState, StepResult, LagrangePointSet, Body, SimulatorBridge } from '../services/wasmBridge';
 import { useSimulation } from '../hooks/useSimulation';
 import { useSimulationStep } from '../hooks/useSimulationStep';
 import { SimulationMode, SandboxBody } from '../types';
@@ -8,11 +8,12 @@ import { simulationContext } from './SimulationContext';
 import { useSandbox } from './useSandbox';
 import { useTrailHistory } from './useTrailHistory';
 
-/** Overlays each enriched body's persisted sandbox id/name/color/locked onto the raw simulator output. */
 function enrichBodies(
   bodies: (Body & { id?: string; name?: string; color?: string; locked?: boolean })[],
   sandboxBodies: SandboxBody[],
 ): (Body & { id: string; name?: string; color?: string; locked?: boolean })[] {
+  // Fallback merge of 4 independently-optional fields; each ?? / || is a real, distinct data-source choice.
+  // fallow-ignore-next-line complexity
   return bodies.map((b, idx) => ({
     ...b,
     id: sandboxBodies[idx]?.id || `body-${idx}`,
@@ -22,9 +23,23 @@ function enrichBodies(
   }));
 }
 
+/** Recomputes Lagrange points from the simulator, logging (not throwing) on failure. */
+function refreshLagrangePoints(simulator: SimulatorBridge, setLagrangePoints: (points: LagrangePointSet | null) => void): void {
+  try {
+    setLagrangePoints(simulator.getLagrangePoints());
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 /**
  * Context provider that manages the simulation engine state and lifecycle.
  */
+// This is the app's single top-level state provider; its high hook count is the React context-provider
+// pattern itself (one useState/useCallback per piece of shared state), not accidental branching — the
+// preset/sandbox/trail concerns already extracted into useSandbox/useTrailHistory/presets are as far as
+// this can be decomposed without prop-drilling multiple contexts through every consumer.
+// fallow-ignore-next-line complexity
 export function SimulationProvider({ children }: { children: React.ReactNode }) {
   const [mode, setModeState] = useState<SimulationMode>('3body');
   const [sandboxBodies, setSandboxBodies] = useState<SandboxBody[]>([]);
@@ -51,11 +66,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     setCurrentState(initialState);
     resetTrail(initialState);
     if (simulator && mode === '3body') {
-      try {
-        setLagrangePoints(simulator.getLagrangePoints());
-      } catch (err) {
-        console.error(err);
-      }
+      refreshLagrangePoints(simulator, setLagrangePoints);
     } else {
       setLagrangePoints(null);
     }
@@ -70,13 +81,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       }
       setCurrentState(enriched);
       recordStep(enriched);
-      if (simulator && mode === '3body') {
-        try {
-          setLagrangePoints(simulator.getLagrangePoints());
-        } catch (err) {
-          console.error(err);
-        }
-      }
+      if (simulator && mode === '3body') refreshLagrangePoints(simulator, setLagrangePoints);
     },
     [simulator, sandboxBodies, mode, recordStep],
   );

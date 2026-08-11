@@ -17,6 +17,21 @@ function syncBodyKinematics(sandboxBodies: SandboxBody[], latestBodies: LatestBo
   });
 }
 
+/** True when a new body at this position/radius would overlap any existing body. */
+function hasOverlap(body: SandboxBody, existing: { position: [number, number]; radius: number }[]): boolean {
+  return existing.some((other) => {
+    const dx = body.position[0] - other.position[0];
+    const dy = body.position[1] - other.position[1];
+    return Math.hypot(dx, dy) < body.radius + other.radius;
+  });
+}
+
+/** Resolves a sandbox body's current kinematics: its live simulated state if present, else its own last-known values. */
+function resolveCurrentKinematics(sb: SandboxBody, latestBodies: LatestBody[], idx: number): { position: [number, number]; velocity: [number, number] } {
+  const simBody = latestBodies.find((b) => b.id === sb.id) || latestBodies[idx];
+  return simBody ? { position: simBody.position, velocity: simBody.velocity } : { position: sb.position, velocity: sb.velocity };
+}
+
 /** Persists a new sandbox body list into both React state and the running simulator. */
 function commitSandboxBodies(
   bodies: SandboxBody[],
@@ -109,13 +124,7 @@ export function useSandbox(
     (body: SandboxBody) => {
       if (sandboxBodies.length >= 10) throw new Error('Maximum 10 bodies reached');
       const latestBodies = currentState.bodies || sandboxBodies;
-      for (const other of latestBodies) {
-        const dx = body.position[0] - other.position[0];
-        const dy = body.position[1] - other.position[1];
-        if (Math.hypot(dx, dy) < body.radius + other.radius) {
-          throw new Error('Overlap detected with another body');
-        }
-      }
+      if (hasOverlap(body, latestBodies)) throw new Error('Overlap detected with another body');
       const updatedSandbox = syncBodyKinematics(sandboxBodies, latestBodies);
       commitSandboxBodies([...updatedSandbox, body], currentState, setSandboxBodies, setCurrentState, simulator);
     },
@@ -135,19 +144,9 @@ export function useSandbox(
     (id: string, updates: Partial<SandboxBody>) => {
       const latestBodies = currentState.bodies || sandboxBodies;
       const updatedSandbox = sandboxBodies.map((sb, idx) => {
-        const simBody = latestBodies.find((b) => b.id === sb.id) || latestBodies[idx];
-        const currentPos = simBody ? simBody.position : sb.position;
-        const currentVel = simBody ? simBody.velocity : sb.velocity;
-
-        if (sb.id !== id) {
-          return { ...sb, position: currentPos, velocity: currentVel };
-        }
-        return {
-          ...sb,
-          ...updates,
-          position: currentPos,
-          velocity: updates.velocity !== undefined ? updates.velocity : currentVel,
-        };
+        const { position, velocity } = resolveCurrentKinematics(sb, latestBodies, idx);
+        if (sb.id !== id) return { ...sb, position, velocity };
+        return { ...sb, ...updates, position, velocity: updates.velocity !== undefined ? updates.velocity : velocity };
       });
       commitSandboxBodies(updatedSandbox, currentState, setSandboxBodies, setCurrentState, simulator);
     },
