@@ -11,6 +11,43 @@ interface BodyContextMenuProps {
   onClose: () => void;
 }
 
+interface MenuItemProps {
+  onClick: () => void;
+  disabled?: boolean;
+  color: string;
+  hoverColor: string;
+  children: React.ReactNode;
+}
+
+function MenuItem({ onClick, disabled = false, color, hoverColor, children }: MenuItemProps) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        width: '100%',
+        textAlign: 'left',
+        padding: '8px 14px',
+        background: 'none',
+        border: 'none',
+        color,
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        fontSize: '13px',
+        opacity: disabled ? 0.5 : 1,
+      }}
+      onMouseEnter={(e) => {
+        if (!disabled) e.currentTarget.style.backgroundColor = hoverColor;
+      }}
+      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+    >
+      {children}
+    </button>
+  );
+}
+
 /**
  * Renders a context menu for editing, locking, or deleting a sandbox body.
  */
@@ -45,7 +82,6 @@ export function BodyContextMenu({
     };
   }, [onClose]);
 
-  // Adjust menu position so it doesn't overflow screen boundaries
   const adjustedX = Math.min(position.x, window.innerWidth - 180);
   const adjustedY = Math.min(position.y, window.innerHeight - 160);
 
@@ -97,57 +133,31 @@ export function BodyContextMenu({
         </span>
       </div>
 
-      <button
+      <MenuItem
         onClick={() => {
           onEdit(body);
           onClose();
         }}
-        style={{
-          width: '100%',
-          textAlign: 'left',
-          padding: '8px 14px',
-          background: 'none',
-          border: 'none',
-          color: '#f8fafc',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontSize: '13px',
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.2)')}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+        color="#f8fafc"
+        hoverColor="rgba(59, 130, 246, 0.2)"
       >
         {t('contextMenu.edit')}
-      </button>
+      </MenuItem>
 
-      <button
+      <MenuItem
         onClick={() => {
           onLockToggle(body);
           onClose();
         }}
-        style={{
-          width: '100%',
-          textAlign: 'left',
-          padding: '8px 14px',
-          background: 'none',
-          border: 'none',
-          color: body.locked ? '#f59e0b' : '#f8fafc',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontSize: '13px',
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.2)')}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+        color={body.locked ? '#f59e0b' : '#f8fafc'}
+        hoverColor="rgba(59, 130, 246, 0.2)"
       >
         {body.locked ? t('contextMenu.unlock') : t('contextMenu.lock')}
-      </button>
+      </MenuItem>
 
       <div style={{ height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.08)', margin: '4px 0' }} />
 
-      <button
+      <MenuItem
         onClick={() => {
           if (!body.locked) {
             onDelete(body);
@@ -155,27 +165,11 @@ export function BodyContextMenu({
           }
         }}
         disabled={body.locked}
-        style={{
-          width: '100%',
-          textAlign: 'left',
-          padding: '8px 14px',
-          background: 'none',
-          border: 'none',
-          color: body.locked ? '#64748b' : '#ef4444',
-          cursor: body.locked ? 'not-allowed' : 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontSize: '13px',
-          opacity: body.locked ? 0.5 : 1,
-        }}
-        onMouseEnter={(e) => {
-          if (!body.locked) e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
-        }}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+        color={body.locked ? '#64748b' : '#ef4444'}
+        hoverColor="rgba(239, 68, 68, 0.2)"
       >
         {t('contextMenu.delete')}
-      </button>
+      </MenuItem>
     </div>
   );
 }
