@@ -43,5 +43,12 @@ module.exports = [
             ],
             'jsdoc/check-alignment': 'warn'
         }
+    },
+    {
+        // Exempted in max-lines-exceptions.json: i18n translation dictionaries for multi-language support.
+        files: ['src/i18n/translations.ts'],
+        rules: {
+            'max-lines': 'off'
+        }
     }
 ]

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { SandboxBody } from '../../types';
 import { useI18n } from '../../context/I18nContext';
 
@@ -11,14 +11,17 @@ interface BodyContextMenuProps {
   onClose: () => void;
 }
 
-export const BodyContextMenu: React.FC<BodyContextMenuProps> = ({
+/**
+ * Renders a context menu for editing, locking, or deleting a sandbox body.
+ */
+export function BodyContextMenu({
   body,
   position,
   onEdit,
   onLockToggle,
   onDelete,
   onClose,
-}) => {
+}: BodyContextMenuProps) {
   const { t } = useI18n();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -175,4 +178,4 @@ export const BodyContextMenu: React.FC<BodyContextMenuProps> = ({
       </button>
     </div>
   );
-};
+}

@@ -23,6 +23,9 @@ const radiusFromMass = (mass: number) => {
   return 6.371e6 * Math.pow(mass / 5.9722e24, 1 / 3);
 };
 
+/**
+ * Renders a properties dialog modal for editing an existing body's parameters.
+ */
 export function BodyEditDialog({ body, onConfirm, onCancel }: BodyEditDialogProps) {
   const { t } = useI18n();
   const [name, setName] = useState(body.name || t('sandbox.defaultBodyName'));
