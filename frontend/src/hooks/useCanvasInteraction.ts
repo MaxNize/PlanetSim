@@ -67,10 +67,7 @@ export function useCanvasInteraction({ canvasRef, placementActive, onPlacementCa
     const rect = canvasRef.current.getBoundingClientRect();
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
-    return [
-      (screenX - rect.left - centerX) / viewport.scale + viewport.pan.x,
-      (centerY - (screenY - rect.top)) / viewport.scale + viewport.pan.y,
-    ];
+    return [(screenX - rect.left - centerX) / viewport.scale + viewport.pan.x, (centerY - (screenY - rect.top)) / viewport.scale + viewport.pan.y];
   };
 
   const findBodyAtPosition = (worldPos: [number, number]): SandboxBody | null => {

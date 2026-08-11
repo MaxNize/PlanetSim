@@ -36,15 +36,7 @@ export function Canvas({ showTrail = true, placementActive = false, onPlacementC
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<CanvasRenderer | null>(null);
 
-  const {
-    currentState,
-    lagrangePoints,
-    trailHistory,
-    showTrail: contextShowTrail,
-    selectedBodyId,
-    removeBody,
-    updateBody,
-  } = useSimulationContext();
+  const { currentState, lagrangePoints, trailHistory, showTrail: contextShowTrail, selectedBodyId, removeBody, updateBody } = useSimulationContext();
   const activeShowTrail = showTrail && contextShowTrail;
 
   const {
@@ -76,15 +68,7 @@ export function Canvas({ showTrail = true, placementActive = false, onPlacementC
 
     const preview = computePlacementPreview(placementActive, placedWorldPos, draggedVel, hoverWorldPos);
 
-    rendererRef.current.draw(
-      currentState,
-      trailHistory,
-      activeShowTrail,
-      lagrangePoints,
-      viewport,
-      preview,
-      selectedBodyId,
-    );
+    rendererRef.current.draw(currentState, trailHistory, activeShowTrail, lagrangePoints, viewport, preview, selectedBodyId);
   }, [currentState, viewport, trailHistory, activeShowTrail, lagrangePoints, dimensions, placementActive, hoverWorldPos, placedWorldPos, draggedVel, selectedBodyId]);
 
   return (

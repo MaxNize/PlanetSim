@@ -51,14 +51,7 @@ function MenuItem({ onClick, disabled = false, color, hoverColor, children }: Me
 /**
  * Renders a context menu for editing, locking, or deleting a sandbox body.
  */
-export function BodyContextMenu({
-  body,
-  position,
-  onEdit,
-  onLockToggle,
-  onDelete,
-  onClose,
-}: BodyContextMenuProps) {
+export function BodyContextMenu({ body, position, onEdit, onLockToggle, onDelete, onClose }: BodyContextMenuProps) {
   const { t } = useI18n();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -128,9 +121,7 @@ export function BodyContextMenu({
             display: 'inline-block',
           }}
         />
-        <span style={{ maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {body.name || t('sandbox.defaultBodyName')}
-        </span>
+        <span style={{ maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{body.name || t('sandbox.defaultBodyName')}</span>
       </div>
 
       <MenuItem

@@ -113,9 +113,7 @@ export function ParameterControls({
         </button>
       </div>
 
-      {mode === '3body' && (
-        <PresetSelector preset={preset} setPreset={setPreset} earthMoonLabel={t('presets.earthMoon')} binaryStarsLabel={t('presets.binaryStars')} />
-      )}
+      {mode === '3body' && <PresetSelector preset={preset} setPreset={setPreset} earthMoonLabel={t('presets.earthMoon')} binaryStarsLabel={t('presets.binaryStars')} />}
 
       <div style={BUTTONS_ROW_STYLE}>
         <button onClick={() => setIsPaused(!isPaused)} style={PLAY_BUTTON_STYLE(isPaused)}>

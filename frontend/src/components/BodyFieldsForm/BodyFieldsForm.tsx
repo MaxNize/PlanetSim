@@ -78,26 +78,13 @@ export function BodyFieldsForm({
 
       <div style={FIELD_STYLE}>
         <span style={LABEL_STYLE}>{labels.velDir}</span>
-        <input
-          type="number"
-          min="0"
-          max="360"
-          step="1"
-          value={velDir}
-          onChange={(e) => onVelDirChange(parseFloat(e.target.value) || 0)}
-          style={INPUT_STYLE}
-        />
+        <input type="number" min="0" max="360" step="1" value={velDir} onChange={(e) => onVelDirChange(parseFloat(e.target.value) || 0)} style={INPUT_STYLE} />
       </div>
 
       <div style={FIELD_STYLE}>
         <span style={LABEL_STYLE}>{labels.color}</span>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <input
-            type="color"
-            value={color}
-            onChange={(e) => onColorChange(e.target.value)}
-            style={{ ...INPUT_STYLE, padding: '2px 4px', width: '48px', height: '36px', cursor: 'pointer' }}
-          />
+          <input type="color" value={color} onChange={(e) => onColorChange(e.target.value)} style={{ ...INPUT_STYLE, padding: '2px 4px', width: '48px', height: '36px', cursor: 'pointer' }} />
           <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '12px', color: '#94a3b8' }}>{color}</span>
         </div>
       </div>
