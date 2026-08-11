@@ -59,7 +59,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     } else {
       setLagrangePoints(null);
     }
-  }, [simulator, mode, initialState, resetTrail]);
+  }, [simulator, mode]);
 
   const handleStep = useCallback(
     (result: StepResult) => {
