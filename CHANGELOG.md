@@ -1,3 +1,28 @@
+# [1.1.0](https://github.com/MaxNize/fortgeschrittene-programmierung/compare/v1.0.3...v1.1.0) (2026-08-11)
+
+
+### Bug Fixes
+
+* **ci:** resolve remaining CI check failures (Rust line count, SandboxControls size) ([2c7dc8b](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/2c7dc8bc8832eb6498c139b638942741800be776))
+* **docs:** add doc to function ([8ef169d](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/8ef169db08128bf8ce722982014de1ca62f5e2b9))
+* **frontend:** break circular dependency between SimulationContext and SimulationProvider ([e5f6117](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/e5f611787e884329fd8e6fff9ec322919f5539d3))
+* **frontend:** fix failing ci ([27a86e1](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/27a86e154f08867ea14874bbad179195ba8b94b8))
+* **frontend:** resolve ESLint and TypeScript check failures ([645164e](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/645164ed2a01cdfaf5cafc5ad12fdeb0d17ead94))
+* **SimulationProvider:** restore [simulator, mode] deps on mode-change effect to prevent trail reset on every slider drag ([6aeff2d](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/6aeff2dd6f6d75bf49cab79c06515d6161147fd2))
+* **wasm:** correct doctest crate name from planet_sim to planet_sim_wasm ([6fcc708](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/6fcc70813bb8a439fd505b81a2b788098c070ad5))
+
+
+### Features
+
+* **canvas:** implement SPEC-008 multi-body trajectory trails with fa… ([#22](https://github.com/MaxNize/fortgeschrittene-programmierung/issues/22)) ([d387b15](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/d387b159626e10556537b69e7abfc12c43ed8def))
+* **canvas:** implement SPEC-008 multi-body trajectory trails with fading ([b33977e](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/b33977e0f16e7b8557e192596db9d147fb28d753))
+* **frontend:** implement SPEC-006 canvas rendering and E2E playwrigh… ([#20](https://github.com/MaxNize/fortgeschrittene-programmierung/issues/20)) ([9beaaa9](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/9beaaa94e6b4079b78324448055474c87280d76c))
+* **frontend:** implement SPEC-006 canvas rendering and E2E playwright testing ([e61848e](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/e61848efaeca4d5639d76a6eccb998bec3bb4a58)), closes [hi#DPI](https://github.com/hi/issues/DPI)
+* **frontend:** implement spec-009 and add i18n ([0b4f94d](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/0b4f94d9f0fea12e11cff3046b240daed4a711a5))
+* **frontend:** implement spec-009 and add i18n ([#23](https://github.com/MaxNize/fortgeschrittene-programmierung/issues/23)) ([cdf4d4c](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/cdf4d4cccdd68015b8ba7c3eb7d0129199d6e3fa))
+* **i18n:** add klingon ([91542fa](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/91542fad02f35bec8b5b164faab9bcc5dfb7d50b))
+* **i18n:** add klingon ([#25](https://github.com/MaxNize/fortgeschrittene-programmierung/issues/25)) ([9912ef9](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/9912ef957ab4b802bbd6aa1c191f4e537e7d798a))
+
 ## [1.0.3](https://github.com/MaxNize/fortgeschrittene-programmierung/compare/v1.0.2...v1.0.3) (2026-07-25)
 
 
