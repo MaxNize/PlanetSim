@@ -1,7 +1,7 @@
-import React from 'react';
 import { StateDisplayProps } from '../../types';
 import { useSimulationContext } from '../../context/SimulationContext';
 import { useI18n } from '../../context/I18nContext';
+import { SimulationMode } from '../../types';
 
 interface BodyDisplayProps {
   name: string;
@@ -27,6 +27,45 @@ function BodyDisplay({ name, color, position, velocity, posLabel, velLabel }: Bo
         {velLabel}: [{velocity[0].toFixed(2)}, {velocity[1].toFixed(2)}] m/s
       </div>
     </div>
+  );
+}
+
+interface BodyListProps {
+  mode: SimulationMode;
+  sandboxBodies?: { id?: string; name?: string; color?: string; position: [number, number]; velocity: [number, number] }[];
+  primary: { pos: [number, number]; vel: [number, number] };
+  secondary: { pos: [number, number]; vel: [number, number] };
+  testParticle: { pos: [number, number]; vel: [number, number] };
+  labels: { primary: string; secondary: string; testParticle: string; pos: string; vel: string };
+}
+
+/**
+ * Renders the position/velocity readout for either the sandbox custom bodies or the fixed 3-body set.
+ */
+function BodyList({ mode, sandboxBodies, primary, secondary, testParticle, labels }: BodyListProps) {
+  if (mode === 'sandbox' && sandboxBodies) {
+    return (
+      <>
+        {sandboxBodies.map((b, idx) => (
+          <BodyDisplay
+            key={b.id || `body-${idx}`}
+            name={b.name || `Body ${idx + 1}`}
+            color={b.color || '#fff'}
+            position={b.position}
+            velocity={b.velocity}
+            posLabel={labels.pos}
+            velLabel={labels.vel}
+          />
+        ))}
+      </>
+    );
+  }
+  return (
+    <>
+      <BodyDisplay name={labels.primary} color="#f0932b" position={primary.pos} velocity={primary.vel} posLabel={labels.pos} velLabel={labels.vel} />
+      <BodyDisplay name={labels.secondary} color="#48dbfb" position={secondary.pos} velocity={secondary.vel} posLabel={labels.pos} velLabel={labels.vel} />
+      <BodyDisplay name={labels.testParticle} color="#2ed573" position={testParticle.pos} velocity={testParticle.vel} posLabel={labels.pos} velLabel={labels.vel} />
+    </>
   );
 }
 
@@ -89,25 +128,14 @@ export function StateDisplay({ time, primaryPos, primaryVel, secondaryPos, secon
         <hr style={{ border: 'none', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }} />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '200px', overflowY: 'auto' }}>
-          {mode === 'sandbox' && currentState.bodies ? (
-            currentState.bodies.map((b: any, idx: number) => (
-              <BodyDisplay
-                key={b.id || `body-${idx}`}
-                name={b.name || `Body ${idx + 1}`}
-                color={b.color || '#fff'}
-                position={b.position}
-                velocity={b.velocity}
-                posLabel={posLabel}
-                velLabel={velLabel}
-              />
-            ))
-          ) : (
-            <>
-              <BodyDisplay name={t('telemetry.primary')} color="#f0932b" position={primaryPos} velocity={primaryVel} posLabel={posLabel} velLabel={velLabel} />
-              <BodyDisplay name={t('telemetry.secondary')} color="#48dbfb" position={secondaryPos} velocity={secondaryVel} posLabel={posLabel} velLabel={velLabel} />
-              <BodyDisplay name={t('telemetry.testParticle')} color="#2ed573" position={testParticlePos} velocity={testParticleVel} posLabel={posLabel} velLabel={velLabel} />
-            </>
-          )}
+          <BodyList
+            mode={mode}
+            sandboxBodies={currentState.bodies}
+            primary={{ pos: primaryPos, vel: primaryVel }}
+            secondary={{ pos: secondaryPos, vel: secondaryVel }}
+            testParticle={{ pos: testParticlePos, vel: testParticleVel }}
+            labels={{ primary: t('telemetry.primary'), secondary: t('telemetry.secondary'), testParticle: t('telemetry.testParticle'), pos: posLabel, vel: velLabel }}
+          />
         </div>
 
         <hr style={{ border: 'none', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }} />
