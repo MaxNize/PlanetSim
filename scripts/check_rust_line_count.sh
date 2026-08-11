@@ -10,6 +10,7 @@ $ROOT_DIR/wasm/src/lib.rs
 $ROOT_DIR/wasm/src/physics/mod.rs
 $ROOT_DIR/wasm/src/physics/calculations.rs
 $ROOT_DIR/wasm/src/physics/gravity.rs
+$ROOT_DIR/wasm/src/physics/integrator.rs
 $ROOT_DIR/wasm/src/wasm/mod.rs
 "
 
