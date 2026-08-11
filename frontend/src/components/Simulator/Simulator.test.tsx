@@ -29,20 +29,22 @@ describe('Simulator container component', () => {
       clearHistory: vi.fn(),
       resetSimulation: vi.fn(),
       error: 'Mock engine error',
+      preset: 'earth-moon' as const,
+      setPreset: vi.fn(),
     };
 
     render(
-      <simulationContext.Provider value={mockContextValue}>
+      <simulationContext.Provider value={mockContextValue as any}>
         <Simulator />
       </simulationContext.Provider>,
     );
 
     // Assert container renders headings from presentational children
-    expect(screen.getByText('Simulation Controls')).toBeDefined();
+    expect(screen.getByText('Simulation System')).toBeDefined();
     expect(screen.getByText('Simulation Telemetry')).toBeDefined();
 
-    // Assert Canvas placeholder renders
-    expect(screen.getByLabelText('Simulation Canvas Placeholder')).toBeDefined();
+    // Assert Canvas renders
+    expect(screen.getByLabelText('Celestial simulation rendering area')).toBeDefined();
 
     // Assert context errors are passed
     expect(screen.getByText('⚠️ Error: Mock engine error')).toBeDefined();

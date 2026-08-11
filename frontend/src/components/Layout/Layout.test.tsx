@@ -20,10 +20,12 @@ describe('Layout component', () => {
       clearHistory: vi.fn(),
       resetSimulation: vi.fn(),
       error: null,
+      preset: 'earth-moon' as const,
+      setPreset: vi.fn(),
     };
 
     render(
-      <simulationContext.Provider value={mockContextValue}>
+      <simulationContext.Provider value={mockContextValue as any}>
         <Layout />
       </simulationContext.Provider>,
     );
@@ -33,6 +35,6 @@ describe('Layout component', () => {
     expect(screen.getByText('Simulates orbital mechanics of a test particle in a primary/secondary gravitational system.')).toBeDefined();
 
     // Assert children are rendered
-    expect(screen.getByText('Simulation Controls')).toBeDefined();
+    expect(screen.getByText('Simulation System')).toBeDefined();
   });
 });

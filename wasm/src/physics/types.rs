@@ -10,6 +10,8 @@ pub struct Body {
     pub velocity: (f64, f64),
     pub mass: f64,
     pub radius: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub locked: Option<bool>,
 }
 
 impl Body {
@@ -20,6 +22,24 @@ impl Body {
             velocity,
             mass,
             radius,
+            locked: None,
+        }
+    }
+
+    /// Creates a new body with locked status.
+    pub const fn new_locked(
+        position: (f64, f64),
+        velocity: (f64, f64),
+        mass: f64,
+        radius: f64,
+        locked: bool,
+    ) -> Self {
+        Self {
+            position,
+            velocity,
+            mass,
+            radius,
+            locked: Some(locked),
         }
     }
 }
@@ -46,8 +66,8 @@ impl Default for PhysicsConfig {
     }
 }
 
-/// Full simulation state for the restricted three-body system.
-#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+/// Full simulation state for the system.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct State {
     pub primary: Body,
@@ -55,6 +75,8 @@ pub struct State {
     pub test_particle: Body,
     pub time: f64,
     pub gravitational_constant: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bodies: Option<Vec<Body>>,
 }
 
 impl State {
@@ -72,12 +94,44 @@ impl State {
             test_particle,
             time,
             gravitational_constant,
+            bodies: None,
+        }
+    }
+
+    /// Creates a new simulation state with custom bodies.
+    pub fn new_with_bodies(
+        primary: Body,
+        secondary: Body,
+        test_particle: Body,
+        time: f64,
+        gravitational_constant: f64,
+        bodies: Option<Vec<Body>>,
+    ) -> Self {
+        Self {
+            primary,
+            secondary,
+            test_particle,
+            time,
+            gravitational_constant,
+            bodies,
         }
     }
 
     /// Creates a new state using a configuration object.
-    pub const fn with_config(primary: Body, secondary: Body, test_particle: Body, time: f64, config: PhysicsConfig) -> Self {
-        Self::new(primary, secondary, test_particle, time, config.gravitational_constant)
+    pub fn with_config(
+        primary: Body,
+        secondary: Body,
+        test_particle: Body,
+        time: f64,
+        config: PhysicsConfig,
+    ) -> Self {
+        Self::new(
+            primary,
+            secondary,
+            test_particle,
+            time,
+            config.gravitational_constant,
+        )
     }
 }
 

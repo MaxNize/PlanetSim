@@ -13,6 +13,10 @@ export interface ParameterControlsProps {
   isPaused: boolean;
   setIsPaused: (paused: boolean) => void;
   onReset: () => void;
+  preset: 'earth-moon' | 'binary-stars' | 'custom';
+  setPreset: (preset: 'earth-moon' | 'binary-stars' | 'custom') => void;
+  placementActive?: boolean;
+  setPlacementActive?: (active: boolean) => void;
 }
 
 /**
@@ -29,4 +33,43 @@ export interface StateDisplayProps {
   kineticEnergy: number | undefined;
   potentialEnergy: number | undefined;
   error: string | null;
+}
+
+/**
+ * Historical coordinates structure for drawing trajectory trails of all celestial bodies.
+ */
+export interface TrailHistory {
+  primary: [number, number][];
+  secondary: [number, number][];
+  testParticle: [number, number][];
+  customBodies?: { [bodyId: string]: [number, number][] };
+}
+
+/**
+ * Modes of simulation: standard restricted 3-body or generalized sandbox mode.
+ */
+export type SimulationMode = '3body' | 'sandbox';
+
+/**
+ * Representation of a customizable body placed in sandbox mode.
+ */
+export interface SandboxBody {
+  id: string;
+  position: [number, number];
+  velocity: [number, number];
+  mass: number;
+  radius: number;
+  color: string;
+  name?: string;
+  locked?: boolean;
+}
+
+/**
+ * Props for the SandboxControls component.
+ */
+export interface SandboxControlsProps {
+  placementActive: boolean;
+  setPlacementActive: (active: boolean) => void;
+  selectedBodyId?: string | null;
+  onSelectBody?: (id: string | null) => void;
 }

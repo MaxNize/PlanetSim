@@ -5,35 +5,81 @@ use super::types::{Body, LagrangePointSet};
 /// Default gravitational constant in m^3 kg^-1 s^-2.
 pub const DEFAULT_GRAVITATIONAL_CONSTANT: f64 = 6.67430e-11;
 
-/// Computes the Euclidean distance between two positions.
+/// Computes the Euclidean distance between two positions in meters.
+///
+/// # Examples
+/// ```
+/// use planet_sim_wasm::physics::gravity::distance;
+/// let d = distance((0.0, 0.0), (3.0, 4.0));
+/// assert_eq!(d, 5.0);
+/// ```
 pub fn distance(position1: (f64, f64), position2: (f64, f64)) -> f64 {
     let delta_x = position2.0 - position1.0;
     let delta_y = position2.1 - position1.1;
     delta_x.hypot(delta_y)
 }
 
-/// Computes the gravitational force magnitude between two bodies.
+/// Computes the gravitational force magnitude between two bodies using Newton's law of universal gravitation:
+///
+/// $$F = G \frac{m_1 m_2}{r^2}$$
+///
+/// # Arguments
+/// * `mass1` - Mass of body 1 (kg)
+/// * `mass2` - Mass of body 2 (kg)
+/// * `distance` - Euclidean distance between bodies (m)
+/// * `gravitational_constant` - Gravitational constant G (m³ kg⁻¹ s⁻²)
+///
+/// # Examples
+/// ```
+/// use planet_sim_wasm::physics::gravity::force_between;
+/// let force = force_between(5.9722e24, 7.348e22, 3.844e8, 6.67430e-11);
+/// assert!((force - 1.982e20).abs() < 1e18);
+/// ```
 pub fn force_between(mass1: f64, mass2: f64, distance: f64, gravitational_constant: f64) -> f64 {
     assert!(distance > 0.0, "distance must be positive");
-    assert!(gravitational_constant > 0.0, "gravitational_constant must be positive");
+    assert!(
+        gravitational_constant > 0.0,
+        "gravitational_constant must be positive"
+    );
 
     gravitational_constant * mass1 * mass2 / distance.powi(2)
 }
 
-/// Converts a force magnitude into acceleration.
+/// Converts a force magnitude into acceleration using Newton's second law ($a = F / m$).
+///
+/// # Examples
+/// ```
+/// use planet_sim_wasm::physics::gravity::acceleration_from_force;
+/// let accel = acceleration_from_force(100.0, 20.0);
+/// assert_eq!(accel, 5.0);
+/// ```
 pub fn acceleration_from_force(force: f64, mass: f64) -> f64 {
     assert!(mass > 0.0, "mass must be positive");
     force / mass
 }
 
-/// Calculates the Newtonian gravitational force using the default gravitational constant.
+/// Calculates the Newtonian gravitational force using the default gravitational constant $G = 6.67430 \times 10^{-11} \text{ m}^3 \text{ kg}^{-1} \text{ s}^{-2}$.
+///
+/// # Examples
+/// ```
+/// use planet_sim_wasm::physics::gravity::gravitational_force;
+/// let force = gravitational_force(5.9722e24, 7.348e22, 3.844e8);
+/// assert!(force > 1.9e20);
+/// ```
 pub fn gravitational_force(mass1: f64, mass2: f64, distance: f64) -> f64 {
     force_between(mass1, mass2, distance, DEFAULT_GRAVITATIONAL_CONSTANT)
 }
 
 /// Calculates the five Lagrange points for a primary/secondary pair.
-pub fn lagrange_points(primary: &Body, secondary: &Body, gravitational_constant: f64) -> LagrangePointSet {
-    assert!(gravitational_constant > 0.0, "gravitational_constant must be positive");
+pub fn lagrange_points(
+    primary: &Body,
+    secondary: &Body,
+    gravitational_constant: f64,
+) -> LagrangePointSet {
+    assert!(
+        gravitational_constant > 0.0,
+        "gravitational_constant must be positive"
+    );
 
     let separation = distance(primary.position, secondary.position);
     assert!(separation > 0.0, "bodies must not occupy the same position");
@@ -97,8 +143,9 @@ fn solve_collinear_point(initial_guess: f64, mass_ratio: f64) -> f64 {
         }
 
         let step = x.abs().max(1.0) * 1e-8;
-        let derivative =
-            (collinear_equation(x + step, mass_ratio) - collinear_equation(x - step, mass_ratio)) / (2.0 * step);
+        let derivative = (collinear_equation(x + step, mass_ratio)
+            - collinear_equation(x - step, mass_ratio))
+            / (2.0 * step);
         if derivative.abs() < 1e-14 {
             break;
         }
@@ -123,7 +170,10 @@ fn collinear_equation(x: f64, mass_ratio: f64) -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use super::{acceleration_from_force, distance, force_between, gravitational_force, lagrange_points, DEFAULT_GRAVITATIONAL_CONSTANT};
+    use super::{
+        acceleration_from_force, distance, force_between, gravitational_force, lagrange_points,
+        DEFAULT_GRAVITATIONAL_CONSTANT,
+    };
     use crate::physics::fixtures::*;
     use crate::physics::types::Body;
 
@@ -135,7 +185,12 @@ mod tests {
 
     #[test]
     fn force_between_earth_and_moon_matches_expected_value() {
-        let force = force_between(EARTH_MASS, MOON_MASS, EARTH_MOON_DISTANCE, DEFAULT_GRAVITATIONAL_CONSTANT);
+        let force = force_between(
+            EARTH_MASS,
+            MOON_MASS,
+            EARTH_MOON_DISTANCE,
+            DEFAULT_GRAVITATIONAL_CONSTANT,
+        );
         let expected_force = 1.982054291079361e20;
         assert!((force - expected_force).abs() < 1e16);
     }

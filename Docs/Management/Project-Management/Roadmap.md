@@ -40,7 +40,7 @@ real-time  physics simulation.
 | Spec     | Title                        | Dependencies       | Status | Notes                                           |
 | -------- | ---------------------------- | ------------------ | ------ | ----------------------------------------------- |
 | SPEC-005 | React Component Architecture | SPEC-001, SPEC-004 | ✅ Done | Context API, hooks, component structure         |
-| SPEC-006 | Canvas Rendering System      | SPEC-004, SPEC-005 | 📋 Todo | 2D canvas, coordinate transforms, 60 FPS target |
+| SPEC-006 | Canvas Rendering System      | SPEC-004, SPEC-005 | ✅ Done | 2D canvas, coordinate transforms, 60 FPS target |
 
 **Deliverable**: Two bodies orbit each other smoothly on canvas
 
@@ -51,8 +51,8 @@ real-time  physics simulation.
 
 | Spec     | Title                      | Dependencies       | Status | Notes                                                  |
 | -------- | -------------------------- | ------------------ | ------ | ------------------------------------------------------ |
-| SPEC-007 | Physics Parameter Controls | SPEC-005, SPEC-006 | 📋 Todo | Mass sliders, time scale, presets (Earth-Moon, Binary) |
-| SPEC-008 | Trajectory Visualization   | SPEC-005, SPEC-006 | 📋 Todo | Trail rendering, length control, performance           |
+| SPEC-007 | Physics Parameter Controls | SPEC-005, SPEC-006 | ✅ Done | Mass sliders, time scale, presets (Earth-Moon, Binary) |
+| SPEC-008 | Trajectory Visualization   | SPEC-005, SPEC-006 | ✅ Done | Trail rendering, length control, performance           |
 
 **Deliverable**: Students can adjust parameters and see orbit changes in real time
 
@@ -63,8 +63,8 @@ real-time  physics simulation.
 
 | Spec     | Title                                | Dependencies                           | Status | Notes                                                    |
 | -------- | ------------------------------------ | -------------------------------------- | ------ | -------------------------------------------------------- |
-| SPEC-009 | Sandbox Mode - Interactive Placement | SPEC-005, SPEC-006, SPEC-007, SPEC-008 | 📋 Todo | Click to place bodies, properties dialog, max 10 bodies  |
-| SPEC-010 | Object Manipulation & Management     | SPEC-009                               | 📋 Todo | Right-click edit/delete, body list sidebar, lock feature |
+| SPEC-009 | Sandbox Mode - Interactive Placement | SPEC-005, SPEC-006, SPEC-007, SPEC-008 | ✅ Done | Click to place bodies, properties dialog, max 10 bodies  |
+| SPEC-010 | Object Manipulation & Management     | SPEC-009                               | ✅ Done | Right-click edit/delete, body list sidebar, lock feature |
 
 **Deliverable**: Users can create custom multi-body configurations and experiment
 
@@ -75,8 +75,8 @@ real-time  physics simulation.
 
 | Spec     | Title                          | Dependencies           | Status | Notes                                         |
 | -------- | ------------------------------ | ---------------------- | ------ | --------------------------------------------- |
-| SPEC-012 | Deployment Strategy            | SPEC-001, SPEC-011     | 📋 Todo | GitHub Pages, Docker, auto-release            |
-| SPEC-013 | API Documentation              | All physics/WASM specs | 📋 Todo | Cargo docs, JSDoc, physics guide              |
+| SPEC-012 | Deployment Strategy            | SPEC-001, SPEC-011     | ✅ Done | GitHub Pages, Docker, auto-release            |
+| SPEC-013 | API Documentation              | All physics/WASM specs | ✅ Done | Cargo docs, JSDoc, physics guide              |
 | SPEC-014 | Developer Guide & Contribution | All specs              | ✅ Done | CONTRIBUTING.md, architecture guide, examples |
 
 **Deliverable**: App live at `planet-sim.example.com`, docs complete, contributions welcome
