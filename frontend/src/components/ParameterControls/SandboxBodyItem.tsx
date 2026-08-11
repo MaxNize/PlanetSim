@@ -27,40 +27,40 @@ const ACTION_BUTTON_STYLE = {
   borderRadius: '4px',
 } as const;
 
+const DELETE_BUTTON_ENABLED_STYLE = { ...ACTION_BUTTON_STYLE, color: '#ef4444', cursor: 'pointer', opacity: 1 } as const;
+const DELETE_BUTTON_DISABLED_STYLE = { ...ACTION_BUTTON_STYLE, color: '#64748b', cursor: 'not-allowed', opacity: 0.4 } as const;
+const deleteButtonStyle = (locked: boolean) => (locked ? DELETE_BUTTON_DISABLED_STYLE : DELETE_BUTTON_ENABLED_STYLE);
+
+const NAME_STYLE_BASE = { fontWeight: 500, maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } as const;
+const nameStyle = (isSelected: boolean) => ({ ...NAME_STYLE_BASE, color: isSelected ? '#38bdf8' : '#fff' });
+
+export interface SandboxBodyItemLabels {
+  edit: string;
+  delete: string;
+  defaultName: string;
+  locked: string;
+}
+
 interface SandboxBodyItemProps {
   body: SandboxBody;
   isSelected: boolean;
   onSelect: (id: string) => void;
   onEdit: (body: SandboxBody) => void;
   onDelete: (id: string) => void;
-  editLabel: string;
-  deleteLabel: string;
-  defaultNameLabel: string;
-  lockedLabel: string;
+  labels: SandboxBodyItemLabels;
 }
 
 /**
  * Renders a single sandbox body row with selection, edit, and delete controls.
  */
-export function SandboxBodyItem({ body, isSelected, onSelect, onEdit, onDelete, editLabel, deleteLabel, defaultNameLabel, lockedLabel }: SandboxBodyItemProps) {
+export function SandboxBodyItem({ body, isSelected, onSelect, onEdit, onDelete, labels }: SandboxBodyItemProps) {
   return (
     <div style={BODY_ITEM_STYLE(isSelected)} onClick={() => onSelect(body.id)} data-testid={`body-item-${body.id}`}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: body.color }} />
-        <span
-          style={{
-            fontWeight: 500,
-            maxWidth: '100px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            color: isSelected ? '#38bdf8' : '#fff',
-          }}
-        >
-          {body.name || defaultNameLabel}
-        </span>
+        <span style={nameStyle(isSelected)}>{body.name || labels.defaultName}</span>
         {body.locked && (
-          <span title={lockedLabel} style={{ fontSize: '11px' }}>
+          <span title={labels.locked} style={{ fontSize: '11px' }}>
             🔒
           </span>
         )}
@@ -73,7 +73,7 @@ export function SandboxBodyItem({ body, isSelected, onSelect, onEdit, onDelete, 
             onEdit(body);
           }}
           style={ACTION_BUTTON_STYLE}
-          title={editLabel}
+          title={labels.edit}
           data-testid={`edit-btn-${body.id}`}
         >
           ✏️
@@ -84,13 +84,8 @@ export function SandboxBodyItem({ body, isSelected, onSelect, onEdit, onDelete, 
             if (!body.locked) onDelete(body.id);
           }}
           disabled={body.locked}
-          style={{
-            ...ACTION_BUTTON_STYLE,
-            color: body.locked ? '#64748b' : '#ef4444',
-            cursor: body.locked ? 'not-allowed' : 'pointer',
-            opacity: body.locked ? 0.4 : 1,
-          }}
-          title={deleteLabel}
+          style={deleteButtonStyle(Boolean(body.locked))}
+          title={labels.delete}
           data-testid={`delete-btn-${body.id}`}
         >
           ✕

@@ -48,6 +48,12 @@ function PresetSelector({ preset, setPreset, earthMoonLabel, binaryStarsLabel }:
 /**
  * Renders parameter control inputs and preset selector buttons.
  */
+// Cyclomatic complexity is low (4); the high cognitive score is driven by 15 props and 7 hooks —
+// this is the standard "container passes all simulation-control state down to a presentational
+// component" pattern (Simulator.tsx owns the state, this just renders it). PresetSelector and
+// SandboxControls were already extracted above; further prop-bundling would need a matching
+// change in Simulator.tsx and doesn't reduce real complexity, just moves it into nested objects.
+// fallow-ignore-next-line complexity
 export function ParameterControls({
   massM1,
   setMassM1,

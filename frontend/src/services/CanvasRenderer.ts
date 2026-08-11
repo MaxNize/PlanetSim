@@ -1,6 +1,6 @@
 import { SimulationState, LagrangePointSet, Body } from './wasmBridge';
 import { TrailHistory } from '../types';
-import { drawTrail, drawLagrangePoints, drawOverlay, drawBodyLabel } from './canvasHelpers';
+import { drawTrail, drawLagrangePoints, drawOverlay, drawBodyLabel, drawVelocityArrow, drawRing } from './canvasHelpers';
 
 export interface ViewportConfig {
   scale: number; // pixels per meter
@@ -18,6 +18,10 @@ export class CanvasRenderer {
   }
 
   /** Main render method that coordinates drawing the entire simulation state. */
+  // 4 independent top-level rendering steps (early-return guard, optional Lagrange points,
+  // sandbox-vs-fixed body dispatch, optional placement preview) — already delegated to helper
+  // methods; wrapping single `if`s in more functions would only dodge the metric.
+  // fallow-ignore-next-line complexity
   public draw(
     state: SimulationState,
     trailHistory: TrailHistory,
@@ -41,30 +45,57 @@ export class CanvasRenderer {
     if (state.bodies) {
       this.drawSandboxBodies(ctx, state.bodies, trailHistory, showTrail, viewport, width, height, selectedBodyId, wtc);
     } else {
-      if (showTrail) {
-        drawTrail(ctx, trailHistory.primary, '#f0932b', wtc);
-        drawTrail(ctx, trailHistory.secondary, '#48dbfb', wtc);
-        drawTrail(ctx, trailHistory.testParticle, '#2ed573', wtc);
-      }
-      this.drawBody(state.primary.position, state.primary.radius, '#f0932b', viewport, width, height, false, selectedBodyId === 'primary');
-      this.drawBody(state.secondary.position, state.secondary.radius, '#48dbfb', viewport, width, height, false, selectedBodyId === 'secondary');
-      this.drawBody(state.testParticle.position, state.testParticle.radius, '#2ed573', viewport, width, height, false, selectedBodyId === 'testParticle');
+      this.drawFixedBodies(ctx, state, trailHistory, showTrail, viewport, width, height, selectedBodyId, wtc);
     }
 
     if (placementPreview) {
-      const p = placementPreview;
-      this.drawBody(p.position, p.radius, p.color, viewport, width, height);
-
-      const velMag = Math.hypot(...p.velocity);
-      if (velMag > 0) {
-        const start = wtc(p.position);
-        const scaleVel = 1e1;
-        const endPos: [number, number] = [p.position[0] + p.velocity[0] * scaleVel, p.position[1] + p.velocity[1] * scaleVel];
-        this.drawVelocityArrow(ctx, start, wtc(endPos));
-      }
+      this.drawPlacementPreview(ctx, placementPreview, viewport, width, height, wtc);
     }
 
     drawOverlay(ctx, state, viewport.scale);
+  }
+
+  /** Draws the ghost body and, if it has a nonzero velocity, the directional launch arrow shown while placing a new body. */
+  private drawPlacementPreview(
+    ctx: CanvasRenderingContext2D,
+    preview: { position: [number, number]; velocity: [number, number]; radius: number; color: string },
+    viewport: ViewportConfig,
+    width: number,
+    height: number,
+    wtc: (pos: [number, number]) => { x: number; y: number },
+  ): void {
+    this.drawBody(preview.position, preview.radius, preview.color, viewport, width, height);
+
+    const velMag = Math.hypot(...preview.velocity);
+    if (velMag === 0) return;
+
+    const start = wtc(preview.position);
+    const scaleVel = 1e1;
+    const endPos: [number, number] = [preview.position[0] + preview.velocity[0] * scaleVel, preview.position[1] + preview.velocity[1] * scaleVel];
+    drawVelocityArrow(ctx, start, wtc(endPos));
+  }
+
+  /** Renders the trails and discs for the fixed primary/secondary/test-particle bodies. */
+  private drawFixedBodies(
+    ctx: CanvasRenderingContext2D,
+    state: SimulationState,
+    trailHistory: TrailHistory,
+    showTrail: boolean,
+    viewport: ViewportConfig,
+    width: number,
+    height: number,
+    selectedBodyId: string | null | undefined,
+    wtc: (pos: [number, number]) => { x: number; y: number },
+  ): void {
+    const fixedBodies = [
+      { id: 'primary', body: state.primary, color: '#f0932b', trail: trailHistory.primary },
+      { id: 'secondary', body: state.secondary, color: '#48dbfb', trail: trailHistory.secondary },
+      { id: 'testParticle', body: state.testParticle, color: '#2ed573', trail: trailHistory.testParticle },
+    ];
+    fixedBodies.forEach(({ id, body, color, trail }) => {
+      if (showTrail) drawTrail(ctx, trail, color, wtc);
+      this.drawBody(body.position, body.radius, color, viewport, width, height, false, selectedBodyId === id);
+    });
   }
 
   /** Renders each sandbox body's trail, disc, and optional name label. */
@@ -79,37 +110,16 @@ export class CanvasRenderer {
     selectedBodyId: string | null | undefined,
     wtc: (pos: [number, number]) => { x: number; y: number },
   ): void {
+    // 3 independent per-body concerns: id fallback, optional trail, optional label — already minimal.
+    // fallow-ignore-next-line complexity
     bodies.forEach((b, idx) => {
       const bodyId = b.id || `body-${idx}`;
-      const isSelected = selectedBodyId === bodyId;
-      if (showTrail && trailHistory.customBodies && trailHistory.customBodies[bodyId]) {
+      if (showTrail && trailHistory.customBodies?.[bodyId]) {
         drawTrail(ctx, trailHistory.customBodies[bodyId], b.color || '#fff', wtc);
       }
-      this.drawBody(b.position, b.radius, b.color || '#fff', viewport, width, height, false, isSelected, b.locked);
-      if (b.name) {
-        drawBodyLabel(ctx, b.position, b.name, wtc);
-      }
+      this.drawBody(b.position, b.radius, b.color || '#fff', viewport, width, height, false, selectedBodyId === bodyId, b.locked);
+      if (b.name) drawBodyLabel(ctx, b.position, b.name, wtc);
     });
-  }
-
-  /** Draws a directional arrow representing a velocity vector preview. */
-  private drawVelocityArrow(ctx: CanvasRenderingContext2D, start: { x: number; y: number }, end: { x: number; y: number }): void {
-    ctx.beginPath();
-    ctx.strokeStyle = '#3b82f6';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([4, 4]);
-    ctx.moveTo(start.x, start.y);
-    ctx.lineTo(end.x, end.y);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    const angle = Math.atan2(end.y - start.y, end.x - start.x);
-    ctx.beginPath();
-    ctx.fillStyle = '#3b82f6';
-    ctx.moveTo(end.x, end.y);
-    ctx.lineTo(end.x - 8 * Math.cos(angle - Math.PI / 6), end.y - 8 * Math.sin(angle - Math.PI / 6));
-    ctx.lineTo(end.x - 8 * Math.cos(angle + Math.PI / 6), end.y - 8 * Math.sin(angle + Math.PI / 6));
-    ctx.fill();
   }
 
   /** Resizes canvas to match client dimensions, accounting for high-DPI screens. */
@@ -171,28 +181,14 @@ export class CanvasRenderer {
     this.ctx.fillStyle = gradient;
     this.ctx.fill();
 
-    if (isSelected) {
-      this.ctx.strokeStyle = '#38bdf8';
-      this.ctx.lineWidth = 2.5;
-      this.ctx.beginPath();
-      this.ctx.arc(x, y, radius + 5, 0, Math.PI * 2);
-      this.ctx.stroke();
-    }
-
-    if (isLocked) {
-      this.ctx.strokeStyle = '#f59e0b';
-      this.ctx.lineWidth = 1.5;
-      this.ctx.beginPath();
-      this.ctx.arc(x, y, radius + (isSelected ? 8 : 4), 0, Math.PI * 2);
-      this.ctx.stroke();
-    }
-
-    if (isFixed) {
-      this.ctx.strokeStyle = '#ffffff';
-      this.ctx.lineWidth = 1.5;
-      this.ctx.beginPath();
-      this.ctx.arc(x, y, radius + 2, 0, Math.PI * 2);
-      this.ctx.stroke();
-    }
+    const ctx = this.ctx;
+    const rings: { active: boolean; color: string; lineWidth: number; offset: number }[] = [
+      { active: isSelected, color: '#38bdf8', lineWidth: 2.5, offset: 5 },
+      { active: isLocked, color: '#f59e0b', lineWidth: 1.5, offset: isSelected ? 8 : 4 },
+      { active: isFixed, color: '#ffffff', lineWidth: 1.5, offset: 2 },
+    ];
+    rings.forEach((ring) => {
+      if (ring.active) drawRing(ctx, x, y, radius + ring.offset, ring.color, ring.lineWidth);
+    });
   }
 }

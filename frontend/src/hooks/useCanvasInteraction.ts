@@ -41,6 +41,9 @@ export function useCanvasInteraction({ canvasRef, placementActive, onPlacementCa
   }, [canvasRef]);
 
   useEffect(() => {
+    // Multiplexes two independent, unrelated keyboard concerns (space = pan modifier, escape =
+    // cancel placement) onto one shared listener — intentional, not accidental complexity.
+    // fallow-ignore-next-line complexity
     const handleKey = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
         e.preventDefault();
@@ -70,6 +73,8 @@ export function useCanvasInteraction({ canvasRef, placementActive, onPlacementCa
     return [(screenX - rect.left - centerX) / viewport.scale + viewport.pan.x, (centerY - (screenY - rect.top)) / viewport.scale + viewport.pan.y];
   };
 
+  // Minimal hit-test loop: guard, radius-aware distance check, early return on first hit.
+  // fallow-ignore-next-line complexity
   const findBodyAtPosition = (worldPos: [number, number]): SandboxBody | null => {
     // currentState.bodies is always fully enriched with id/color by the time it's set (see SimulationProvider.handleStep and useSandbox).
     const bodies = (currentState.bodies || sandboxBodies) as SandboxBody[];
@@ -94,6 +99,8 @@ export function useCanvasInteraction({ canvasRef, placementActive, onPlacementCa
     }
   };
 
+  // Dispatches on mouse button + modifier state (select vs. start-drag) — inherent to reading a single mousedown event.
+  // fallow-ignore-next-line complexity
   const handleSelectionOrDrag = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (e.button === 0 && !isSpacePressed) {
       const hit = findBodyAtPosition(screenToWorld(e.clientX, e.clientY));
@@ -126,6 +133,8 @@ export function useCanvasInteraction({ canvasRef, placementActive, onPlacementCa
     }
   };
 
+  // Multiplexes two independent, unrelated pointer concerns (velocity-drag preview vs. viewport pan) onto one mousemove handler.
+  // fallow-ignore-next-line complexity
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const pos = screenToWorld(e.clientX, e.clientY);
     setHoverWorldPos(pos);

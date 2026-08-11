@@ -95,3 +95,36 @@ export function drawBodyLabel(ctx: CanvasRenderingContext2D, pos: [number, numbe
   ctx.textAlign = 'center';
   ctx.fillText(name, screenPos.x, screenPos.y - 12);
 }
+
+/**
+ * Draws a directional arrow representing a velocity vector preview.
+ */
+export function drawVelocityArrow(ctx: CanvasRenderingContext2D, start: { x: number; y: number }, end: { x: number; y: number }): void {
+  ctx.beginPath();
+  ctx.strokeStyle = '#3b82f6';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 4]);
+  ctx.moveTo(start.x, start.y);
+  ctx.lineTo(end.x, end.y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  const angle = Math.atan2(end.y - start.y, end.x - start.x);
+  ctx.beginPath();
+  ctx.fillStyle = '#3b82f6';
+  ctx.moveTo(end.x, end.y);
+  ctx.lineTo(end.x - 8 * Math.cos(angle - Math.PI / 6), end.y - 8 * Math.sin(angle - Math.PI / 6));
+  ctx.lineTo(end.x - 8 * Math.cos(angle + Math.PI / 6), end.y - 8 * Math.sin(angle + Math.PI / 6));
+  ctx.fill();
+}
+
+/**
+ * Strokes a single decoration ring (selection/lock/fixed indicator) around a body.
+ */
+export function drawRing(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, color: string, lineWidth: number): void {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.stroke();
+}

@@ -11,6 +11,12 @@ export type { BodyDialogProps };
  * The two modes share nearly all field markup and confirm math; they differ only in initial values, preset
  * option order, whether the locked checkbox is shown, and a couple of button/testid details.
  */
+// This component is the deliberate result of merging BodyEditDialog/BodyPlacementDialog to eliminate
+// ~250 lines of near-duplicate JSX (see fallow's duplication finding on the pre-merge state). The
+// mode-branching here is exactly what that merge concentrated; getInitialFormState/buildConfirmedBody
+// already carry the two heaviest branches out to bodyDialogLogic.ts. Further splitting the remaining
+// small isEditProps() checks would re-fragment the two dialogs and defeat the point of the merge.
+// fallow-ignore-next-line complexity
 export function BodyDialog(props: BodyDialogProps) {
   const { onConfirm, onCancel } = props;
   const { t } = useI18n();
