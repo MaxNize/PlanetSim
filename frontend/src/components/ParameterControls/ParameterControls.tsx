@@ -10,6 +10,41 @@ import { CONTAINER_STYLE, HEADER_STYLE, CONTROLS_LIST_STYLE, BUTTONS_ROW_STYLE, 
 const toLogValue = (val: number) => Math.log10(val);
 const fromLogValue = (logVal: number) => Math.pow(10, logVal);
 
+function presetButtonStyle(active: boolean) {
+  return {
+    flex: 1,
+    padding: '8px 12px',
+    borderRadius: '6px',
+    border: active ? '1px solid #3b82f6' : '1px solid rgba(255, 255, 255, 0.12)',
+    background: active ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
+    color: active ? '#3b82f6' : '#94a3b8',
+    fontSize: '12px',
+    fontWeight: 500,
+    cursor: 'pointer',
+    outline: 'none',
+  } as const;
+}
+
+interface PresetSelectorProps {
+  preset: 'earth-moon' | 'binary-stars' | 'custom';
+  setPreset: (preset: 'earth-moon' | 'binary-stars' | 'custom') => void;
+  earthMoonLabel: string;
+  binaryStarsLabel: string;
+}
+
+function PresetSelector({ preset, setPreset, earthMoonLabel, binaryStarsLabel }: PresetSelectorProps) {
+  return (
+    <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+      <button onClick={() => setPreset('earth-moon')} style={presetButtonStyle(preset === 'earth-moon')}>
+        {earthMoonLabel}
+      </button>
+      <button onClick={() => setPreset('binary-stars')} style={presetButtonStyle(preset === 'binary-stars')}>
+        {binaryStarsLabel}
+      </button>
+    </div>
+  );
+}
+
 /**
  * Renders parameter control inputs and preset selector buttons.
  */
@@ -65,19 +100,6 @@ export function ParameterControls({
     else setLocalSpeed(speedMultiplier.toFixed(0));
   };
 
-  const presetStyle = (p: typeof preset) => ({
-    flex: 1,
-    padding: '8px 12px',
-    borderRadius: '6px',
-    border: preset === p ? '1px solid #3b82f6' : '1px solid rgba(255, 255, 255, 0.12)',
-    background: preset === p ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
-    color: preset === p ? '#3b82f6' : '#94a3b8',
-    fontSize: '12px',
-    fontWeight: 500,
-    cursor: 'pointer',
-    outline: 'none',
-  });
-
   return (
     <div style={CONTAINER_STYLE}>
       <h2 style={HEADER_STYLE}>{t('controls.title')}</h2>
@@ -92,14 +114,7 @@ export function ParameterControls({
       </div>
 
       {mode === '3body' && (
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-          <button onClick={() => setPreset('earth-moon')} style={presetStyle('earth-moon')}>
-            {t('presets.earthMoon')}
-          </button>
-          <button onClick={() => setPreset('binary-stars')} style={presetStyle('binary-stars')}>
-            {t('presets.binaryStars')}
-          </button>
-        </div>
+        <PresetSelector preset={preset} setPreset={setPreset} earthMoonLabel={t('presets.earthMoon')} binaryStarsLabel={t('presets.binaryStars')} />
       )}
 
       <div style={BUTTONS_ROW_STYLE}>
