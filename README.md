@@ -14,6 +14,7 @@ Structure
 - wasm/ — Rust library compiled to WASM (wasm-bindgen)
 - Docs/ — project docs and specs
   - [Deployment Guide](./Docs/Guides/deployment-guide.md) — Instructions for containerized production setup
+  - [arc42 Architekturdokumentation](./Docs/arc42.md) — Full arc42 architecture document (German)
 
 See Docs/Management/Project-Management/Specs/SPEC-001-project-setup-guardrails.md for conventions and guardrails.
 
