@@ -12,7 +12,7 @@ interface CanvasInteractionOptions {
 /** Hook for managing canvas viewport zooming, panning, placement, selection, and context menu events. */
 export function useCanvasInteraction({ canvasRef, placementActive, onPlacementCancel }: CanvasInteractionOptions) {
   const lastMousePos = useRef({ x: 0, y: 0 });
-  const { currentState, setSelectedBodyId, sandboxBodies } = useSimulationContext();
+  const { currentState, setSelectedBodyId, sandboxBodies, mode } = useSimulationContext();
 
   const [viewport, setViewport] = useState<ViewportConfig>({ scale: 1e-6, pan: { x: 1.5e8, y: 0.0 } });
   const [isDragging, setIsDragging] = useState(false);
@@ -124,6 +124,13 @@ export function useCanvasInteraction({ canvasRef, placementActive, onPlacementCa
   const handleContextMenu = (e: React.MouseEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     if (placementActive) return;
+    // Edit/lock/delete only make sense for user-defined sandbox bodies; the fixed primary/secondary/testParticle
+    // roles in preset ('3body') mode aren't backed by sandboxBodies, so updateBody would silently no-op and the
+    // body would appear to "reset" on the next simulation tick (FP-39).
+    if (mode !== 'sandbox') {
+      setContextMenu(null);
+      return;
+    }
     const hit = findBodyAtPosition(screenToWorld(e.clientX, e.clientY));
     if (hit) {
       setSelectedBodyId(hit.id);
