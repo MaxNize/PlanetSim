@@ -43,7 +43,7 @@ describe('Canvas component', () => {
     expect(canvasElement.tagName).toBe('CANVAS');
   });
 
-  it('should not open the body context menu (edit/lock/delete) in preset (3body) mode', () => {
+  it('should only show Track (not edit/lock/delete) in the context menu in preset (3body) mode', () => {
     const bodies = [
       { ...DEFAULT_INITIAL_STATE.primary, id: 'body-0', name: 'Primary' },
       { ...DEFAULT_INITIAL_STATE.secondary, id: 'body-1', name: 'Secondary' },
@@ -62,7 +62,10 @@ describe('Canvas component', () => {
     // and a zero-size jsdom bounding rect, clientX -150 / clientY 0 maps back to world (0, 0).
     fireEvent.contextMenu(canvasElement, { clientX: -150, clientY: 0 });
 
-    expect(screen.queryByTestId('body-context-menu')).toBeNull();
+    // Menu opens (Track works in every mode, FP-36) but Edit/Lock/Delete stay sandbox-only (FP-39).
+    expect(screen.queryByTestId('body-context-menu')).not.toBeNull();
+    expect(screen.getByText(/Track/)).toBeDefined();
+    expect(screen.queryByText('✏️ Edit')).toBeNull();
   });
 
   it('should open the body context menu in sandbox mode', () => {

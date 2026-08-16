@@ -5,6 +5,7 @@ export const colors = {
   accentDark: '#1d4ed8',
   accentGradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
   selection: '#38bdf8',
+  tracked: '#10b981',
   warning: '#f59e0b',
   background: '#05070a',
   textOnDark: '#f1f2f6',
