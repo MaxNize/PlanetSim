@@ -2,6 +2,14 @@ import { useCallback } from 'react';
 import { SandboxBody, SimulationMode } from '../types';
 import { SimulationState } from '../services/wasmBridge';
 
+/**
+ * Upper bound on sandbox body count (FP-38). The previous cap of 10 was arbitrary; this value is
+ * derived from measuring the WASM step() cost directly (brute-force O(n²) gravity): ~0.43ms/step
+ * at 100 bodies, ~1.3ms/step at 200, ~7.1ms/step at 500 (60 FPS gives a ~16.6ms/frame budget, shared
+ * with rendering). 300 keeps physics well under that budget with headroom for rendering.
+ */
+export const MAX_SANDBOX_BODIES = 300;
+
 interface LatestBody {
   id?: string;
   position: [number, number];
@@ -122,7 +130,7 @@ export function useSandbox(
 
   const addBody = useCallback(
     (body: SandboxBody) => {
-      if (sandboxBodies.length >= 10) throw new Error('Maximum 10 bodies reached');
+      if (sandboxBodies.length >= MAX_SANDBOX_BODIES) throw new Error(`Maximum ${MAX_SANDBOX_BODIES} bodies reached`);
       const latestBodies = currentState.bodies || sandboxBodies;
       if (hasOverlap(body, latestBodies)) throw new Error('Overlap detected with another body');
       const updatedSandbox = syncBodyKinematics(sandboxBodies, latestBodies);

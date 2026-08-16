@@ -5,38 +5,41 @@ import { BodyPlacementDialog } from '../BodyPlacementDialog/BodyPlacementDialog'
 import { BodyContextMenu } from '../BodyContextMenu/BodyContextMenu';
 import { BodyEditDialog } from '../BodyEditDialog/BodyEditDialog';
 import { useCanvasInteraction } from '../../hooks/useCanvasInteraction';
-import { SandboxBody } from '../../types';
+import { SandboxBody, SimulationMode } from '../../types';
 import { colors } from '../../styles/tokens';
 
 interface CanvasProps {
   showTrail?: boolean;
-  placementActive?: boolean;
-  onPlacementCancel?: () => void;
   onPlacementComplete?: (body: SandboxBody) => void;
 }
 
-// Two independent simple guards (has a placed point vs. is just hovering) — already minimal.
+/** Live preview of the body being created: a solid drag-preview while placing, or a translucent
+ * hover hint over empty sandbox canvas space (never over an existing body). */
+// Three independently-optional guards (actively placing vs. just hovering vs. hovering a body) —
+// already minimal.
 // fallow-ignore-next-line complexity
 function computePlacementPreview(
-  placementActive: boolean,
+  mode: SimulationMode,
+  isPlacingBody: boolean,
   placedWorldPos: [number, number] | null,
   draggedVel: [number, number],
   hoverWorldPos: [number, number] | null,
+  isHoveringBody: boolean,
 ): { position: [number, number]; velocity: [number, number]; radius: number; color: string } | undefined {
-  if (placementActive && placedWorldPos) {
+  if (isPlacingBody && placedWorldPos) {
     return { position: placedWorldPos, velocity: draggedVel, radius: 6.371e6, color: colors.accent };
   }
-  if (placementActive && hoverWorldPos) {
+  if (mode === 'sandbox' && hoverWorldPos && !isHoveringBody) {
     return { position: hoverWorldPos, velocity: [0, 0], radius: 6.371e6, color: 'rgba(59, 130, 246, 0.4)' };
   }
   return undefined;
 }
 
-/** Picks the mouse cursor for the current interaction state (dragging > space-panning > placing > default). */
-function getCanvasCursor(isDragging: boolean, isSpacePressed: boolean, placementActive: boolean): string {
+/** Picks the mouse cursor for the current interaction state (dragging > space-panning > sandbox-create-hint > default). */
+function getCanvasCursor(isDragging: boolean, isSpacePressed: boolean, mode: SimulationMode, isHoveringBody: boolean): string {
   if (isDragging) return 'grabbing';
   if (isSpacePressed) return 'grab';
-  if (placementActive) return 'crosshair';
+  if (mode === 'sandbox' && !isHoveringBody) return 'crosshair';
   return 'default';
 }
 
@@ -89,9 +92,10 @@ function CanvasOverlays({
 }
 
 /**
- * Renders the interactive simulation viewport canvas.
+ * Renders the interactive simulation viewport canvas. In sandbox mode, clicking and dragging on
+ * empty canvas space creates a new body directly — no separate placement-mode toggle (FP-38).
  */
-export function Canvas({ showTrail = true, placementActive = false, onPlacementCancel, onPlacementComplete }: CanvasProps) {
+export function Canvas({ showTrail = true, onPlacementComplete }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<CanvasRenderer | null>(null);
 
@@ -103,6 +107,9 @@ export function Canvas({ showTrail = true, placementActive = false, onPlacementC
     dimensions,
     isDragging,
     isSpacePressed,
+    mode,
+    isPlacingBody,
+    isHoveringBody,
     hoverWorldPos,
     placedWorldPos,
     draggedVel,
@@ -118,17 +125,18 @@ export function Canvas({ showTrail = true, placementActive = false, onPlacementC
     handleContextMenu,
     handleMouseMove,
     handleMouseUp,
+    handleMouseLeave,
     handleWheel,
-  } = useCanvasInteraction({ canvasRef, placementActive, onPlacementCancel });
+  } = useCanvasInteraction({ canvasRef });
 
   useEffect(() => {
     if (!canvasRef.current) return;
     if (!rendererRef.current) rendererRef.current = new CanvasRenderer(canvasRef.current);
 
-    const preview = computePlacementPreview(placementActive, placedWorldPos, draggedVel, hoverWorldPos);
+    const preview = computePlacementPreview(mode, isPlacingBody, placedWorldPos, draggedVel, hoverWorldPos, isHoveringBody);
 
     rendererRef.current.draw(currentState, trailHistory, activeShowTrail, lagrangePoints, viewport, preview, selectedBodyId);
-  }, [currentState, viewport, trailHistory, activeShowTrail, lagrangePoints, dimensions, placementActive, hoverWorldPos, placedWorldPos, draggedVel, selectedBodyId]);
+  }, [currentState, viewport, trailHistory, activeShowTrail, lagrangePoints, dimensions, mode, isPlacingBody, hoverWorldPos, placedWorldPos, draggedVel, isHoveringBody, selectedBodyId]);
 
   return (
     <>
@@ -138,14 +146,14 @@ export function Canvas({ showTrail = true, placementActive = false, onPlacementC
         onContextMenu={handleContextMenu}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
         onWheel={handleWheel}
         aria-label="Celestial simulation rendering area"
         style={{
           display: 'block',
           width: '100%',
           height: '100%',
-          cursor: getCanvasCursor(isDragging, isSpacePressed, placementActive),
+          cursor: getCanvasCursor(isDragging, isSpacePressed, mode, isHoveringBody),
           outline: 'none',
         }}
       />
@@ -175,7 +183,6 @@ export function Canvas({ showTrail = true, placementActive = false, onPlacementC
           setShowDialog(false);
           setPlacedWorldPos(null);
           setDraggedVel([0, 0]);
-          if (onPlacementCancel) onPlacementCancel();
         }}
       />
     </>

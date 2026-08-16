@@ -5,6 +5,7 @@ import { useI18n } from '../../context/I18nContext';
 import { BodyEditDialog } from '../BodyEditDialog/BodyEditDialog';
 import { SandboxBodyItem } from './SandboxBodyItem';
 import { colors } from '../../styles/tokens';
+import { MAX_SANDBOX_BODIES } from '../../context/useSandbox';
 
 const SECTION_HEADER_STYLE = {
   fontSize: '12px',
@@ -17,33 +18,12 @@ const SECTION_HEADER_STYLE = {
   margin: 0,
 } as const;
 
-const ADD_BUTTON_BASE_STYLE = {
-  width: '100%',
-  padding: '10px 16px',
-  borderRadius: '6px',
-  fontWeight: 600,
-  fontSize: '13px',
-  cursor: 'pointer',
-  outline: 'none',
+const HINT_STYLE = {
+  fontSize: '11px',
+  color: colors.textMuted,
+  textAlign: 'center',
+  fontStyle: 'italic',
 } as const;
-
-const ADD_BUTTON_ACTIVE_STYLE = {
-  ...ADD_BUTTON_BASE_STYLE,
-  border: '1px solid #10b981',
-  background: 'rgba(16, 185, 129, 0.15)',
-  color: '#10b981',
-  boxShadow: 'none',
-} as const;
-
-const ADD_BUTTON_INACTIVE_STYLE = {
-  ...ADD_BUTTON_BASE_STYLE,
-  border: 'none',
-  background: colors.accentGradient,
-  color: colors.white,
-  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-} as const;
-
-const ADD_BUTTON_STYLE = (active: boolean) => (active ? ADD_BUTTON_ACTIVE_STYLE : ADD_BUTTON_INACTIVE_STYLE);
 
 /** Prefers the controlled `selectedBodyId` prop when the parent supplies one, falling back to context state. */
 function resolveActiveSelectedId(propsSelectedId: string | null | undefined, contextSelectedId: string | null): string | null {
@@ -62,7 +42,7 @@ function notifySelection(id: string | null, onSelectBody: ((id: string | null) =
 // Remaining branches (selection toggle, reset confirmation) are each a single, already-minimal
 // condition; the body-sync/style logic they used to carry was already extracted above.
 // fallow-ignore-next-line complexity
-export function SandboxControls({ placementActive, setPlacementActive, selectedBodyId: propsSelectedId, onSelectBody }: SandboxControlsProps) {
+export function SandboxControls({ selectedBodyId: propsSelectedId, onSelectBody }: SandboxControlsProps) {
   const { sandboxBodies, removeBody, updateBody, setMode, selectedBodyId: contextSelectedId, setSelectedBodyId } = useSimulationContext();
   const { t } = useI18n();
   const [editingBody, setEditingBody] = useState<SandboxBody | null>(null);
@@ -83,14 +63,10 @@ export function SandboxControls({ placementActive, setPlacementActive, selectedB
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <h3 style={SECTION_HEADER_STYLE}>{t('sandbox.creatorTitle')}</h3>
 
-      <button onClick={() => setPlacementActive(!placementActive)} style={ADD_BUTTON_STYLE(placementActive)}>
-        {placementActive ? t('sandbox.placingActive') : t('sandbox.addBody')}
-      </button>
-
-      {placementActive && <div style={{ fontSize: '11px', color: colors.textMuted, textAlign: 'center', fontStyle: 'italic' }}>{t('sandbox.helpText')}</div>}
+      <div style={HINT_STYLE}>{t('sandbox.helpText')}</div>
 
       <h3 style={SECTION_HEADER_STYLE}>
-        {t('sandbox.bodiesTitle')} ({sandboxBodies.length}/10)
+        {t('sandbox.bodiesTitle')} ({sandboxBodies.length}/{MAX_SANDBOX_BODIES})
       </h3>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
@@ -123,7 +99,7 @@ export function SandboxControls({ placementActive, setPlacementActive, selectedB
         />
       )}
 
-      {sandboxBodies.length >= 6 && (
+      {sandboxBodies.length >= MAX_SANDBOX_BODIES * 0.5 && (
         <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '6px', padding: '8px 12px', fontSize: '11px', color: '#f59e0b' }}>
           {t('sandbox.highCountWarning')}
         </div>
