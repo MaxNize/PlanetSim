@@ -4,8 +4,8 @@ import { colors } from '../../styles/tokens';
 const BODY_ITEM_STYLE = (selected: boolean) =>
   ({
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    gap: '6px',
     background: selected ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.04)',
     border: selected ? `1px solid ${colors.selection}` : '1px solid rgba(255, 255, 255, 0.08)',
     borderRadius: '6px',
@@ -14,6 +14,9 @@ const BODY_ITEM_STYLE = (selected: boolean) =>
     cursor: 'pointer',
     transition: 'all 0.15s ease',
   }) as const;
+
+const ROW_STYLE = { display: 'flex', alignItems: 'center', justifyContent: 'space-between' } as const;
+const ACTIONS_ROW_STYLE = { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' } as const;
 
 const ACTION_BUTTON_STYLE = {
   background: 'none',
@@ -70,17 +73,19 @@ interface SandboxBodyItemProps {
 export function SandboxBodyItem({ body, isSelected, isTracked, isInMiniview, onSelect, onEdit, onDelete, onTrackToggle, onMiniviewToggle, labels }: SandboxBodyItemProps) {
   return (
     <div style={BODY_ITEM_STYLE(isSelected)} onClick={() => onSelect(body.id)} data-testid={`body-item-${body.id}`}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: body.color }} />
-        <span style={nameStyle(isSelected)}>{body.name || labels.defaultName}</span>
-        {body.locked && (
-          <span title={labels.locked} style={{ fontSize: '11px' }}>
-            🔒
-          </span>
-        )}
+      <div style={ROW_STYLE}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+          <span style={{ flexShrink: 0, display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: body.color }} />
+          <span style={nameStyle(isSelected)}>{body.name || labels.defaultName}</span>
+          {body.locked && (
+            <span title={labels.locked} style={{ flexShrink: 0, fontSize: '11px' }}>
+              🔒
+            </span>
+          )}
+        </div>
+        <span style={{ flexShrink: 0, fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', color: colors.textMuted }}>{(body.mass / 5.9722e24).toFixed(1)} M⊕</span>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', color: colors.textMuted }}>{(body.mass / 5.9722e24).toFixed(1)} M⊕</span>
+      <div style={ACTIONS_ROW_STYLE}>
         <button
           onClick={(e) => {
             e.stopPropagation();
