@@ -134,4 +134,24 @@ describe('Canvas component', () => {
 
     expect(screen.queryByText('Configure New Body')).toBeNull();
   });
+
+  it('should open a Miniview for a body via the context menu, independent of tracking (FP-37)', () => {
+    const bodies = [{ ...DEFAULT_INITIAL_STATE.primary, id: 'body-0', name: 'Primary', color: '#fff' }];
+    render(
+      <simulationContext.Provider
+        value={{ ...mockContextValue, mode: 'sandbox', currentState: { ...DEFAULT_INITIAL_STATE, bodies } } as any}
+      >
+        <Canvas showTrail={true} />
+      </simulationContext.Provider>,
+    );
+
+    const canvasElement = screen.getByLabelText('Celestial simulation rendering area');
+    expect(screen.queryByLabelText('Body miniview')).toBeNull();
+
+    fireEvent.contextMenu(canvasElement, { clientX: -150, clientY: 0 });
+    fireEvent.click(screen.getByText(/Miniview/));
+
+    expect(screen.getByLabelText('Body miniview')).toBeDefined();
+    expect(screen.getByText(/Primary/)).toBeDefined();
+  });
 });

@@ -23,6 +23,8 @@ function renderMenu(overrides: Partial<React.ComponentProps<typeof BodyContextMe
     showFullMenu: true,
     isTracked: false,
     onTrackToggle: vi.fn(),
+    isInMiniview: false,
+    onMiniviewToggle: vi.fn(),
     onEdit: vi.fn(),
     onLockToggle: vi.fn(),
     onDelete: vi.fn(),
@@ -92,12 +94,27 @@ describe('BodyContextMenu Component', () => {
     expect(screen.getByText(/Untrack/)).toBeInTheDocument();
   });
 
-  it('hides Edit/Lock/Delete and only shows Track when showFullMenu is false (preset mode, FP-36)', () => {
+  it('hides Edit/Lock/Delete and only shows Track/Miniview when showFullMenu is false (preset mode, FP-36)', () => {
     renderMenu({ showFullMenu: false });
 
     expect(screen.getByText(/Track/)).toBeInTheDocument();
+    expect(screen.getByText(/Miniview/)).toBeInTheDocument();
     expect(screen.queryByText('✏️ Edit')).toBeNull();
     expect(screen.queryByText('🔒 Lock')).toBeNull();
     expect(screen.queryByText('❌ Delete')).toBeNull();
+  });
+
+  it('shows "Show in Miniview" and triggers onMiniviewToggle when not yet shown (FP-37)', () => {
+    const props = renderMenu({ isInMiniview: false });
+
+    fireEvent.click(screen.getByText(/Miniview/));
+    expect(props.onMiniviewToggle).toHaveBeenCalledWith(mockBody);
+    expect(props.onClose).toHaveBeenCalled();
+  });
+
+  it('shows "Hide Miniview" when already shown', () => {
+    renderMenu({ isInMiniview: true });
+
+    expect(screen.getByText(/Hide Miniview/)).toBeInTheDocument();
   });
 });

@@ -9,6 +9,8 @@ export interface CanvasOverlaysProps {
   showFullMenu: boolean;
   isTracked: boolean;
   onTrackToggle: (body: SandboxBody) => void;
+  isInMiniview: boolean;
+  onMiniviewToggle: (body: SandboxBody) => void;
   onEdit: (body: SandboxBody) => void;
   onLockToggle: (body: SandboxBody) => void;
   onDelete: (body: SandboxBody) => void;
@@ -32,6 +34,8 @@ export function CanvasOverlays({
   showFullMenu,
   isTracked,
   onTrackToggle,
+  isInMiniview,
+  onMiniviewToggle,
   onEdit,
   onLockToggle,
   onDelete,
@@ -53,6 +57,8 @@ export function CanvasOverlays({
           showFullMenu={showFullMenu}
           isTracked={isTracked}
           onTrackToggle={onTrackToggle}
+          isInMiniview={isInMiniview}
+          onMiniviewToggle={onMiniviewToggle}
           onEdit={onEdit}
           onLockToggle={onLockToggle}
           onDelete={onDelete}
