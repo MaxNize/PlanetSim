@@ -1,10 +1,11 @@
 import React from 'react';
+import { colors } from '../../styles/tokens';
 
 const INPUT_STYLE = {
   background: 'rgba(255, 255, 255, 0.05)',
   border: '1px solid rgba(255, 255, 255, 0.12)',
   borderRadius: '6px',
-  color: '#ffffff',
+  color: colors.white,
   padding: '8px 12px',
   fontFamily: "'JetBrains Mono', monospace",
   fontSize: '13px',
@@ -16,7 +17,7 @@ const FIELD_LABEL_STYLE = {
   fontWeight: 600,
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
-  color: '#94a3b8',
+  color: colors.textMuted,
   marginBottom: '6px',
 } as const;
 

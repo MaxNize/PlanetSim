@@ -1,4 +1,13 @@
 /* Global style resets and custom control overrides */
+
+/* Design tokens (kept in sync with frontend/src/styles/tokens.ts, FP-44) */
+:root {
+  --color-accent: #3b82f6;
+  --color-background: #05070a;
+  --color-text-on-dark: #f1f2f6;
+  --color-white: #ffffff;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -13,8 +22,8 @@ body {
     'Segoe UI',
     Roboto,
     sans-serif;
-  background-color: #05070a;
-  color: #f1f2f6;
+  background-color: var(--color-background);
+  color: var(--color-text-on-dark);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -39,8 +48,8 @@ input[type='range']::-webkit-slider-thumb {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #3b82f6;
-  border: 2px solid #ffffff;
+  background: var(--color-accent);
+  border: 2px solid var(--color-white);
   cursor: pointer;
   box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
   transition:
@@ -58,7 +67,7 @@ input[type='number'] {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 6px;
-  color: #ffffff;
+  color: var(--color-white);
   padding: 8px 12px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
@@ -70,7 +79,7 @@ input[type='number'] {
 }
 
 input[type='number']:focus {
-  border-color: #3b82f6;
+  border-color: var(--color-accent);
   background: rgba(255, 255, 255, 0.08);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
 }

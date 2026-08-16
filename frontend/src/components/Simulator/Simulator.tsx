@@ -3,6 +3,7 @@ import { useSimulationContext } from '../../context/SimulationContext';
 import { ParameterControls } from '../ParameterControls/ParameterControls';
 import { StateDisplay } from '../StateDisplay/StateDisplay';
 import { Canvas } from '../Canvas/Canvas';
+import { colors } from '../../styles/tokens';
 
 const LEGEND_STYLE = {
   position: 'absolute',
@@ -138,7 +139,7 @@ export function Simulator() {
             backdropFilter: 'blur(8px)',
             borderRadius: '12px',
             border: '1px solid rgba(255, 255, 255, 0.1)',
-            color: '#fff',
+            color: colors.white,
             overflow: 'hidden',
             flexShrink: 0,
           }}
@@ -168,7 +169,7 @@ export function Simulator() {
             backdropFilter: 'blur(8px)',
             borderRadius: '12px',
             border: '1px solid rgba(255, 255, 255, 0.1)',
-            color: '#fff',
+            color: colors.white,
             overflow: 'hidden',
             flexShrink: 0,
           }}

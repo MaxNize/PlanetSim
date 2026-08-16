@@ -6,6 +6,7 @@ import { BodyContextMenu } from '../BodyContextMenu/BodyContextMenu';
 import { BodyEditDialog } from '../BodyEditDialog/BodyEditDialog';
 import { useCanvasInteraction } from '../../hooks/useCanvasInteraction';
 import { SandboxBody } from '../../types';
+import { colors } from '../../styles/tokens';
 
 interface CanvasProps {
   showTrail?: boolean;
@@ -23,7 +24,7 @@ function computePlacementPreview(
   hoverWorldPos: [number, number] | null,
 ): { position: [number, number]; velocity: [number, number]; radius: number; color: string } | undefined {
   if (placementActive && placedWorldPos) {
-    return { position: placedWorldPos, velocity: draggedVel, radius: 6.371e6, color: '#3b82f6' };
+    return { position: placedWorldPos, velocity: draggedVel, radius: 6.371e6, color: colors.accent };
   }
   if (placementActive && hoverWorldPos) {
     return { position: hoverWorldPos, velocity: [0, 0], radius: 6.371e6, color: 'rgba(59, 130, 246, 0.4)' };

@@ -4,13 +4,14 @@ import { useSimulationContext } from '../../context/SimulationContext';
 import { useI18n } from '../../context/I18nContext';
 import { BodyEditDialog } from '../BodyEditDialog/BodyEditDialog';
 import { SandboxBodyItem } from './SandboxBodyItem';
+import { colors } from '../../styles/tokens';
 
 const SECTION_HEADER_STYLE = {
   fontSize: '12px',
   fontWeight: 600,
   textTransform: 'uppercase',
   letterSpacing: '0.08em',
-  color: '#fff',
+  color: colors.white,
   borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
   paddingBottom: '8px',
   margin: 0,
@@ -37,8 +38,8 @@ const ADD_BUTTON_ACTIVE_STYLE = {
 const ADD_BUTTON_INACTIVE_STYLE = {
   ...ADD_BUTTON_BASE_STYLE,
   border: 'none',
-  background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-  color: '#fff',
+  background: colors.accentGradient,
+  color: colors.white,
   boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
 } as const;
 
@@ -86,7 +87,7 @@ export function SandboxControls({ placementActive, setPlacementActive, selectedB
         {placementActive ? t('sandbox.placingActive') : t('sandbox.addBody')}
       </button>
 
-      {placementActive && <div style={{ fontSize: '11px', color: '#94a3b8', textAlign: 'center', fontStyle: 'italic' }}>{t('sandbox.helpText')}</div>}
+      {placementActive && <div style={{ fontSize: '11px', color: colors.textMuted, textAlign: 'center', fontStyle: 'italic' }}>{t('sandbox.helpText')}</div>}
 
       <h3 style={SECTION_HEADER_STYLE}>
         {t('sandbox.bodiesTitle')} ({sandboxBodies.length}/10)

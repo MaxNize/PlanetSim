@@ -3,6 +3,7 @@ import { useI18n } from '../../context/I18nContext';
 import { OVERLAY_STYLE, DIALOG_STYLE, FIELD_STYLE, LABEL_STYLE, BUTTON_STYLE } from '../BodyPlacementDialog/styles';
 import { BodyFieldsForm, BodyPresetOption } from '../BodyFieldsForm/BodyFieldsForm';
 import { BodyDialogProps, isEditProps, CONFIRM_PRESETS, EDIT_PRESET_OPTIONS, PLACE_PRESET_OPTIONS, getInitialFormState, buildConfirmedBody } from './bodyDialogLogic';
+import { colors } from '../../styles/tokens';
 
 export type { BodyDialogProps };
 
@@ -112,7 +113,7 @@ export function BodyDialog(props: BodyDialogProps) {
         )}
 
         <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-          <button onClick={onCancel} style={{ ...BUTTON_STYLE, flex: 1, background: 'rgba(255, 255, 255, 0.08)', color: isEditProps(props) ? '#94a3b8' : '#fff' }}>
+          <button onClick={onCancel} style={{ ...BUTTON_STYLE, flex: 1, background: 'rgba(255, 255, 255, 0.08)', color: isEditProps(props) ? colors.textMuted : colors.white }}>
             {t('dialog.cancel')}
           </button>
           <button
@@ -120,8 +121,8 @@ export function BodyDialog(props: BodyDialogProps) {
             style={{
               ...BUTTON_STYLE,
               flex: 1,
-              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-              color: '#fff',
+              background: colors.accentGradient,
+              color: colors.white,
               ...(isEditProps(props) ? {} : { boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)' }),
             }}
           >

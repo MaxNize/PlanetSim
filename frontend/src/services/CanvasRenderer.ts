@@ -1,6 +1,7 @@
 import { SimulationState, LagrangePointSet, Body } from './wasmBridge';
 import { TrailHistory } from '../types';
 import { drawTrail, drawLagrangePoints, drawOverlay, drawBodyLabel, drawVelocityArrow, drawRing } from './canvasHelpers';
+import { colors } from '../styles/tokens';
 
 export interface ViewportConfig {
   scale: number; // pixels per meter
@@ -115,9 +116,9 @@ export class CanvasRenderer {
     bodies.forEach((b, idx) => {
       const bodyId = b.id || `body-${idx}`;
       if (showTrail && trailHistory.customBodies?.[bodyId]) {
-        drawTrail(ctx, trailHistory.customBodies[bodyId], b.color || '#fff', wtc);
+        drawTrail(ctx, trailHistory.customBodies[bodyId], b.color || colors.white, wtc);
       }
-      this.drawBody(b.position, b.radius, b.color || '#fff', viewport, width, height, false, selectedBodyId === bodyId, b.locked);
+      this.drawBody(b.position, b.radius, b.color || colors.white, viewport, width, height, false, selectedBodyId === bodyId, b.locked);
       if (b.name) drawBodyLabel(ctx, b.position, b.name, wtc);
     });
   }
@@ -140,7 +141,7 @@ export class CanvasRenderer {
   public clear(): void {
     if (!this.ctx) return;
     const rect = this.canvas.getBoundingClientRect();
-    this.ctx.fillStyle = '#05070a';
+    this.ctx.fillStyle = colors.background;
     this.ctx.fillRect(0, 0, rect.width, rect.height);
   }
 
@@ -174,7 +175,7 @@ export class CanvasRenderer {
     this.ctx.arc(x, y, radius, 0, Math.PI * 2);
 
     const gradient = this.ctx.createRadialGradient(x, y, radius * 0.1, x, y, radius);
-    gradient.addColorStop(0, '#ffffff');
+    gradient.addColorStop(0, colors.white);
     gradient.addColorStop(0.3, color);
     gradient.addColorStop(1, '#000000');
 
@@ -183,9 +184,9 @@ export class CanvasRenderer {
 
     const ctx = this.ctx;
     const rings: { active: boolean; color: string; lineWidth: number; offset: number }[] = [
-      { active: isSelected, color: '#38bdf8', lineWidth: 2.5, offset: 5 },
-      { active: isLocked, color: '#f59e0b', lineWidth: 1.5, offset: isSelected ? 8 : 4 },
-      { active: isFixed, color: '#ffffff', lineWidth: 1.5, offset: 2 },
+      { active: isSelected, color: colors.selection, lineWidth: 2.5, offset: 5 },
+      { active: isLocked, color: colors.warning, lineWidth: 1.5, offset: isSelected ? 8 : 4 },
+      { active: isFixed, color: colors.white, lineWidth: 1.5, offset: 2 },
     ];
     rings.forEach((ring) => {
       if (ring.active) drawRing(ctx, x, y, radius + ring.offset, ring.color, ring.lineWidth);
