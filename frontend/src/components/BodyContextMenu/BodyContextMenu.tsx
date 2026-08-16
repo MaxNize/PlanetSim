@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { SandboxBody } from '../../types';
 import { useI18n } from '../../context/I18nContext';
+import { colors } from '../../styles/tokens';
 
 interface BodyContextMenuProps {
   body: SandboxBody;
@@ -96,7 +97,7 @@ export function BodyContextMenu({ body, position, onEdit, onLockToggle, onDelete
         borderRadius: '8px',
         boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
         padding: '6px 0',
-        color: '#f8fafc',
+        color: colors.textPrimary,
         fontSize: '13px',
         userSelect: 'none',
       }}
@@ -107,7 +108,7 @@ export function BodyContextMenu({ body, position, onEdit, onLockToggle, onDelete
           padding: '6px 12px',
           fontSize: '11px',
           fontWeight: 600,
-          color: '#94a3b8',
+          color: colors.textMuted,
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           marginBottom: '4px',
           display: 'flex',
@@ -132,7 +133,7 @@ export function BodyContextMenu({ body, position, onEdit, onLockToggle, onDelete
           onEdit(body);
           onClose();
         }}
-        color="#f8fafc"
+        color={colors.textPrimary}
         hoverColor="rgba(59, 130, 246, 0.2)"
       >
         {t('contextMenu.edit')}
@@ -143,7 +144,7 @@ export function BodyContextMenu({ body, position, onEdit, onLockToggle, onDelete
           onLockToggle(body);
           onClose();
         }}
-        color={body.locked ? '#f59e0b' : '#f8fafc'}
+        color={body.locked ? colors.warning : colors.textPrimary}
         hoverColor="rgba(59, 130, 246, 0.2)"
       >
         {body.locked ? t('contextMenu.unlock') : t('contextMenu.lock')}

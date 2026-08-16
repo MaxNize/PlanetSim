@@ -6,6 +6,7 @@ import { SandboxControls } from './SandboxControls';
 import { useSimulationContext } from '../../context/SimulationContext';
 import { useI18n } from '../../context/I18nContext';
 import { CONTAINER_STYLE, HEADER_STYLE, CONTROLS_LIST_STYLE, BUTTONS_ROW_STYLE, PLAY_BUTTON_STYLE, RESET_BUTTON_STYLE, TABS_STYLE, TAB_BUTTON_STYLE } from './styles';
+import { colors } from '../../styles/tokens';
 
 const toLogValue = (val: number) => Math.log10(val);
 const fromLogValue = (logVal: number) => Math.pow(10, logVal);
@@ -15,9 +16,9 @@ function presetButtonStyle(active: boolean) {
     flex: 1,
     padding: '8px 12px',
     borderRadius: '6px',
-    border: active ? '1px solid #3b82f6' : '1px solid rgba(255, 255, 255, 0.12)',
+    border: active ? `1px solid ${colors.accent}` : '1px solid rgba(255, 255, 255, 0.12)',
     background: active ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
-    color: active ? '#3b82f6' : '#94a3b8',
+    color: active ? colors.accent : colors.textMuted,
     fontSize: '12px',
     fontWeight: 500,
     cursor: 'pointer',

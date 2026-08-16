@@ -1,3 +1,5 @@
+import { colors } from '../../styles/tokens';
+
 export const CONTAINER_STYLE = {
   padding: '20px',
   fontFamily: 'inherit',
@@ -10,7 +12,7 @@ export const HEADER_STYLE = {
   fontWeight: 600,
   textTransform: 'uppercase',
   letterSpacing: '0.08em',
-  color: '#fff',
+  color: colors.white,
   margin: '0 0 16px 0',
   borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
   paddingBottom: '8px',
@@ -33,8 +35,8 @@ export const PLAY_BUTTON_STYLE = (isPaused: boolean) => ({
   padding: '10px 16px',
   borderRadius: '6px',
   border: isPaused ? 'none' : '1px solid rgba(255, 255, 255, 0.15)',
-  background: isPaused ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' : 'rgba(255, 255, 255, 0.1)',
-  color: '#fff',
+  background: isPaused ? colors.accentGradient : 'rgba(255, 255, 255, 0.1)',
+  color: colors.white,
   fontWeight: 500,
   fontSize: '13px',
   cursor: 'pointer',
@@ -78,7 +80,7 @@ export const TAB_BUTTON_STYLE = (active: boolean) => ({
   borderRadius: '6px',
   border: 'none',
   background: active ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
-  color: active ? '#fff' : '#94a3b8',
+  color: active ? colors.white : colors.textMuted,
   fontWeight: 600,
   fontSize: '12px',
   cursor: 'pointer',

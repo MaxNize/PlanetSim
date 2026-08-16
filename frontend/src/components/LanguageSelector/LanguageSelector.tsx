@@ -1,12 +1,13 @@
 import React from 'react';
 import { useI18n } from '../../context/I18nContext';
 import { Language } from '../../i18n/translations';
+import { colors } from '../../styles/tokens';
 
 const SELECTOR_STYLE = {
   background: 'rgba(255, 255, 255, 0.08)',
   border: '1px solid rgba(255, 255, 255, 0.15)',
   borderRadius: '6px',
-  color: '#ffffff',
+  color: colors.white,
   padding: '4px 8px',
   fontSize: '12px',
   fontFamily: "'Outfit', sans-serif",

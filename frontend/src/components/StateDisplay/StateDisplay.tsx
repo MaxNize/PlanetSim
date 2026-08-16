@@ -2,6 +2,7 @@ import { StateDisplayProps } from '../../types';
 import { useSimulationContext } from '../../context/SimulationContext';
 import { useI18n } from '../../context/I18nContext';
 import { SimulationMode } from '../../types';
+import { colors } from '../../styles/tokens';
 
 interface BodyDisplayProps {
   name: string;
@@ -50,7 +51,7 @@ function BodyList({ mode, sandboxBodies, primary, secondary, testParticle, label
           <BodyDisplay
             key={b.id || `body-${idx}`}
             name={b.name || `Body ${idx + 1}`}
-            color={b.color || '#fff'}
+            color={b.color || colors.white}
             position={b.position}
             velocity={b.velocity}
             posLabel={labels.pos}
@@ -91,7 +92,7 @@ export function StateDisplay({ time, primaryPos, primaryVel, secondaryPos, secon
           fontWeight: 600,
           textTransform: 'uppercase',
           letterSpacing: '0.08em',
-          color: '#fff',
+          color: colors.white,
           marginBottom: '16px',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           paddingBottom: '8px',
@@ -119,9 +120,9 @@ export function StateDisplay({ time, primaryPos, primaryVel, secondaryPos, secon
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94a3b8' }}>{t('telemetry.time')}:</span>
-          <div style={{ fontSize: '15px', fontWeight: 600, color: '#fff', marginTop: '4px', fontFamily: "'JetBrains Mono', monospace" }}>
-            {time.toFixed(1)} s <span style={{ fontSize: '12px', fontWeight: 400, color: '#94a3b8' }}>({(time / 3600).toFixed(2)} h)</span>
+          <span style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: colors.textMuted }}>{t('telemetry.time')}:</span>
+          <div style={{ fontSize: '15px', fontWeight: 600, color: colors.white, marginTop: '4px', fontFamily: "'JetBrains Mono', monospace" }}>
+            {time.toFixed(1)} s <span style={{ fontSize: '12px', fontWeight: 400, color: colors.textMuted }}>({(time / 3600).toFixed(2)} h)</span>
           </div>
         </div>
 
@@ -141,7 +142,7 @@ export function StateDisplay({ time, primaryPos, primaryVel, secondaryPos, secon
         <hr style={{ border: 'none', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }} />
 
         <div>
-          <span style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94a3b8' }}>{t('telemetry.systemEnergies')}</span>
+          <span style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: colors.textMuted }}>{t('telemetry.systemEnergies')}</span>
           <div style={{ marginTop: '6px', fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', color: '#cbd5e1', lineHeight: '1.5' }}>
             {t('telemetry.kinetic')}: {formatEnergy(kineticEnergy)} J<br />
             {t('telemetry.potential')}: {formatEnergy(potentialEnergy)} J<br />

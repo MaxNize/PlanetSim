@@ -1,13 +1,14 @@
 import React from 'react';
 import { useSimulationContext } from '../../context/SimulationContext';
 import { useI18n } from '../../context/I18nContext';
+import { colors } from '../../styles/tokens';
 
 const HEADER_STYLE = {
   fontSize: '12px',
   fontWeight: 600,
   textTransform: 'uppercase',
   letterSpacing: '0.08em',
-  color: '#fff',
+  color: colors.white,
   marginTop: '16px',
   marginBottom: '16px',
   borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
@@ -19,7 +20,7 @@ const LABEL_STYLE = {
   fontWeight: 600,
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
-  color: '#94a3b8',
+  color: colors.textMuted,
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
@@ -71,7 +72,7 @@ export function TrailControls() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           <div style={LABEL_STYLE}>
             <span>{t('controls.trailLength')}</span>
-            <span style={{ fontFamily: "'JetBrains Mono', monospace", color: '#fff' }}>{trailLength} pts</span>
+            <span style={{ fontFamily: "'JetBrains Mono', monospace", color: colors.white }}>{trailLength} pts</span>
           </div>
           <input type="range" min={100} max={5000} step={100} value={trailLength} onChange={(e) => setTrailLength(parseInt(e.target.value, 10))} style={{ cursor: 'pointer' }} />
         </div>

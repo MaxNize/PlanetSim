@@ -1,4 +1,5 @@
 import { SandboxBody } from '../../types';
+import { colors } from '../../styles/tokens';
 
 const BODY_ITEM_STYLE = (selected: boolean) =>
   ({
@@ -6,7 +7,7 @@ const BODY_ITEM_STYLE = (selected: boolean) =>
     alignItems: 'center',
     justifyContent: 'space-between',
     background: selected ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.04)',
-    border: selected ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.08)',
+    border: selected ? `1px solid ${colors.selection}` : '1px solid rgba(255, 255, 255, 0.08)',
     borderRadius: '6px',
     padding: '8px 12px',
     fontSize: '12px',
@@ -17,7 +18,7 @@ const BODY_ITEM_STYLE = (selected: boolean) =>
 const ACTION_BUTTON_STYLE = {
   background: 'none',
   border: 'none',
-  color: '#94a3b8',
+  color: colors.textMuted,
   cursor: 'pointer',
   fontSize: '12px',
   padding: '2px 4px',
@@ -32,7 +33,7 @@ const DELETE_BUTTON_DISABLED_STYLE = { ...ACTION_BUTTON_STYLE, color: '#64748b',
 const deleteButtonStyle = (locked: boolean) => (locked ? DELETE_BUTTON_DISABLED_STYLE : DELETE_BUTTON_ENABLED_STYLE);
 
 const NAME_STYLE_BASE = { fontWeight: 500, maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } as const;
-const nameStyle = (isSelected: boolean) => ({ ...NAME_STYLE_BASE, color: isSelected ? '#38bdf8' : '#fff' });
+const nameStyle = (isSelected: boolean) => ({ ...NAME_STYLE_BASE, color: isSelected ? colors.selection : colors.white });
 
 export interface SandboxBodyItemLabels {
   edit: string;
@@ -66,7 +67,7 @@ export function SandboxBodyItem({ body, isSelected, onSelect, onEdit, onDelete, 
         )}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', color: '#94a3b8' }}>{(body.mass / 5.9722e24).toFixed(1)} M⊕</span>
+        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', color: colors.textMuted }}>{(body.mass / 5.9722e24).toFixed(1)} M⊕</span>
         <button
           onClick={(e) => {
             e.stopPropagation();
