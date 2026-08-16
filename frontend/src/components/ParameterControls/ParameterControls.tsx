@@ -70,8 +70,6 @@ export function ParameterControls({
   onReset,
   preset,
   setPreset,
-  placementActive = false,
-  setPlacementActive = () => {},
 }: ParameterControlsProps) {
   const { mode, setMode } = useSimulationContext();
   const { t } = useI18n();
@@ -133,7 +131,7 @@ export function ParameterControls({
       </div>
 
       {mode === 'sandbox' ? (
-        <SandboxControls placementActive={placementActive} setPlacementActive={setPlacementActive} />
+        <SandboxControls />
       ) : (
         <div style={CONTROLS_LIST_STYLE}>
           <ParameterField

@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { simulationContext } from '../../context/SimulationContext';
 import { Simulator } from './Simulator';
 import { SimulationState } from '../../services/wasmBridge';
@@ -48,5 +48,50 @@ describe('Simulator container component', () => {
 
     // Assert context errors are passed
     expect(screen.getByText('⚠️ Error: Mock engine error')).toBeDefined();
+  });
+
+  it('should show a toast instead of crashing when addBody throws (FP-38)', () => {
+    const addBody = vi.fn(() => {
+      throw new Error('Maximum 300 bodies reached');
+    });
+    const mockContextValue = {
+      initialState: mockState,
+      setInitialState: vi.fn(),
+      currentState: mockState,
+      stepResult: null,
+      isPaused: true,
+      setIsPaused: vi.fn(),
+      speedMultiplier: 1000.0,
+      setSpeedMultiplier: vi.fn(),
+      lagrangePoints: null,
+      history: [],
+      clearHistory: vi.fn(),
+      resetSimulation: vi.fn(),
+      error: null,
+      preset: 'earth-moon' as const,
+      setPreset: vi.fn(),
+      mode: 'sandbox' as const,
+      setMode: vi.fn(),
+      sandboxBodies: [],
+      addBody,
+      removeBody: vi.fn(),
+      updateBody: vi.fn(),
+      selectedBodyId: null,
+      setSelectedBodyId: vi.fn(),
+    };
+
+    render(
+      <simulationContext.Provider value={mockContextValue as any}>
+        <Simulator />
+      </simulationContext.Provider>,
+    );
+
+    const canvasElement = screen.getByLabelText('Celestial simulation rendering area');
+    fireEvent.mouseDown(canvasElement, { button: 0, clientX: 1000, clientY: 1000 });
+    fireEvent.mouseUp(canvasElement, { clientX: 1000, clientY: 1000 });
+    fireEvent.click(screen.getByText('Confirm'));
+
+    expect(addBody).toHaveBeenCalled();
+    expect(screen.getByText(/Maximum body count reached/)).toBeDefined();
   });
 });

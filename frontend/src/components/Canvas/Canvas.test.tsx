@@ -80,4 +80,55 @@ describe('Canvas component', () => {
 
     expect(screen.queryByTestId('body-context-menu')).not.toBeNull();
   });
+
+  it('should create a body directly on click-drag-release of empty sandbox canvas, without any mode button (FP-38)', () => {
+    render(
+      <simulationContext.Provider value={{ ...mockContextValue, mode: 'sandbox' } as any}>
+        <Canvas showTrail={true} />
+      </simulationContext.Provider>,
+    );
+
+    const canvasElement = screen.getByLabelText('Celestial simulation rendering area');
+    // Far from any existing body (there are none here) — just a plain empty-space click-drag-release.
+    fireEvent.mouseDown(canvasElement, { button: 0, clientX: 1000, clientY: 1000 });
+    fireEvent.mouseMove(canvasElement, { clientX: 1050, clientY: 950 });
+    fireEvent.mouseUp(canvasElement, { clientX: 1050, clientY: 950 });
+
+    expect(screen.getByText('Configure New Body')).toBeDefined();
+  });
+
+  it('should not start body creation when mousedown hits an existing body (selects instead)', () => {
+    const bodies = [{ ...DEFAULT_INITIAL_STATE.primary, id: 'body-0', name: 'Primary', color: '#fff' }];
+    const setSelectedBodyId = vi.fn();
+    render(
+      <simulationContext.Provider
+        value={{ ...mockContextValue, mode: 'sandbox', currentState: { ...DEFAULT_INITIAL_STATE, bodies }, setSelectedBodyId } as any}
+      >
+        <Canvas showTrail={true} />
+      </simulationContext.Provider>,
+    );
+
+    const canvasElement = screen.getByLabelText('Celestial simulation rendering area');
+    // Primary body sits at world (0, 0), reachable via clientX -150 / clientY 0 (see comment above).
+    fireEvent.mouseDown(canvasElement, { button: 0, clientX: -150, clientY: 0 });
+    fireEvent.mouseUp(canvasElement, { clientX: -150, clientY: 0 });
+
+    expect(setSelectedBodyId).toHaveBeenCalledWith('body-0');
+    expect(screen.queryByText('Configure New Body')).toBeNull();
+  });
+
+  it('should cancel an in-progress body creation when the mouse leaves the canvas', () => {
+    render(
+      <simulationContext.Provider value={{ ...mockContextValue, mode: 'sandbox' } as any}>
+        <Canvas showTrail={true} />
+      </simulationContext.Provider>,
+    );
+
+    const canvasElement = screen.getByLabelText('Celestial simulation rendering area');
+    fireEvent.mouseDown(canvasElement, { button: 0, clientX: 1000, clientY: 1000 });
+    fireEvent.mouseLeave(canvasElement);
+    fireEvent.mouseUp(canvasElement, { clientX: 1000, clientY: 1000 });
+
+    expect(screen.queryByText('Configure New Body')).toBeNull();
+  });
 });
