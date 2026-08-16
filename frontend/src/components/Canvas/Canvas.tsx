@@ -2,8 +2,10 @@ import React, { useRef, useEffect } from 'react';
 import { useSimulationContext } from '../../context/SimulationContext';
 import { CanvasRenderer } from '../../services/CanvasRenderer';
 import { useCanvasInteraction } from '../../hooks/useCanvasInteraction';
+import { useMiniview } from '../../hooks/useMiniview';
 import { computePlacementPreview, getCanvasCursor } from './canvasVisuals';
 import { CanvasOverlays } from './CanvasOverlays';
+import { MiniviewCanvas } from '../MiniviewCanvas/MiniviewCanvas';
 import { SandboxBody } from '../../types';
 
 interface CanvasProps {
@@ -51,6 +53,8 @@ export function Canvas({ showTrail = true, onPlacementComplete }: CanvasProps) {
     handleWheel,
   } = useCanvasInteraction({ canvasRef });
 
+  const { miniviewBodyId, setMiniviewBodyId, toggleMiniview } = useMiniview(currentState, mode);
+
   useEffect(() => {
     if (!canvasRef.current) return;
     if (!rendererRef.current) rendererRef.current = new CanvasRenderer(canvasRef.current);
@@ -86,6 +90,8 @@ export function Canvas({ showTrail = true, onPlacementComplete }: CanvasProps) {
         showFullMenu={mode === 'sandbox'}
         isTracked={!!contextMenu && contextMenu.body.id === trackedBodyId}
         onTrackToggle={toggleTracking}
+        isInMiniview={!!contextMenu && contextMenu.body.id === miniviewBodyId}
+        onMiniviewToggle={toggleMiniview}
         onEdit={(b) => setEditingBody(b)}
         onLockToggle={(b) => updateBody(b.id, { locked: !b.locked })}
         onDelete={(b) => removeBody(b.id)}
@@ -110,6 +116,8 @@ export function Canvas({ showTrail = true, onPlacementComplete }: CanvasProps) {
           setDraggedVel([0, 0]);
         }}
       />
+
+      {miniviewBodyId && <MiniviewCanvas bodyId={miniviewBodyId} onClose={() => setMiniviewBodyId(null)} />}
     </>
   );
 }

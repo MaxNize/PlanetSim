@@ -6,10 +6,12 @@ import { colors } from '../../styles/tokens';
 interface BodyContextMenuProps {
   body: SandboxBody;
   position: { x: number; y: number };
-  /** Full menu (Edit/Lock/Delete + Track) in sandbox mode; only Track/Untrack elsewhere (FP-39/FP-36). */
+  /** Full menu (Edit/Lock/Delete + Track/Miniview) in sandbox mode; only Track/Miniview elsewhere (FP-39/FP-36). */
   showFullMenu: boolean;
   isTracked: boolean;
   onTrackToggle: (body: SandboxBody) => void;
+  isInMiniview: boolean;
+  onMiniviewToggle: (body: SandboxBody) => void;
   onEdit: (body: SandboxBody) => void;
   onLockToggle: (body: SandboxBody) => void;
   onDelete: (body: SandboxBody) => void;
@@ -75,13 +77,10 @@ function MenuHeader({ body, t }: { body: SandboxBody; t: (key: string) => string
   );
 }
 
-/**
- * Renders a context menu for tracking a body (any mode), plus editing/locking/deleting it (sandbox mode only).
- */
-// Size here is JSX volume (header + up to 4 already-extracted MenuItems), not branchy logic — cyclomatic
-// is already low; the menu items themselves were already pulled out into the MenuItem subcomponent above.
+/** Context menu: Track/Miniview (any mode) plus Edit/Lock/Delete (sandbox mode only). */
+// JSX volume (header + up to 5 already-extracted MenuItems), not branchy logic — cyclomatic is low.
 // fallow-ignore-next-line complexity
-export function BodyContextMenu({ body, position, showFullMenu, isTracked, onTrackToggle, onEdit, onLockToggle, onDelete, onClose }: BodyContextMenuProps) {
+export function BodyContextMenu({ body, position, showFullMenu, isTracked, onTrackToggle, isInMiniview, onMiniviewToggle, onEdit, onLockToggle, onDelete, onClose }: BodyContextMenuProps) {
   const { t } = useI18n();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -140,6 +139,17 @@ export function BodyContextMenu({ body, position, showFullMenu, isTracked, onTra
         hoverColor="rgba(59, 130, 246, 0.2)"
       >
         {isTracked ? t('contextMenu.untrack') : t('contextMenu.track')}
+      </MenuItem>
+
+      <MenuItem
+        onClick={() => {
+          onMiniviewToggle(body);
+          onClose();
+        }}
+        color={isInMiniview ? colors.accent : colors.textPrimary}
+        hoverColor="rgba(59, 130, 246, 0.2)"
+      >
+        {isInMiniview ? t('contextMenu.hideMiniview') : t('contextMenu.showMiniview')}
       </MenuItem>
 
       {showFullMenu && (
