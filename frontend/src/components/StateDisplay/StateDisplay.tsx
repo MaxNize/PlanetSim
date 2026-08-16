@@ -3,6 +3,7 @@ import { useSimulationContext } from '../../context/SimulationContext';
 import { useI18n } from '../../context/I18nContext';
 import { SimulationMode } from '../../types';
 import { colors } from '../../styles/tokens';
+import { formatDistance, formatVelocity } from '../../utils/formatUnits';
 
 interface BodyDisplayProps {
   name: string;
@@ -24,8 +25,8 @@ function BodyDisplay({ name, color, position, velocity, posLabel, velLabel }: Bo
         <span style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#e2e8f0' }}>{name}</span>
       </div>
       <div style={{ paddingLeft: '14px', fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', color: '#cbd5e1', lineHeight: '1.5' }}>
-        {posLabel}: [{position[0].toExponential(3)}, {position[1].toExponential(3)}] m<br />
-        {velLabel}: [{velocity[0].toFixed(2)}, {velocity[1].toFixed(2)}] m/s
+        {posLabel}: [{formatDistance(position[0])}, {formatDistance(position[1])}]<br />
+        {velLabel}: [{formatVelocity(velocity[0])}, {formatVelocity(velocity[1])}]
       </div>
     </div>
   );
