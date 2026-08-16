@@ -2,7 +2,6 @@ import { useRef, useEffect, useState } from 'react';
 import { useSimulationContext } from '../context/SimulationContext';
 import { ViewportConfig } from '../services/CanvasRenderer';
 import { screenToWorld as toWorld, findBodyAtPosition as hitTest } from '../services/canvasHitTest';
-import { useBodyTracking } from './useBodyTracking';
 import { SandboxBody } from '../types';
 
 interface CanvasInteractionOptions {
@@ -17,7 +16,7 @@ interface CanvasInteractionOptions {
  */
 export function useCanvasInteraction({ canvasRef }: CanvasInteractionOptions) {
   const lastMousePos = useRef({ x: 0, y: 0 });
-  const { currentState, setSelectedBodyId, sandboxBodies, mode } = useSimulationContext();
+  const { currentState, setSelectedBodyId, sandboxBodies, mode, trackedBodyId, setTrackedBodyId, toggleTracking } = useSimulationContext();
 
   const [viewport, setViewport] = useState<ViewportConfig>({ scale: 1e-6, pan: { x: 1.5e8, y: 0.0 } });
   const [isDragging, setIsDragging] = useState(false);
@@ -34,14 +33,19 @@ export function useCanvasInteraction({ canvasRef }: CanvasInteractionOptions) {
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; body: SandboxBody } | null>(null);
   const [editingBody, setEditingBody] = useState<SandboxBody | null>(null);
 
-  const { trackedBodyId, setTrackedBodyId, toggleTracking } = useBodyTracking(currentState, mode, setViewport);
+  // Camera tracking (FP-36): trackedBodyId lives in context; this effect pans the Canvas-local viewport.
+  useEffect(() => {
+    if (!trackedBodyId) return;
+    const trackedBody = currentState.bodies?.find((b) => b.id === trackedBodyId);
+    if (!trackedBody) return;
+    setViewport((prev) => ({ ...prev, pan: { x: trackedBody.position[0], y: trackedBody.position[1] } }));
+  }, [currentState, trackedBodyId]);
 
   useEffect(() => {
     const handleResize = () => {
-      if (canvasRef.current) {
-        const rect = canvasRef.current.getBoundingClientRect();
-        setDimensions({ width: rect.width, height: rect.height });
-      }
+      if (!canvasRef.current) return;
+      const rect = canvasRef.current.getBoundingClientRect();
+      setDimensions({ width: rect.width, height: rect.height });
     };
     handleResize();
     window.addEventListener('resize', handleResize);

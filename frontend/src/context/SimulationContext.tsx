@@ -37,6 +37,14 @@ export interface SimulationContextType {
   updateBody: (id: string, updates: Partial<SandboxBody>) => void;
   selectedBodyId: string | null;
   setSelectedBodyId: (id: string | null) => void;
+  // Camera tracking (FP-36) and focused miniview (FP-37); toggleable from both the canvas context
+  // menu and the sandbox object list.
+  trackedBodyId: string | null;
+  setTrackedBodyId: (id: string | null) => void;
+  toggleTracking: (body: SandboxBody) => void;
+  miniviewBodyId: string | null;
+  setMiniviewBodyId: (id: string | null) => void;
+  toggleMiniview: (body: SandboxBody) => void;
 }
 
 export const simulationContext = createContext<SimulationContextType | null>(null);

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { colors } from '../../styles/tokens';
 
 interface ToastProps {
@@ -12,10 +12,16 @@ interface ToastProps {
  * creation failures) that would otherwise fail silently (FP-38).
  */
 export function Toast({ message, onDismiss, durationMs = 3000 }: ToastProps) {
+  // onDismiss is often a fresh inline callback on every parent render (e.g. every simulation step);
+  // depending on it directly would reset this timer before it ever fires. A ref keeps the effect
+  // keyed only on what should actually restart the countdown, while still calling the latest callback.
+  const onDismissRef = useRef(onDismiss);
+  onDismissRef.current = onDismiss;
+
   useEffect(() => {
-    const timer = setTimeout(onDismiss, durationMs);
+    const timer = setTimeout(() => onDismissRef.current(), durationMs);
     return () => clearTimeout(timer);
-  }, [message, durationMs, onDismiss]);
+  }, [message, durationMs]);
 
   return (
     <div

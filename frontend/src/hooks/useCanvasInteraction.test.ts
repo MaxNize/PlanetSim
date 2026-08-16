@@ -13,18 +13,33 @@ function makeCanvasRef(): React.RefObject<HTMLCanvasElement | null> {
   return { current: el };
 }
 
+// trackedBodyId now lives in SimulationContext (production: SimulationProvider via useBodyTracking, see
+// useBodyTracking.test.ts for its own toggle/cleanup behavior). This harness stubs just enough of that
+// contract — a mutable trackedBodyId plus setters that trigger a rerender — for useCanvasInteraction's
+// own responsibility: reading it to pan the viewport, and clearing it when a manual pan drag starts.
 function renderWithContext(mode: 'sandbox' | '3body', bodies: SandboxBody[]) {
   const canvasRef = makeCanvasRef();
-  let contextValue = {
+  let rerenderFn: () => void = () => {};
+  let contextValue: any = {
     currentState: { ...DEFAULT_INITIAL_STATE, bodies },
     setSelectedBodyId: vi.fn(),
     sandboxBodies: bodies,
     mode,
+    trackedBodyId: null as string | null,
+    setTrackedBodyId: (id: string | null) => {
+      contextValue = { ...contextValue, trackedBodyId: id };
+      rerenderFn();
+    },
+    toggleTracking: (body: SandboxBody) => {
+      contextValue = { ...contextValue, trackedBodyId: contextValue.trackedBodyId === body.id ? null : body.id };
+      rerenderFn();
+    },
   };
 
-  const wrapper = ({ children }: { children: React.ReactNode }) => React.createElement(simulationContext.Provider, { value: contextValue as any }, children);
+  const wrapper = ({ children }: { children: React.ReactNode }) => React.createElement(simulationContext.Provider, { value: contextValue }, children);
 
   const { result, rerender } = renderHook(() => useCanvasInteraction({ canvasRef }), { wrapper });
+  rerenderFn = rerender;
 
   const setCurrentState = (bodies: SandboxBody[]) => {
     contextValue = { ...contextValue, currentState: { ...DEFAULT_INITIAL_STATE, bodies } };
@@ -35,16 +50,6 @@ function renderWithContext(mode: 'sandbox' | '3body', bodies: SandboxBody[]) {
 }
 
 describe('useCanvasInteraction tracking (FP-36)', () => {
-  it('toggles a body in and out of trackedBodyId', () => {
-    const { result } = renderWithContext('sandbox', [trackedBody]);
-
-    expect(result.current.trackedBodyId).toBeNull();
-    act(() => result.current.toggleTracking(trackedBody));
-    expect(result.current.trackedBodyId).toBe('body-0');
-    act(() => result.current.toggleTracking(trackedBody));
-    expect(result.current.trackedBodyId).toBeNull();
-  });
-
   it('pans the viewport to follow the tracked body as its position updates', () => {
     const { result, setCurrentState } = renderWithContext('sandbox', [trackedBody]);
 
@@ -61,15 +66,6 @@ describe('useCanvasInteraction tracking (FP-36)', () => {
     expect(result.current.trackedBodyId).toBe('body-0');
 
     act(() => result.current.handleMouseDown({ button: 1, clientX: 0, clientY: 0 } as any));
-    expect(result.current.trackedBodyId).toBeNull();
-  });
-
-  it('clears tracking when the tracked body no longer exists', () => {
-    const { result, setCurrentState } = renderWithContext('sandbox', [trackedBody]);
-    act(() => result.current.toggleTracking(trackedBody));
-    expect(result.current.trackedBodyId).toBe('body-0');
-
-    setCurrentState([]);
     expect(result.current.trackedBodyId).toBeNull();
   });
 });

@@ -131,5 +131,20 @@ test.describe('Restricted 3-Body Planet Simulation E2E Tests', () => {
 
     // 6. Verify the new body is listed in sidebar and telemetry
     await expect(page.getByText('E2E Test Star').first()).toBeVisible();
+
+    // 7. Track and Miniview should also be toggleable from the object list, not just the canvas
+    // context menu (user feedback: "Mini view und tracking sollte auch aus der objekt liste möglich sein").
+    const listItem = page.locator('[data-testid^="body-item-"]').first();
+    const trackButton = listItem.locator('[data-testid^="track-btn-"]');
+    const miniviewButton = listItem.locator('[data-testid^="miniview-btn-"]');
+
+    await trackButton.click();
+    await expect(page.locator('canvas[aria-label="Body miniview"]')).toHaveCount(0);
+    await trackButton.click(); // untrack again, don't leave the camera locked for the next assertion
+
+    await miniviewButton.click();
+    await expect(page.locator('canvas[aria-label="Body miniview"]')).toBeVisible();
+    await miniviewButton.click();
+    await expect(page.locator('canvas[aria-label="Body miniview"]')).toHaveCount(0);
   });
 });

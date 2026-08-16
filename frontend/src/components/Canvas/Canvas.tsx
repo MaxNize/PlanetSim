@@ -2,7 +2,6 @@ import React, { useRef, useEffect } from 'react';
 import { useSimulationContext } from '../../context/SimulationContext';
 import { CanvasRenderer } from '../../services/CanvasRenderer';
 import { useCanvasInteraction } from '../../hooks/useCanvasInteraction';
-import { useMiniview } from '../../hooks/useMiniview';
 import { computePlacementPreview, getCanvasCursor } from './canvasVisuals';
 import { CanvasOverlays } from './CanvasOverlays';
 import { MiniviewCanvas } from '../MiniviewCanvas/MiniviewCanvas';
@@ -21,7 +20,8 @@ export function Canvas({ showTrail = true, onPlacementComplete }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<CanvasRenderer | null>(null);
 
-  const { currentState, lagrangePoints, trailHistory, showTrail: contextShowTrail, selectedBodyId, removeBody, updateBody } = useSimulationContext();
+  const { currentState, lagrangePoints, trailHistory, showTrail: contextShowTrail, selectedBodyId, removeBody, updateBody, miniviewBodyId, setMiniviewBodyId, toggleMiniview } =
+    useSimulationContext();
   const activeShowTrail = showTrail && contextShowTrail;
 
   const {
@@ -52,8 +52,6 @@ export function Canvas({ showTrail = true, onPlacementComplete }: CanvasProps) {
     handleMouseLeave,
     handleWheel,
   } = useCanvasInteraction({ canvasRef });
-
-  const { miniviewBodyId, setMiniviewBodyId, toggleMiniview } = useMiniview(currentState, mode);
 
   useEffect(() => {
     if (!canvasRef.current) return;
