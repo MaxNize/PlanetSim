@@ -1,11 +1,17 @@
 import { SimulationState, LagrangePointSet, Body } from './wasmBridge';
 import { TrailHistory } from '../types';
 import { drawTrail, drawLagrangePoints, drawOverlay, drawBodyLabel, drawVelocityArrow, drawRing } from './canvasHelpers';
+import { ViewportConfig, worldToCanvas as toCanvas, canvasToWorld as toWorld } from './canvasCoords';
 import { colors } from '../styles/tokens';
 
-export interface ViewportConfig {
-  scale: number; // pixels per meter
-  pan: { x: number; y: number }; // physical center offset in meters
+export type { ViewportConfig };
+
+/** Which highlight rings to draw around a body (selection, lock, fixed-role, camera-tracking). */
+export interface BodyMarkers {
+  isFixed?: boolean;
+  isSelected?: boolean;
+  isLocked?: boolean;
+  isTracked?: boolean;
 }
 
 /** Handles 2D HTML5 Canvas rendering logic (coordinate system mapping and pan/zoom). */
@@ -31,6 +37,7 @@ export class CanvasRenderer {
     viewport: ViewportConfig,
     placementPreview?: { position: [number, number]; velocity: [number, number]; radius: number; color: string },
     selectedBodyId?: string | null,
+    trackedBodyId?: string | null,
   ): void {
     const { width, height } = this.resize();
     this.clear();
@@ -44,9 +51,9 @@ export class CanvasRenderer {
     }
 
     if (state.bodies) {
-      this.drawSandboxBodies(ctx, state.bodies, trailHistory, showTrail, viewport, width, height, selectedBodyId, wtc);
+      this.drawSandboxBodies(ctx, state.bodies, trailHistory, showTrail, viewport, width, height, selectedBodyId, trackedBodyId, wtc);
     } else {
-      this.drawFixedBodies(ctx, state, trailHistory, showTrail, viewport, width, height, selectedBodyId, wtc);
+      this.drawFixedBodies(ctx, state, trailHistory, showTrail, viewport, width, height, selectedBodyId, trackedBodyId, wtc);
     }
 
     if (placementPreview) {
@@ -86,6 +93,7 @@ export class CanvasRenderer {
     width: number,
     height: number,
     selectedBodyId: string | null | undefined,
+    trackedBodyId: string | null | undefined,
     wtc: (pos: [number, number]) => { x: number; y: number },
   ): void {
     const fixedBodies = [
@@ -95,7 +103,7 @@ export class CanvasRenderer {
     ];
     fixedBodies.forEach(({ id, body, color, trail }) => {
       if (showTrail) drawTrail(ctx, trail, color, wtc);
-      this.drawBody(body.position, body.radius, color, viewport, width, height, false, selectedBodyId === id);
+      this.drawBody(body.position, body.radius, color, viewport, width, height, { isSelected: selectedBodyId === id, isTracked: trackedBodyId === id });
     });
   }
 
@@ -109,6 +117,7 @@ export class CanvasRenderer {
     width: number,
     height: number,
     selectedBodyId: string | null | undefined,
+    trackedBodyId: string | null | undefined,
     wtc: (pos: [number, number]) => { x: number; y: number },
   ): void {
     // 3 independent per-body concerns: id fallback, optional trail, optional label — already minimal.
@@ -118,7 +127,7 @@ export class CanvasRenderer {
       if (showTrail && trailHistory.customBodies?.[bodyId]) {
         drawTrail(ctx, trailHistory.customBodies[bodyId], b.color || colors.white, wtc);
       }
-      this.drawBody(b.position, b.radius, b.color || colors.white, viewport, width, height, false, selectedBodyId === bodyId, b.locked);
+      this.drawBody(b.position, b.radius, b.color || colors.white, viewport, width, height, { isSelected: selectedBodyId === bodyId, isLocked: b.locked, isTracked: trackedBodyId === bodyId });
       if (b.name) drawBodyLabel(ctx, b.position, b.name, wtc);
     });
   }
@@ -147,26 +156,17 @@ export class CanvasRenderer {
 
   /** Converts physics coordinate in meters to canvas screen coordinates. */
   public worldToCanvas(pos: [number, number], viewport: ViewportConfig, width: number, height: number): { x: number; y: number } {
-    const centerX = width / 2;
-    const centerY = height / 2;
-    return {
-      x: centerX + (pos[0] - viewport.pan.x) * viewport.scale,
-      y: centerY - (pos[1] - viewport.pan.y) * viewport.scale,
-    };
+    return toCanvas(pos, viewport, width, height);
   }
 
   /** Converts canvas screen coordinates to physics coordinates in meters. */
   public canvasToWorld(screenX: number, screenY: number, viewport: ViewportConfig, width: number, height: number): { x: number; y: number } {
-    const centerX = width / 2;
-    const centerY = height / 2;
-    return {
-      x: (screenX - centerX) / viewport.scale + viewport.pan.x,
-      y: (centerY - screenY) / viewport.scale + viewport.pan.y,
-    };
+    return toWorld(screenX, screenY, viewport, width, height);
   }
 
   /** Draws a celestial body on the canvas. */
-  public drawBody(pos: [number, number], physicalRadius: number, color: string, viewport: ViewportConfig, width: number, height: number, isFixed = false, isSelected = false, isLocked = false): void {
+  public drawBody(pos: [number, number], physicalRadius: number, color: string, viewport: ViewportConfig, width: number, height: number, markers: BodyMarkers = {}): void {
+    const { isFixed = false, isSelected = false, isLocked = false, isTracked = false } = markers;
     if (!this.ctx) return;
     const { x, y } = this.worldToCanvas(pos, viewport, width, height);
     const radius = Math.max(4, physicalRadius * viewport.scale);
@@ -187,6 +187,7 @@ export class CanvasRenderer {
       { active: isSelected, color: colors.selection, lineWidth: 2.5, offset: 5 },
       { active: isLocked, color: colors.warning, lineWidth: 1.5, offset: isSelected ? 8 : 4 },
       { active: isFixed, color: colors.white, lineWidth: 1.5, offset: 2 },
+      { active: isTracked, color: colors.tracked, lineWidth: 2, offset: isSelected ? 13 : 9 },
     ];
     rings.forEach((ring) => {
       if (ring.active) drawRing(ctx, x, y, radius + ring.offset, ring.color, ring.lineWidth);

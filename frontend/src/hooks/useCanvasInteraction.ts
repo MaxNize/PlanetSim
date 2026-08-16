@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import { useSimulationContext } from '../context/SimulationContext';
 import { ViewportConfig } from '../services/CanvasRenderer';
 import { screenToWorld as toWorld, findBodyAtPosition as hitTest } from '../services/canvasHitTest';
+import { useBodyTracking } from './useBodyTracking';
 import { SandboxBody } from '../types';
 
 interface CanvasInteractionOptions {
@@ -32,6 +33,8 @@ export function useCanvasInteraction({ canvasRef }: CanvasInteractionOptions) {
   const [showDialog, setShowDialog] = useState(false);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; body: SandboxBody } | null>(null);
   const [editingBody, setEditingBody] = useState<SandboxBody | null>(null);
+
+  const { trackedBodyId, setTrackedBodyId, toggleTracking } = useBodyTracking(currentState, mode, setViewport);
 
   useEffect(() => {
     const handleResize = () => {
@@ -83,6 +86,8 @@ export function useCanvasInteraction({ canvasRef }: CanvasInteractionOptions) {
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     setContextMenu(null);
     if (e.button === 1 || (e.button === 0 && isSpacePressed)) {
+      // Manual panning takes over the camera; drop any active tracking so they don't fight (FP-36).
+      setTrackedBodyId(null);
       setIsDragging(true);
       lastMousePos.current = { x: e.clientX, y: e.clientY };
       return;
@@ -100,15 +105,10 @@ export function useCanvasInteraction({ canvasRef }: CanvasInteractionOptions) {
     }
   };
 
+  // Opening the menu itself is mode-agnostic (tracking works in both modes, FP-36); Canvas decides
+  // per-mode which menu items to show (Edit/Lock/Delete are sandbox-only, see BodyContextMenu, FP-39).
   const handleContextMenu = (e: React.MouseEvent<HTMLCanvasElement>) => {
     e.preventDefault();
-    // Edit/lock/delete only make sense for user-defined sandbox bodies; the fixed primary/secondary/testParticle
-    // roles in preset ('3body') mode aren't backed by sandboxBodies, so updateBody would silently no-op and the
-    // body would appear to "reset" on the next simulation tick (FP-39).
-    if (mode !== 'sandbox') {
-      setContextMenu(null);
-      return;
-    }
     const hit = findBodyAtPosition(screenToWorld(e.clientX, e.clientY));
     if (hit) {
       setSelectedBodyId(hit.id);
@@ -183,6 +183,8 @@ export function useCanvasInteraction({ canvasRef }: CanvasInteractionOptions) {
     setContextMenu,
     editingBody,
     setEditingBody,
+    trackedBodyId,
+    toggleTracking,
     handleMouseDown,
     handleContextMenu,
     handleMouseMove,
