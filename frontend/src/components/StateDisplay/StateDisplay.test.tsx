@@ -31,9 +31,9 @@ describe('StateDisplay component', () => {
     expect(screen.getByText(/3600\.0 s/)).toBeDefined();
     expect(screen.getByText(/1\.00 h/)).toBeDefined();
 
-    // Assert coordinates
-    expect(screen.getByText(/Pos: \[1\.000e\+6, 2\.000e\+6\] m/)).toBeDefined();
-    expect(screen.getByText(/Vel: \[100\.00, -200\.00\] m\/s/)).toBeDefined();
+    // Assert coordinates are formatted with human-readable, auto-scaled units (FP-34)
+    expect(screen.getByText(/Pos: \[1\.00 Mm, 2\.00 Mm\]/)).toBeDefined();
+    expect(screen.getByText(/Vel: \[100\.0 m\/s, -200\.0 m\/s\]/)).toBeDefined();
 
     // Assert energies
     expect(screen.getByText(/Kinetic: 1\.5000e\+20 J/)).toBeDefined();

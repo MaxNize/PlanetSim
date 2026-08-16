@@ -21,6 +21,12 @@ const FIELD_LABEL_STYLE = {
   marginBottom: '6px',
 } as const;
 
+const HINT_STYLE = {
+  fontSize: '11px',
+  color: colors.textMuted,
+  marginTop: '4px',
+} as const;
+
 interface ParameterFieldProps {
   label: string;
   value: string;
@@ -30,13 +36,15 @@ interface ParameterFieldProps {
   sliderMax: number;
   sliderVal: number;
   onSliderChange: (val: number) => void;
+  /** Optional human-readable rendering of the current value (e.g. "1.000 M⊕"), shown below the raw input (FP-34). */
+  hint?: string;
 }
 
 /**
  * Renders an individual parameter input field with a label, a text box,
  * and a range slider, coordinating typing and dragging behaviors.
  */
-export function ParameterField({ label, value, onChangeText, onCommit, sliderMin, sliderMax, sliderVal, onSliderChange }: ParameterFieldProps) {
+export function ParameterField({ label, value, onChangeText, onCommit, sliderMin, sliderMax, sliderVal, onSliderChange, hint }: ParameterFieldProps) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       onCommit();
@@ -48,6 +56,7 @@ export function ParameterField({ label, value, onChangeText, onCommit, sliderMin
       <span style={FIELD_LABEL_STYLE}>{label}</span>
       <input type="text" value={value} onChange={(e) => onChangeText(e.target.value)} onBlur={onCommit} onKeyDown={handleKeyDown} style={INPUT_STYLE} />
       <input type="range" min={sliderMin} max={sliderMax} step={0.01} value={sliderVal} onChange={(e) => onSliderChange(parseFloat(e.target.value))} />
+      {hint && <span style={HINT_STYLE}>≈ {hint}</span>}
     </label>
   );
 }
