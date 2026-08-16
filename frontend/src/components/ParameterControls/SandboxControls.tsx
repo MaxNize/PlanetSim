@@ -43,7 +43,18 @@ function notifySelection(id: string | null, onSelectBody: ((id: string | null) =
 // condition; the body-sync/style logic they used to carry was already extracted above.
 // fallow-ignore-next-line complexity
 export function SandboxControls({ selectedBodyId: propsSelectedId, onSelectBody }: SandboxControlsProps) {
-  const { sandboxBodies, removeBody, updateBody, setMode, selectedBodyId: contextSelectedId, setSelectedBodyId } = useSimulationContext();
+  const {
+    sandboxBodies,
+    removeBody,
+    updateBody,
+    setMode,
+    selectedBodyId: contextSelectedId,
+    setSelectedBodyId,
+    trackedBodyId,
+    toggleTracking,
+    miniviewBodyId,
+    toggleMiniview,
+  } = useSimulationContext();
   const { t } = useI18n();
   const [editingBody, setEditingBody] = useState<SandboxBody | null>(null);
 
@@ -75,14 +86,22 @@ export function SandboxControls({ selectedBodyId: propsSelectedId, onSelectBody 
             key={b.id}
             body={b}
             isSelected={activeSelectedId === b.id}
+            isTracked={trackedBodyId === b.id}
+            isInMiniview={miniviewBodyId === b.id}
             onSelect={handleSelect}
             onEdit={setEditingBody}
             onDelete={removeBody}
+            onTrackToggle={toggleTracking}
+            onMiniviewToggle={toggleMiniview}
             labels={{
               edit: t('sandbox.editBody'),
               delete: t('sandbox.deleteBody'),
               defaultName: t('sandbox.defaultBodyName'),
               locked: t('editDialog.locked'),
+              track: t('contextMenu.track'),
+              untrack: t('contextMenu.untrack'),
+              showMiniview: t('contextMenu.showMiniview'),
+              hideMiniview: t('contextMenu.hideMiniview'),
             }}
           />
         ))}

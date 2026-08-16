@@ -28,6 +28,9 @@ const ACTION_BUTTON_STYLE = {
   borderRadius: '4px',
 } as const;
 
+const ACTION_BUTTON_ACTIVE_STYLE = { ...ACTION_BUTTON_STYLE, color: colors.accent } as const;
+const actionButtonStyle = (active: boolean) => (active ? ACTION_BUTTON_ACTIVE_STYLE : ACTION_BUTTON_STYLE);
+
 const DELETE_BUTTON_ENABLED_STYLE = { ...ACTION_BUTTON_STYLE, color: '#ef4444', cursor: 'pointer', opacity: 1 } as const;
 const DELETE_BUTTON_DISABLED_STYLE = { ...ACTION_BUTTON_STYLE, color: '#64748b', cursor: 'not-allowed', opacity: 0.4 } as const;
 const deleteButtonStyle = (locked: boolean) => (locked ? DELETE_BUTTON_DISABLED_STYLE : DELETE_BUTTON_ENABLED_STYLE);
@@ -40,21 +43,31 @@ export interface SandboxBodyItemLabels {
   delete: string;
   defaultName: string;
   locked: string;
+  track: string;
+  untrack: string;
+  showMiniview: string;
+  hideMiniview: string;
 }
 
 interface SandboxBodyItemProps {
   body: SandboxBody;
   isSelected: boolean;
+  isTracked: boolean;
+  isInMiniview: boolean;
   onSelect: (id: string) => void;
   onEdit: (body: SandboxBody) => void;
   onDelete: (id: string) => void;
+  onTrackToggle: (body: SandboxBody) => void;
+  onMiniviewToggle: (body: SandboxBody) => void;
   labels: SandboxBodyItemLabels;
 }
 
 /**
- * Renders a single sandbox body row with selection, edit, and delete controls.
+ * Renders a single sandbox body row with selection, track, miniview, edit, and delete controls.
  */
-export function SandboxBodyItem({ body, isSelected, onSelect, onEdit, onDelete, labels }: SandboxBodyItemProps) {
+// JSX volume (5 already-minimal action buttons), not branchy logic — cyclomatic is low.
+// fallow-ignore-next-line complexity
+export function SandboxBodyItem({ body, isSelected, isTracked, isInMiniview, onSelect, onEdit, onDelete, onTrackToggle, onMiniviewToggle, labels }: SandboxBodyItemProps) {
   return (
     <div style={BODY_ITEM_STYLE(isSelected)} onClick={() => onSelect(body.id)} data-testid={`body-item-${body.id}`}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -68,6 +81,28 @@ export function SandboxBodyItem({ body, isSelected, onSelect, onEdit, onDelete, 
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
         <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', color: colors.textMuted }}>{(body.mass / 5.9722e24).toFixed(1)} M⊕</span>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onTrackToggle(body);
+          }}
+          style={actionButtonStyle(isTracked)}
+          title={isTracked ? labels.untrack : labels.track}
+          data-testid={`track-btn-${body.id}`}
+        >
+          🎯
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onMiniviewToggle(body);
+          }}
+          style={actionButtonStyle(isInMiniview)}
+          title={isInMiniview ? labels.hideMiniview : labels.showMiniview}
+          data-testid={`miniview-btn-${body.id}`}
+        >
+          🔍
+        </button>
         <button
           onClick={(e) => {
             e.stopPropagation();

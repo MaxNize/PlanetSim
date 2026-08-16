@@ -63,6 +63,8 @@ export function Simulator() {
     [addBody, t],
   );
 
+  const dismissToast = useCallback(() => setToastMessage(null), []);
+
   const setMassM1 = useCallback(
     (m: number) => {
       setInitialState({
@@ -103,7 +105,7 @@ export function Simulator() {
 
       {/* Floating Legend Overlay */}
       <SimulatorLegend mode={mode} hasLagrangePoints={!!lagrangePoints} />
-      {toastMessage && <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />}
+      {toastMessage && <Toast message={toastMessage} onDismiss={dismissToast} />}
 
       {/* Floating Control Sidebar */}
       <div

@@ -1,41 +1,53 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { simulationContext, DEFAULT_INITIAL_STATE } from '../../context/SimulationContext';
 import { Canvas } from './Canvas';
+import { SandboxBody, SimulationMode } from '../../types';
+
+const baseContextValue = {
+  initialState: DEFAULT_INITIAL_STATE,
+  setInitialState: vi.fn(),
+  currentState: DEFAULT_INITIAL_STATE,
+  stepResult: null,
+  isPaused: true,
+  setIsPaused: vi.fn(),
+  speedMultiplier: 1000.0,
+  setSpeedMultiplier: vi.fn(),
+  lagrangePoints: null,
+  history: [] as [number, number][],
+  clearHistory: vi.fn(),
+  resetSimulation: vi.fn(),
+  error: null,
+  preset: 'earth-moon' as const,
+  setPreset: vi.fn(),
+  mode: '3body' as SimulationMode,
+  setMode: vi.fn(),
+  sandboxBodies: [],
+  addBody: vi.fn(),
+  removeBody: vi.fn(),
+  updateBody: vi.fn(),
+  selectedBodyId: null,
+  setSelectedBodyId: vi.fn(),
+};
+
+/** Provides a real stateful trackedBodyId/miniviewBodyId (live toggling, as SimulationProvider does in production) around static test overrides. */
+function TestProvider({ overrides, children }: { overrides: Partial<typeof baseContextValue>; children: React.ReactNode }) {
+  const [trackedBodyId, setTrackedBodyId] = useState<string | null>(null);
+  const [miniviewBodyId, setMiniviewBodyId] = useState<string | null>(null);
+  const toggleTracking = (body: SandboxBody) => setTrackedBodyId((prev) => (prev === body.id ? null : body.id));
+  const toggleMiniview = (body: SandboxBody) => setMiniviewBodyId((prev) => (prev === body.id ? null : body.id));
+
+  const value = { ...baseContextValue, ...overrides, trackedBodyId, setTrackedBodyId, toggleTracking, miniviewBodyId, setMiniviewBodyId, toggleMiniview };
+  return <simulationContext.Provider value={value as any}>{children}</simulationContext.Provider>;
+}
 
 describe('Canvas component', () => {
-  const mockContextValue = {
-    initialState: DEFAULT_INITIAL_STATE,
-    setInitialState: vi.fn(),
-    currentState: DEFAULT_INITIAL_STATE,
-    stepResult: null,
-    isPaused: true,
-    setIsPaused: vi.fn(),
-    speedMultiplier: 1000.0,
-    setSpeedMultiplier: vi.fn(),
-    lagrangePoints: null,
-    history: [] as [number, number][],
-    clearHistory: vi.fn(),
-    resetSimulation: vi.fn(),
-    error: null,
-    preset: 'earth-moon' as const,
-    setPreset: vi.fn(),
-    mode: '3body' as const,
-    setMode: vi.fn(),
-    sandboxBodies: [],
-    addBody: vi.fn(),
-    removeBody: vi.fn(),
-    updateBody: vi.fn(),
-    selectedBodyId: null,
-    setSelectedBodyId: vi.fn(),
-  };
-
   it('should render canvas element with appropriate attributes', () => {
     render(
-      <simulationContext.Provider value={mockContextValue as any}>
+      <TestProvider overrides={{}}>
         <Canvas showTrail={true} />
-      </simulationContext.Provider>,
+      </TestProvider>,
     );
 
     const canvasElement = screen.getByLabelText('Celestial simulation rendering area');
@@ -50,11 +62,9 @@ describe('Canvas component', () => {
       { ...DEFAULT_INITIAL_STATE.testParticle, id: 'body-2', name: 'Test' },
     ];
     render(
-      <simulationContext.Provider
-        value={{ ...mockContextValue, mode: '3body', currentState: { ...DEFAULT_INITIAL_STATE, bodies } } as any}
-      >
+      <TestProvider overrides={{ mode: '3body', currentState: { ...DEFAULT_INITIAL_STATE, bodies } }}>
         <Canvas showTrail={true} />
-      </simulationContext.Provider>,
+      </TestProvider>,
     );
 
     const canvasElement = screen.getByLabelText('Celestial simulation rendering area');
@@ -71,11 +81,9 @@ describe('Canvas component', () => {
   it('should open the body context menu in sandbox mode', () => {
     const bodies = [{ ...DEFAULT_INITIAL_STATE.primary, id: 'body-0', name: 'Primary', color: '#fff' }];
     render(
-      <simulationContext.Provider
-        value={{ ...mockContextValue, mode: 'sandbox', currentState: { ...DEFAULT_INITIAL_STATE, bodies } } as any}
-      >
+      <TestProvider overrides={{ mode: 'sandbox', currentState: { ...DEFAULT_INITIAL_STATE, bodies } }}>
         <Canvas showTrail={true} />
-      </simulationContext.Provider>,
+      </TestProvider>,
     );
 
     const canvasElement = screen.getByLabelText('Celestial simulation rendering area');
@@ -86,9 +94,9 @@ describe('Canvas component', () => {
 
   it('should create a body directly on click-drag-release of empty sandbox canvas, without any mode button (FP-38)', () => {
     render(
-      <simulationContext.Provider value={{ ...mockContextValue, mode: 'sandbox' } as any}>
+      <TestProvider overrides={{ mode: 'sandbox' }}>
         <Canvas showTrail={true} />
-      </simulationContext.Provider>,
+      </TestProvider>,
     );
 
     const canvasElement = screen.getByLabelText('Celestial simulation rendering area');
@@ -104,11 +112,9 @@ describe('Canvas component', () => {
     const bodies = [{ ...DEFAULT_INITIAL_STATE.primary, id: 'body-0', name: 'Primary', color: '#fff' }];
     const setSelectedBodyId = vi.fn();
     render(
-      <simulationContext.Provider
-        value={{ ...mockContextValue, mode: 'sandbox', currentState: { ...DEFAULT_INITIAL_STATE, bodies }, setSelectedBodyId } as any}
-      >
+      <TestProvider overrides={{ mode: 'sandbox', currentState: { ...DEFAULT_INITIAL_STATE, bodies }, setSelectedBodyId }}>
         <Canvas showTrail={true} />
-      </simulationContext.Provider>,
+      </TestProvider>,
     );
 
     const canvasElement = screen.getByLabelText('Celestial simulation rendering area');
@@ -122,9 +128,9 @@ describe('Canvas component', () => {
 
   it('should cancel an in-progress body creation when the mouse leaves the canvas', () => {
     render(
-      <simulationContext.Provider value={{ ...mockContextValue, mode: 'sandbox' } as any}>
+      <TestProvider overrides={{ mode: 'sandbox' }}>
         <Canvas showTrail={true} />
-      </simulationContext.Provider>,
+      </TestProvider>,
     );
 
     const canvasElement = screen.getByLabelText('Celestial simulation rendering area');
@@ -138,11 +144,9 @@ describe('Canvas component', () => {
   it('should open a Miniview for a body via the context menu, independent of tracking (FP-37)', () => {
     const bodies = [{ ...DEFAULT_INITIAL_STATE.primary, id: 'body-0', name: 'Primary', color: '#fff' }];
     render(
-      <simulationContext.Provider
-        value={{ ...mockContextValue, mode: 'sandbox', currentState: { ...DEFAULT_INITIAL_STATE, bodies } } as any}
-      >
+      <TestProvider overrides={{ mode: 'sandbox', currentState: { ...DEFAULT_INITIAL_STATE, bodies } }}>
         <Canvas showTrail={true} />
-      </simulationContext.Provider>,
+      </TestProvider>,
     );
 
     const canvasElement = screen.getByLabelText('Celestial simulation rendering area');
