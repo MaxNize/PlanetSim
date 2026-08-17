@@ -16,6 +16,9 @@ jobs:
   commit-lint:
     name: Commit Message Lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
