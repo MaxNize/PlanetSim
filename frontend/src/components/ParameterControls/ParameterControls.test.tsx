@@ -3,15 +3,27 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ParameterControls } from './ParameterControls';
 
+const contextMock = {
+  showTrail: true,
+  setShowTrail: vi.fn(),
+  trailLength: 1000,
+  setTrailLength: vi.fn(),
+  clearTrailHistory: vi.fn(),
+  mode: '3body' as '3body' | 'sandbox',
+  setMode: vi.fn(),
+  sandboxBodies: [] as unknown[],
+  removeBody: vi.fn(),
+  updateBody: vi.fn(),
+  selectedBodyId: null,
+  setSelectedBodyId: vi.fn(),
+  trackedBodyId: null,
+  toggleTracking: vi.fn(),
+  miniviewBodyId: null,
+  toggleMiniview: vi.fn(),
+};
+
 vi.mock('../../context/SimulationContext', () => ({
-  useSimulationContext: () => ({
-    showTrail: true,
-    setShowTrail: vi.fn(),
-    trailLength: 1000,
-    setTrailLength: vi.fn(),
-    clearTrailHistory: vi.fn(),
-    mode: '3body',
-  }),
+  useSimulationContext: () => contextMock,
 }));
 
 describe('ParameterControls component', () => {
@@ -78,5 +90,56 @@ describe('ParameterControls component', () => {
     // Trigger Preset click
     fireEvent.click(screen.getByText('✨ Binary Stars'));
     expect(props.setPreset).toHaveBeenCalledWith('binary-stars');
+  });
+
+  const props = {
+    massM1: 1e24,
+    setMassM1: vi.fn(),
+    massM2: 1e22,
+    setMassM2: vi.fn(),
+    distanceR: 1e8,
+    setDistanceR: vi.fn(),
+    speedMultiplier: 1000,
+    setSpeedMultiplier: vi.fn(),
+    isPaused: true,
+    setIsPaused: vi.fn(),
+    onReset: vi.fn(),
+    preset: 'earth-moon' as const,
+    setPreset: vi.fn(),
+  };
+
+  it('switches to sandbox mode when the sandbox tab is clicked', () => {
+    render(<ParameterControls {...props} />);
+    fireEvent.click(screen.getByText('Sandbox Mode'));
+    expect(contextMock.setMode).toHaveBeenCalledWith('sandbox');
+  });
+
+  it('renders SandboxControls instead of the mass/distance fields in sandbox mode', () => {
+    contextMock.mode = 'sandbox';
+    render(<ParameterControls {...props} />);
+    expect(screen.getByText('Sandbox Creator')).toBeDefined();
+    expect(screen.queryByText('Mass 1 (Primary, kg)')).toBeNull();
+    contextMock.mode = '3body';
+  });
+
+  it('rejects an out-of-range mass and reverts to the last valid value on blur', () => {
+    render(<ParameterControls {...props} />);
+    const massInput = screen.getAllByRole('textbox')[0] as HTMLInputElement;
+
+    fireEvent.change(massInput, { target: { value: 'not-a-number' } });
+    fireEvent.blur(massInput);
+
+    expect(props.setMassM1).not.toHaveBeenCalled();
+    expect(massInput.value).toBe(props.massM1.toExponential(3));
+  });
+
+  it('commits a valid mass value on blur', () => {
+    render(<ParameterControls {...props} />);
+    const massInput = screen.getAllByRole('textbox')[0] as HTMLInputElement;
+
+    fireEvent.change(massInput, { target: { value: '2e24' } });
+    fireEvent.blur(massInput);
+
+    expect(props.setMassM1).toHaveBeenCalledWith(2e24);
   });
 });
