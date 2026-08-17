@@ -24,6 +24,8 @@ export function computePlacementPreview(
 }
 
 /** Picks the mouse cursor for the current interaction state (dragging > space-panning > sandbox-create-hint > default). */
+// Priority ladder over 4 interaction states — already minimal, same shape as computePlacementPreview above.
+// fallow-ignore-next-line complexity
 export function getCanvasCursor(isDragging: boolean, isSpacePressed: boolean, mode: SimulationMode, isHoveringBody: boolean): string {
   if (isDragging) return 'grabbing';
   if (isSpacePressed) return 'grab';

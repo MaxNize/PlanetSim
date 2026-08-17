@@ -3,9 +3,8 @@ import { SandboxBody } from '../../types';
 import { useI18n } from '../../context/I18nContext';
 import { colors } from '../../styles/tokens';
 
-interface BodyContextMenuProps {
-  body: SandboxBody;
-  position: { x: number; y: number };
+/** Shared with CanvasOverlays, which forwards these straight through to BodyContextMenu. */
+export interface BodyContextMenuActions {
   /** Full menu (Edit/Lock/Delete + Track/Miniview) in sandbox mode; only Track/Miniview elsewhere (FP-39/FP-36). */
   showFullMenu: boolean;
   isTracked: boolean;
@@ -15,9 +14,13 @@ interface BodyContextMenuProps {
   onEdit: (body: SandboxBody) => void;
   onLockToggle: (body: SandboxBody) => void;
   onDelete: (body: SandboxBody) => void;
-  onClose: () => void;
 }
 
+interface BodyContextMenuProps extends BodyContextMenuActions {
+  body: SandboxBody;
+  position: { x: number; y: number };
+  onClose: () => void;
+}
 interface MenuItemProps {
   onClick: () => void;
   disabled?: boolean;
@@ -25,7 +28,6 @@ interface MenuItemProps {
   hoverColor: string;
   children: React.ReactNode;
 }
-
 function MenuItem({ onClick, disabled = false, color, hoverColor, children }: MenuItemProps) {
   return (
     <button
@@ -106,7 +108,6 @@ export function BodyContextMenu({ body, position, showFullMenu, isTracked, onTra
 
   const adjustedX = Math.min(position.x, window.innerWidth - 180);
   const adjustedY = Math.min(position.y, window.innerHeight - 160);
-
   return (
     <div
       ref={menuRef}

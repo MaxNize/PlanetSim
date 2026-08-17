@@ -13,9 +13,9 @@ export function findBodyAtPosition(worldPos: [number, number], bodies: SandboxBo
   if (!bodies || bodies.length === 0) return null;
   const minHitRadiusMeters = 15 / scale;
 
-  for (const b of bodies) {
+  const hit = bodies.find((b) => {
     const dist = Math.hypot(worldPos[0] - b.position[0], worldPos[1] - b.position[1]);
-    if (dist <= Math.max(b.radius || 6.371e6, minHitRadiusMeters)) return b;
-  }
-  return null;
+    return dist <= Math.max(b.radius || 6.371e6, minHitRadiusMeters);
+  });
+  return hit ?? null;
 }

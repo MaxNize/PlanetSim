@@ -29,7 +29,9 @@ describe('MiniviewCanvas (FP-37)', () => {
   });
 
   it('zooms out on wheel-down and back in on wheel-up', () => {
-    const rectSpy = vi.spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect').mockReturnValue({ width: 220, height: 160, left: 0, top: 0, right: 220, bottom: 160, x: 0, y: 0, toJSON: () => ({}) });
+    const rectSpy = vi
+      .spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect')
+      .mockReturnValue({ width: 220, height: 160, left: 0, top: 0, right: 220, bottom: 160, x: 0, y: 0, toJSON: () => ({}) });
     const drawSpy = vi.spyOn(CanvasRendererModule.CanvasRenderer.prototype, 'draw').mockImplementation(() => {});
     renderMiniview();
     const canvasElement = screen.getByLabelText('Body miniview');

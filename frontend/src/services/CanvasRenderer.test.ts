@@ -99,23 +99,15 @@ describe('CanvasRenderer', () => {
     expect(offsetWorld.y).toBe(600.0);
   });
 
+  const sampleTrail: Array<[number, number]> = [
+    [0, 0],
+    [1, 1],
+  ];
+
   describe('draw', () => {
     it('renders fixed bodies with trails, lagrange points, and the overlay', () => {
       const renderer = new CanvasRenderer(mockCanvas);
-      const trails: TrailHistory = {
-        primary: [
-          [0, 0],
-          [1, 1],
-        ],
-        secondary: [
-          [0, 0],
-          [1, 1],
-        ],
-        testParticle: [
-          [0, 0],
-          [1, 1],
-        ],
-      };
+      const trails: TrailHistory = { primary: sampleTrail, secondary: sampleTrail, testParticle: sampleTrail };
 
       renderer.draw(fixedState, trails, true, lagrangePoints, viewport, undefined, 'primary', 'secondary');
 
@@ -134,12 +126,7 @@ describe('CanvasRenderer', () => {
       };
       const trails: TrailHistory = {
         ...emptyTrails,
-        customBodies: {
-          a: [
-            [0, 0],
-            [1, 1],
-          ],
-        },
+        customBodies: { a: sampleTrail },
       };
 
       renderer.draw(sandboxState, trails, true, null, viewport, undefined, 'a', 'body-1');
