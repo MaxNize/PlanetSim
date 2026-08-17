@@ -73,6 +73,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       setLagrangePoints(null);
     }
     // Deps intentionally exclude initialState/resetTrail: including them resets the trail on every mass/distance slider change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [simulator, mode]);
 
   const handleStep = useCallback(

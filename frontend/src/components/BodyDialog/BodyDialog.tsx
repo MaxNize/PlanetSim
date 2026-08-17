@@ -38,6 +38,9 @@ export function BodyDialog(props: BodyDialogProps) {
       setColor(data.color);
       if (!isEditProps(props)) setName(t(`dialog.presets.${preset}`));
     }
+    // `props` is intentionally excluded: this effect reacts to preset changes only.
+    // Depending on `props` would re-run (and reset name/mass/color) on every field edit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preset, t]);
 
   useEffect(() => {

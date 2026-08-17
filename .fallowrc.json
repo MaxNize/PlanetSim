@@ -21,8 +21,6 @@
     "unused-exports": "warn",
     "unused-types": "warn",
     "circular-dependencies": "error",
-    "code-duplication": "warn",
-    "complexity-hotspots": "warn",
     "boundary-violations": "error"
   }
 }

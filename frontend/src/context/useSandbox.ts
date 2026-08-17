@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { SandboxBody, SimulationMode } from '../types';
-import { SimulationState } from '../services/wasmBridge';
+import { SimulationState, SimulatorBridge, StepResult } from '../services/wasmBridge';
 
 /**
  * Upper bound on sandbox body count (FP-38). The previous cap of 10 was arbitrary; this value is
@@ -46,7 +46,7 @@ function commitSandboxBodies(
   currentState: SimulationState,
   setSandboxBodies: React.Dispatch<React.SetStateAction<SandboxBody[]>>,
   setCurrentState: React.Dispatch<React.SetStateAction<SimulationState>>,
-  simulator: any,
+  simulator: SimulatorBridge | null,
 ): void {
   setSandboxBodies(bodies);
   const nextState = { ...currentState, bodies };
@@ -70,9 +70,9 @@ export function useSandbox(
   setCurrentState: React.Dispatch<React.SetStateAction<SimulationState>>,
   setInitialState: React.Dispatch<React.SetStateAction<SimulationState>>,
   setIsPaused: React.Dispatch<React.SetStateAction<boolean>>,
-  setStepResult: React.Dispatch<React.SetStateAction<any>>,
+  setStepResult: React.Dispatch<React.SetStateAction<StepResult | null>>,
   setModeState: React.Dispatch<React.SetStateAction<SimulationMode>>,
-  simulator: any,
+  simulator: SimulatorBridge | null,
 ) {
   const setMode = useCallback(
     (newMode: SimulationMode) => {
