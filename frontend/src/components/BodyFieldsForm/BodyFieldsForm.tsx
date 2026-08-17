@@ -1,4 +1,5 @@
 import { FIELD_STYLE, LABEL_STYLE, INPUT_STYLE } from '../BodyPlacementDialog/styles';
+import { colors } from '../../styles/tokens';
 
 export interface BodyPresetOption {
   value: string;
@@ -85,7 +86,7 @@ export function BodyFieldsForm({
         <span style={LABEL_STYLE}>{labels.color}</span>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <input type="color" value={color} onChange={(e) => onColorChange(e.target.value)} style={{ ...INPUT_STYLE, padding: '2px 4px', width: '48px', height: '36px', cursor: 'pointer' }} />
-          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '12px', color: '#94a3b8' }}>{color}</span>
+          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '12px', color: colors.textMuted }}>{color}</span>
         </div>
       </div>
     </>

@@ -67,6 +67,10 @@ CI workflows (GitHub Actions) remain the authoritative enforcement mechanism for
 - [x] AC 7.10: Fallow runs on the frontend TypeScript sources to flag unused files, unused exports/types, duplication, complexity hotspots, and boundary violations.
   Local check: `npm run check:fallow`; CI gate: `npm run check:quality`.
 - [x] AC 7.11: Rust uses `cargo-udeps` as the comparable unused-dependency quality check for the `wasm` crate. Local check: `cargo +nightly udeps --all-targets --all-features`; CI gate: `npm run check:quality`.
+- [x] AC 7.12: `clippy::cognitive_complexity` (a `nursery`-group lint, off by default) is enabled via `#![warn(clippy::cognitive_complexity)]` in `wasm/src/lib.rs`, threshold set in `clippy.toml`.
+  This is the Rust-side equivalent of Fallow's `complexity-hotspots` rule; it runs as part of the existing `cargo clippy --all-targets -- -D warnings` CI step, no separate gate needed.
+- [x] AC 7.13: `cargo-modules orphans` flags `.rs` files under `wasm/src/` that exist on disk but aren't reachable from any `mod` declaration — the Rust-side equivalent of Fallow's `unused-files` rule.
+  Local check: `cd wasm && cargo modules orphans --cfg-test --deny` (`npm run check:rust-orphans`); CI gate: `npm run check:quality`.
 
 Exceptions catalog: The exceptions to the 200-line rule MUST be recorded in a machine-readable whitelist stored at `max-lines-exceptions.json` at the repository root. The CI linting scripts will
 consult  this file when deciding whether a file is exempt. Schema:
@@ -193,7 +197,7 @@ consult  this file when deciding whether a file is exempt. Schema:
  - **Linting:** `npm run lint` runs ESLint + Prettier check + stylelint + markdownlint; detects missing JSDoc, max-lines violations, naming issues, markdown style violations
  - **Markdown linting:** `npm run lint:md` validates all `.md` files in `Docs/` and root against `.markdownlint.json` rules
  - **Rust linting:** `cargo clippy -- -D warnings` detects documentation issues, line-length violations; exits non-zero on failure
- - **Quality scans:** `npm run check:quality` runs Fallow for frontend code quality and `cargo-udeps` for Rust dependency hygiene
+ - **Quality scans:** `npm run check:quality` runs Fallow (frontend), `cargo-udeps` (Rust deps), and `cargo modules orphans` (unlinked Rust files)
  - **Doc tests:** `cargo test --doc` verifies all rustdoc examples run correctly
  - **Max-lines enforcement:** `node scripts/check-max-lines.js --exceptions max-lines-exceptions.json` checks all files against limit and exceptions
  - **Commit message validation:** `npm run commit-lint` (local, optional)

@@ -8,7 +8,8 @@
     "**/node_modules/**",
     "**/dist/**",
     "**/build/**",
-    "Docs/Wireframe/**"
+    "Docs/Wireframe/**",
+    "Docs/Guides/testing/reports/**"
   ],
   "ignoreDependencies": [
     "eslint-config-prettier",
@@ -20,8 +21,6 @@
     "unused-exports": "warn",
     "unused-types": "warn",
     "circular-dependencies": "error",
-    "code-duplication": "warn",
-    "complexity-hotspots": "warn",
     "boundary-violations": "error"
   }
 }

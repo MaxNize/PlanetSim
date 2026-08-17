@@ -30,10 +30,10 @@ jobs:
           node-version-file: frontend/.nvmrc
 
       - name: Audit root dependencies
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=moderate
 
       - name: Audit frontend dependencies
-        run: cd frontend && npm audit --audit-level=high
+        run: cd frontend && npm audit --audit-level=moderate
 
   cargo-audit:
     name: Cargo Dependency Audit
@@ -60,3 +60,6 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Dependency Review and CodeQL code scanning both require GitHub Advanced Security, which isn't
+  # available for private repositories on our plan — removed rather than left permanently red.

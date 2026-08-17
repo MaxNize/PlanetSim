@@ -15,8 +15,6 @@ export interface ParameterControlsProps {
   onReset: () => void;
   preset: 'earth-moon' | 'binary-stars' | 'custom';
   setPreset: (preset: 'earth-moon' | 'binary-stars' | 'custom') => void;
-  placementActive?: boolean;
-  setPlacementActive?: (active: boolean) => void;
 }
 
 /**
@@ -68,8 +66,6 @@ export interface SandboxBody {
  * Props for the SandboxControls component.
  */
 export interface SandboxControlsProps {
-  placementActive: boolean;
-  setPlacementActive: (active: boolean) => void;
   selectedBodyId?: string | null;
   onSelectBody?: (id: string | null) => void;
 }

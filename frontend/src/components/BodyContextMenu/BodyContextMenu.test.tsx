@@ -16,13 +16,32 @@ const mockBody: SandboxBody = {
   locked: false,
 };
 
+function renderMenu(overrides: Partial<React.ComponentProps<typeof BodyContextMenu>> = {}) {
+  const props: React.ComponentProps<typeof BodyContextMenu> = {
+    body: mockBody,
+    position: { x: 100, y: 100 },
+    showFullMenu: true,
+    isTracked: false,
+    onTrackToggle: vi.fn(),
+    isInMiniview: false,
+    onMiniviewToggle: vi.fn(),
+    onEdit: vi.fn(),
+    onLockToggle: vi.fn(),
+    onDelete: vi.fn(),
+    onClose: vi.fn(),
+    ...overrides,
+  };
+  render(
+    <I18nProvider>
+      <BodyContextMenu {...props} />
+    </I18nProvider>,
+  );
+  return props;
+}
+
 describe('BodyContextMenu Component', () => {
   it('renders menu items and body title correctly', () => {
-    render(
-      <I18nProvider>
-        <BodyContextMenu body={mockBody} position={{ x: 100, y: 100 }} onEdit={vi.fn()} onLockToggle={vi.fn()} onDelete={vi.fn()} onClose={vi.fn()} />
-      </I18nProvider>,
-    );
+    renderMenu();
 
     expect(screen.getByText('Planet X')).toBeInTheDocument();
     expect(screen.getByText('✏️ Edit')).toBeInTheDocument();
@@ -31,58 +50,71 @@ describe('BodyContextMenu Component', () => {
   });
 
   it('triggers onEdit callback when clicking edit option', () => {
-    const handleEdit = vi.fn();
-    const handleClose = vi.fn();
-
-    render(
-      <I18nProvider>
-        <BodyContextMenu body={mockBody} position={{ x: 100, y: 100 }} onEdit={handleEdit} onLockToggle={vi.fn()} onDelete={vi.fn()} onClose={handleClose} />
-      </I18nProvider>,
-    );
+    const props = renderMenu();
 
     fireEvent.click(screen.getByText('✏️ Edit'));
-    expect(handleEdit).toHaveBeenCalledWith(mockBody);
-    expect(handleClose).toHaveBeenCalled();
+    expect(props.onEdit).toHaveBeenCalledWith(mockBody);
+    expect(props.onClose).toHaveBeenCalled();
   });
 
   it('triggers onLockToggle callback when clicking lock option', () => {
-    const handleLock = vi.fn();
-
-    render(
-      <I18nProvider>
-        <BodyContextMenu body={mockBody} position={{ x: 100, y: 100 }} onEdit={vi.fn()} onLockToggle={handleLock} onDelete={vi.fn()} onClose={vi.fn()} />
-      </I18nProvider>,
-    );
+    const props = renderMenu();
 
     fireEvent.click(screen.getByText('🔒 Lock'));
-    expect(handleLock).toHaveBeenCalledWith(mockBody);
+    expect(props.onLockToggle).toHaveBeenCalledWith(mockBody);
   });
 
   it('disables delete button when body is locked', () => {
-    const handleDelete = vi.fn();
-
-    render(
-      <I18nProvider>
-        <BodyContextMenu body={{ ...mockBody, locked: true }} position={{ x: 100, y: 100 }} onEdit={vi.fn()} onLockToggle={vi.fn()} onDelete={handleDelete} onClose={vi.fn()} />
-      </I18nProvider>,
-    );
+    const props = renderMenu({ body: { ...mockBody, locked: true } });
 
     const deleteBtn = screen.getByText('❌ Delete');
     expect(deleteBtn).toBeDisabled();
     fireEvent.click(deleteBtn);
-    expect(handleDelete).not.toHaveBeenCalled();
+    expect(props.onDelete).not.toHaveBeenCalled();
   });
 
   it('closes on Escape key press', () => {
-    const handleClose = vi.fn();
-
-    render(
-      <I18nProvider>
-        <BodyContextMenu body={mockBody} position={{ x: 100, y: 100 }} onEdit={vi.fn()} onLockToggle={vi.fn()} onDelete={vi.fn()} onClose={handleClose} />
-      </I18nProvider>,
-    );
+    const props = renderMenu();
 
     fireEvent.keyDown(document, { key: 'Escape' });
-    expect(handleClose).toHaveBeenCalled();
+    expect(props.onClose).toHaveBeenCalled();
+  });
+
+  it('shows Track and triggers onTrackToggle when not yet tracked (FP-36)', () => {
+    const props = renderMenu({ isTracked: false });
+
+    fireEvent.click(screen.getByText(/Track/));
+    expect(props.onTrackToggle).toHaveBeenCalledWith(mockBody);
+    expect(props.onClose).toHaveBeenCalled();
+  });
+
+  it('shows Untrack when already tracked', () => {
+    renderMenu({ isTracked: true });
+
+    expect(screen.getByText(/Untrack/)).toBeInTheDocument();
+  });
+
+  it('hides Edit/Lock/Delete and only shows Track/Miniview when showFullMenu is false (preset mode, FP-36)', () => {
+    renderMenu({ showFullMenu: false });
+
+    expect(screen.getByText(/Track/)).toBeInTheDocument();
+    expect(screen.getByText(/Miniview/)).toBeInTheDocument();
+    expect(screen.queryByText('✏️ Edit')).toBeNull();
+    expect(screen.queryByText('🔒 Lock')).toBeNull();
+    expect(screen.queryByText('❌ Delete')).toBeNull();
+  });
+
+  it('shows "Show in Miniview" and triggers onMiniviewToggle when not yet shown (FP-37)', () => {
+    const props = renderMenu({ isInMiniview: false });
+
+    fireEvent.click(screen.getByText(/Miniview/));
+    expect(props.onMiniviewToggle).toHaveBeenCalledWith(mockBody);
+    expect(props.onClose).toHaveBeenCalled();
+  });
+
+  it('shows "Hide Miniview" when already shown', () => {
+    renderMenu({ isInMiniview: true });
+
+    expect(screen.getByText(/Hide Miniview/)).toBeInTheDocument();
   });
 });

@@ -7,6 +7,8 @@ import { DEFAULT_INITIAL_STATE, PresetType, getPresetState } from './presets';
 import { simulationContext } from './SimulationContext';
 import { useSandbox } from './useSandbox';
 import { useTrailHistory } from './useTrailHistory';
+import { useBodyTracking } from '../hooks/useBodyTracking';
+import { useMiniview } from '../hooks/useMiniview';
 
 function enrichBodies(
   bodies: (Body & { id?: string; name?: string; color?: string; locked?: boolean })[],
@@ -71,6 +73,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
       setLagrangePoints(null);
     }
     // Deps intentionally exclude initialState/resetTrail: including them resets the trail on every mass/distance slider change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [simulator, mode]);
 
   const handleStep = useCallback(
@@ -130,6 +133,8 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
   );
 
   const { setMode, addBody, removeBody, updateBody } = useSandbox(sandboxBodies, setSandboxBodies, currentState, setCurrentState, setInitialState, setIsPaused, setStepResult, setModeState, simulator);
+  const { trackedBodyId, setTrackedBodyId, toggleTracking } = useBodyTracking(currentState, mode);
+  const { miniviewBodyId, setMiniviewBodyId, toggleMiniview } = useMiniview(currentState, mode);
 
   return (
     <simulationContext.Provider
@@ -163,6 +168,12 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         updateBody,
         selectedBodyId,
         setSelectedBodyId,
+        trackedBodyId,
+        setTrackedBodyId,
+        toggleTracking,
+        miniviewBodyId,
+        setMiniviewBodyId,
+        toggleMiniview,
       }}
     >
       {children}

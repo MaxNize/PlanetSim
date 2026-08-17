@@ -69,6 +69,11 @@
             "path": "Docs/Management/Project-Management/Specs/SPEC-014-developer-guide.md",
             "reason": "Project spec — accepted length",
             "approved_by": "MaxNize"
+        },
+        {
+            "path": "Docs/arc42.md",
+            "reason": "Full 12-chapter arc42 architecture document (FP-40) — accepted length",
+            "approved_by": "MaxNize"
         }
     ]
 }

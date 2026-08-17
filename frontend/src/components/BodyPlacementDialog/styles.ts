@@ -1,3 +1,5 @@
+import { colors } from '../../styles/tokens';
+
 export const OVERLAY_STYLE = {
   position: 'fixed',
   top: 0,
@@ -23,7 +25,7 @@ export const DIALOG_STYLE = {
   gap: '16px',
   boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
   fontFamily: "'Outfit', sans-serif",
-  color: '#ffffff',
+  color: colors.white,
 } as const;
 
 export const FIELD_STYLE = {
@@ -37,14 +39,14 @@ export const LABEL_STYLE = {
   fontWeight: 600,
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
-  color: '#94a3b8',
+  color: colors.textMuted,
 } as const;
 
 export const INPUT_STYLE = {
   background: 'rgba(255, 255, 255, 0.06)',
   border: '1px solid rgba(255, 255, 255, 0.12)',
   borderRadius: '6px',
-  color: '#ffffff',
+  color: colors.white,
   padding: '8px 12px',
   fontFamily: "'JetBrains Mono', monospace",
   fontSize: '13px',

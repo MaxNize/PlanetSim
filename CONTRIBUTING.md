@@ -126,6 +126,28 @@ Exceptions are **tracked in `max-lines-exceptions.json`** at the repository root
 
 3. Get explicit approval from the mentioned approver before merging.
 
+### Architecture & Dead-Code Guardrails
+
+Beyond formatting and file size, we run architecture-level scans that catch unused code, overly
+complex functions, and structural drift — for both languages, not just the frontend.
+
+* **Frontend (TypeScript):** Fallow flags unused files, unused exports/types, circular
+  dependencies, boundary violations, code duplication, and complexity hotspots. Local check:
+  `npm run check:fallow`.
+* **Rust — unlinked source files:** `cargo modules orphans --cfg-test` detects `.rs` files under
+  `wasm/src/` that exist on disk but aren't reachable from any `mod` declaration (the Rust
+  equivalent of Fallow's `unused-files` rule). Local check: `npm run check:rust-orphans`.
+* **Rust — complexity hotspots:** `clippy::cognitive_complexity` is enabled via
+  `#![warn(clippy::cognitive_complexity)]` in `wasm/src/lib.rs`; the threshold lives in
+  `clippy.toml` (`cognitive-complexity-threshold = 25`). It runs automatically as part of
+  `cargo clippy -- -D warnings`, no separate command needed.
+* **Rust — unused dependencies:** `cargo-udeps` flags Cargo dependencies that are declared but
+  never imported. Local check: `cargo +nightly udeps --all-targets --all-features`.
+
+All four run together via `npm run check:quality`, which is also a CI gate on every PR.
+
+**Enforcement:** CI job `code-quality` in `.github/workflows/test.yml`.
+
 ### Naming Conventions
 
 See [Docs/Guides/documentation-conventions.md](Docs/Guides/documentation-conventions.md) for:

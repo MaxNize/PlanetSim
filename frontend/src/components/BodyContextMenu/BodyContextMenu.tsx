@@ -1,16 +1,26 @@
 import { useEffect, useRef } from 'react';
 import { SandboxBody } from '../../types';
 import { useI18n } from '../../context/I18nContext';
+import { colors } from '../../styles/tokens';
 
-interface BodyContextMenuProps {
-  body: SandboxBody;
-  position: { x: number; y: number };
+/** Shared with CanvasOverlays, which forwards these straight through to BodyContextMenu. */
+export interface BodyContextMenuActions {
+  /** Full menu (Edit/Lock/Delete + Track/Miniview) in sandbox mode; only Track/Miniview elsewhere (FP-39/FP-36). */
+  showFullMenu: boolean;
+  isTracked: boolean;
+  onTrackToggle: (body: SandboxBody) => void;
+  isInMiniview: boolean;
+  onMiniviewToggle: (body: SandboxBody) => void;
   onEdit: (body: SandboxBody) => void;
   onLockToggle: (body: SandboxBody) => void;
   onDelete: (body: SandboxBody) => void;
-  onClose: () => void;
 }
 
+interface BodyContextMenuProps extends BodyContextMenuActions {
+  body: SandboxBody;
+  position: { x: number; y: number };
+  onClose: () => void;
+}
 interface MenuItemProps {
   onClick: () => void;
   disabled?: boolean;
@@ -18,7 +28,6 @@ interface MenuItemProps {
   hoverColor: string;
   children: React.ReactNode;
 }
-
 function MenuItem({ onClick, disabled = false, color, hoverColor, children }: MenuItemProps) {
   return (
     <button
@@ -48,13 +57,32 @@ function MenuItem({ onClick, disabled = false, color, hoverColor, children }: Me
   );
 }
 
-/**
- * Renders a context menu for editing, locking, or deleting a sandbox body.
- */
-// Size here is JSX volume (header + 3 already-extracted MenuItems), not branchy logic — cyclomatic is
-// already low (5); the menu items themselves were already pulled out into the MenuItem subcomponent above.
+/** Renders the body-name header row shared by both the full and reduced context menu. */
+function MenuHeader({ body, t }: { body: SandboxBody; t: (key: string) => string }) {
+  return (
+    <div
+      style={{
+        padding: '6px 12px',
+        fontSize: '11px',
+        fontWeight: 600,
+        color: colors.textMuted,
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        marginBottom: '4px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+      }}
+    >
+      <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: body.color, display: 'inline-block' }} />
+      <span style={{ maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{body.name || t('sandbox.defaultBodyName')}</span>
+    </div>
+  );
+}
+
+/** Context menu: Track/Miniview (any mode) plus Edit/Lock/Delete (sandbox mode only). */
+// JSX volume (header + up to 5 already-extracted MenuItems), not branchy logic — cyclomatic is low.
 // fallow-ignore-next-line complexity
-export function BodyContextMenu({ body, position, onEdit, onLockToggle, onDelete, onClose }: BodyContextMenuProps) {
+export function BodyContextMenu({ body, position, showFullMenu, isTracked, onTrackToggle, isInMiniview, onMiniviewToggle, onEdit, onLockToggle, onDelete, onClose }: BodyContextMenuProps) {
   const { t } = useI18n();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -80,7 +108,6 @@ export function BodyContextMenu({ body, position, onEdit, onLockToggle, onDelete
 
   const adjustedX = Math.min(position.x, window.innerWidth - 180);
   const adjustedY = Math.min(position.y, window.innerHeight - 160);
-
   return (
     <div
       ref={menuRef}
@@ -96,74 +123,77 @@ export function BodyContextMenu({ body, position, onEdit, onLockToggle, onDelete
         borderRadius: '8px',
         boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
         padding: '6px 0',
-        color: '#f8fafc',
+        color: colors.textPrimary,
         fontSize: '13px',
         userSelect: 'none',
       }}
       data-testid="body-context-menu"
     >
-      <div
-        style={{
-          padding: '6px 12px',
-          fontSize: '11px',
-          fontWeight: 600,
-          color: '#94a3b8',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          marginBottom: '4px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-        }}
-      >
-        <span
-          style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            backgroundColor: body.color,
-            display: 'inline-block',
-          }}
-        />
-        <span style={{ maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{body.name || t('sandbox.defaultBodyName')}</span>
-      </div>
+      <MenuHeader body={body} t={t} />
 
       <MenuItem
         onClick={() => {
-          onEdit(body);
+          onTrackToggle(body);
           onClose();
         }}
-        color="#f8fafc"
+        color={isTracked ? colors.accent : colors.textPrimary}
         hoverColor="rgba(59, 130, 246, 0.2)"
       >
-        {t('contextMenu.edit')}
+        {isTracked ? t('contextMenu.untrack') : t('contextMenu.track')}
       </MenuItem>
 
       <MenuItem
         onClick={() => {
-          onLockToggle(body);
+          onMiniviewToggle(body);
           onClose();
         }}
-        color={body.locked ? '#f59e0b' : '#f8fafc'}
+        color={isInMiniview ? colors.accent : colors.textPrimary}
         hoverColor="rgba(59, 130, 246, 0.2)"
       >
-        {body.locked ? t('contextMenu.unlock') : t('contextMenu.lock')}
+        {isInMiniview ? t('contextMenu.hideMiniview') : t('contextMenu.showMiniview')}
       </MenuItem>
 
-      <div style={{ height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.08)', margin: '4px 0' }} />
+      {showFullMenu && (
+        <>
+          <MenuItem
+            onClick={() => {
+              onEdit(body);
+              onClose();
+            }}
+            color={colors.textPrimary}
+            hoverColor="rgba(59, 130, 246, 0.2)"
+          >
+            {t('contextMenu.edit')}
+          </MenuItem>
 
-      <MenuItem
-        onClick={() => {
-          if (!body.locked) {
-            onDelete(body);
-            onClose();
-          }
-        }}
-        disabled={body.locked}
-        color={body.locked ? '#64748b' : '#ef4444'}
-        hoverColor="rgba(239, 68, 68, 0.2)"
-      >
-        {t('contextMenu.delete')}
-      </MenuItem>
+          <MenuItem
+            onClick={() => {
+              onLockToggle(body);
+              onClose();
+            }}
+            color={body.locked ? colors.warning : colors.textPrimary}
+            hoverColor="rgba(59, 130, 246, 0.2)"
+          >
+            {body.locked ? t('contextMenu.unlock') : t('contextMenu.lock')}
+          </MenuItem>
+
+          <div style={{ height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.08)', margin: '4px 0' }} />
+
+          <MenuItem
+            onClick={() => {
+              if (!body.locked) {
+                onDelete(body);
+                onClose();
+              }
+            }}
+            disabled={body.locked}
+            color={body.locked ? '#64748b' : '#ef4444'}
+            hoverColor="rgba(239, 68, 68, 0.2)"
+          >
+            {t('contextMenu.delete')}
+          </MenuItem>
+        </>
+      )}
     </div>
   );
 }

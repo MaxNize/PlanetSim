@@ -1,47 +1,31 @@
 import React, { useCallback, useState } from 'react';
 import { useSimulationContext } from '../../context/SimulationContext';
+import { useI18n } from '../../context/I18nContext';
 import { ParameterControls } from '../ParameterControls/ParameterControls';
 import { StateDisplay } from '../StateDisplay/StateDisplay';
 import { Canvas } from '../Canvas/Canvas';
+import { Toast } from '../Toast/Toast';
+import { SimulatorLegend } from './SimulatorLegend';
+import { SandboxBody } from '../../types';
+import { colors } from '../../styles/tokens';
 
-const LEGEND_STYLE = {
-  position: 'absolute',
-  bottom: '24px',
-  left: '24px',
-  zIndex: 10,
+/** Maps a thrown addBody error to a localized, user-facing message (FP-38). */
+function resolveCreateBodyErrorMessage(err: unknown, t: (key: string) => string): string {
+  const raw = err instanceof Error ? err.message : String(err);
+  if (raw.startsWith('Maximum')) return t('sandbox.maxBodiesReached');
+  if (raw.startsWith('Overlap')) return t('sandbox.overlapDetected');
+  return raw;
+}
+
+const CARD_STYLE = {
   background: 'rgba(5, 7, 10, 0.75)',
   backdropFilter: 'blur(8px)',
-  padding: '12px 18px',
-  borderRadius: '8px',
+  borderRadius: '12px',
   border: '1px solid rgba(255, 255, 255, 0.1)',
-  display: 'flex',
-  gap: '16px',
-  fontSize: '12px',
-  color: '#ccc',
-  fontFamily: 'sans-serif',
+  color: colors.white,
+  overflow: 'hidden',
+  flexShrink: 0,
 } as const;
-
-interface SimulatorLegendProps {
-  mode: 'sandbox' | '3body';
-  hasLagrangePoints: boolean;
-}
-
-function SimulatorLegend({ mode, hasLagrangePoints }: SimulatorLegendProps) {
-  return (
-    <div style={LEGEND_STYLE}>
-      {mode === 'sandbox' ? (
-        <span>🌌 Custom Bodies Active (Verlet N-Body Simulator)</span>
-      ) : (
-        <>
-          <span>🟡 M1 (Primary)</span>
-          <span>🔵 M2 (Secondary)</span>
-          <span>🟢 Test Particle</span>
-          {hasLagrangePoints && <span>🔴 Lagrange Points (L1-L5 computed)</span>}
-        </>
-      )}
-    </div>
-  );
-}
 
 /**
  * Container component that connects the global simulation context to presentational children.
@@ -64,8 +48,22 @@ export function Simulator() {
     mode,
     addBody,
   } = useSimulationContext();
+  const { t } = useI18n();
 
-  const [placementActive, setPlacementActive] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const handleCreateBody = useCallback(
+    (body: SandboxBody) => {
+      try {
+        addBody(body);
+      } catch (err) {
+        setToastMessage(resolveCreateBodyErrorMessage(err, t));
+      }
+    },
+    [addBody, t],
+  );
+
+  const dismissToast = useCallback(() => setToastMessage(null), []);
 
   const setMassM1 = useCallback(
     (m: number) => {
@@ -102,19 +100,12 @@ export function Simulator() {
     <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden' }}>
       {/* Simulation Area (Fullscreen Background Canvas) */}
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}>
-        <Canvas
-          showTrail={true}
-          placementActive={placementActive}
-          onPlacementCancel={() => setPlacementActive(false)}
-          onPlacementComplete={(body) => {
-            addBody(body);
-            setPlacementActive(false);
-          }}
-        />
+        <Canvas showTrail={true} onPlacementComplete={handleCreateBody} />
       </div>
 
       {/* Floating Legend Overlay */}
       <SimulatorLegend mode={mode} hasLagrangePoints={!!lagrangePoints} />
+      {toastMessage && <Toast message={toastMessage} onDismiss={dismissToast} />}
 
       {/* Floating Control Sidebar */}
       <div
@@ -132,17 +123,7 @@ export function Simulator() {
           padding: '4px',
         }}
       >
-        <div
-          style={{
-            background: 'rgba(5, 7, 10, 0.75)',
-            backdropFilter: 'blur(8px)',
-            borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            color: '#fff',
-            overflow: 'hidden',
-            flexShrink: 0,
-          }}
-        >
+        <div style={CARD_STYLE}>
           <ParameterControls
             massM1={initialState.primary.mass}
             setMassM1={setMassM1}
@@ -157,22 +138,10 @@ export function Simulator() {
             onReset={resetSimulation}
             preset={preset}
             setPreset={setPreset}
-            placementActive={placementActive}
-            setPlacementActive={setPlacementActive}
           />
         </div>
 
-        <div
-          style={{
-            background: 'rgba(5, 7, 10, 0.75)',
-            backdropFilter: 'blur(8px)',
-            borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            color: '#fff',
-            overflow: 'hidden',
-            flexShrink: 0,
-          }}
-        >
+        <div style={CARD_STYLE}>
           <StateDisplay
             time={currentState.time}
             primaryPos={currentState.primary.position}

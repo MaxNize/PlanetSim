@@ -1,4 +1,5 @@
 import { LagrangePointSet, SimulationState } from './wasmBridge';
+import { colors } from '../styles/tokens';
 
 function drawTrailSection(
   ctx: CanvasRenderingContext2D,
@@ -101,7 +102,7 @@ export function drawBodyLabel(ctx: CanvasRenderingContext2D, pos: [number, numbe
  */
 export function drawVelocityArrow(ctx: CanvasRenderingContext2D, start: { x: number; y: number }, end: { x: number; y: number }): void {
   ctx.beginPath();
-  ctx.strokeStyle = '#3b82f6';
+  ctx.strokeStyle = colors.accent;
   ctx.lineWidth = 2;
   ctx.setLineDash([4, 4]);
   ctx.moveTo(start.x, start.y);
@@ -111,7 +112,7 @@ export function drawVelocityArrow(ctx: CanvasRenderingContext2D, start: { x: num
 
   const angle = Math.atan2(end.y - start.y, end.x - start.x);
   ctx.beginPath();
-  ctx.fillStyle = '#3b82f6';
+  ctx.fillStyle = colors.accent;
   ctx.moveTo(end.x, end.y);
   ctx.lineTo(end.x - 8 * Math.cos(angle - Math.PI / 6), end.y - 8 * Math.sin(angle - Math.PI / 6));
   ctx.lineTo(end.x - 8 * Math.cos(angle + Math.PI / 6), end.y - 8 * Math.sin(angle + Math.PI / 6));

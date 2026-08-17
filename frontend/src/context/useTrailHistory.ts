@@ -2,6 +2,8 @@ import { useCallback, useState } from 'react';
 import { SimulationState } from '../services/wasmBridge';
 import { TrailHistory } from '../types';
 
+type EnrichedBody = NonNullable<SimulationState['bodies']>[number];
+
 const initTrail = (s: SimulationState): TrailHistory => ({
   primary: [s.primary.position],
   secondary: [s.secondary.position],
@@ -25,7 +27,8 @@ export function useTrailHistory(initialState: SimulationState) {
       setTrailHistory((prev) => {
         const nextCustom: { [bodyId: string]: [number, number][] } = { ...(prev.customBodies || {}) };
         if (enriched.bodies) {
-          enriched.bodies.forEach((b: any) => {
+          enriched.bodies.forEach((b: EnrichedBody) => {
+            if (!b.id) return;
             nextCustom[b.id] = [...(nextCustom[b.id] || []), b.position].slice(-trailLength);
           });
         }
