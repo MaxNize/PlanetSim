@@ -16,12 +16,14 @@ interface CanvasProps {
  * Renders the interactive simulation viewport canvas. In sandbox mode, clicking and dragging on
  * empty canvas space creates a new body directly — no separate placement-mode toggle (FP-38).
  */
+// Composition root wiring viewport rendering, pointer interaction, and the overlay stack together —
+// the size follows from being the single place that owns the canvas element, not accidental sprawl.
+// fallow-ignore-next-line complexity
 export function Canvas({ showTrail = true, onPlacementComplete }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<CanvasRenderer | null>(null);
 
-  const { currentState, lagrangePoints, trailHistory, showTrail: contextShowTrail, selectedBodyId, removeBody, updateBody, miniviewBodyId, setMiniviewBodyId, toggleMiniview } =
-    useSimulationContext();
+  const { currentState, lagrangePoints, trailHistory, showTrail: contextShowTrail, selectedBodyId, removeBody, updateBody, miniviewBodyId, setMiniviewBodyId, toggleMiniview } = useSimulationContext();
   const activeShowTrail = showTrail && contextShowTrail;
 
   const {
@@ -60,7 +62,22 @@ export function Canvas({ showTrail = true, onPlacementComplete }: CanvasProps) {
     const preview = computePlacementPreview(mode, isPlacingBody, placedWorldPos, draggedVel, hoverWorldPos, isHoveringBody);
 
     rendererRef.current.draw(currentState, trailHistory, activeShowTrail, lagrangePoints, viewport, preview, selectedBodyId, trackedBodyId);
-  }, [currentState, viewport, trailHistory, activeShowTrail, lagrangePoints, dimensions, mode, isPlacingBody, hoverWorldPos, placedWorldPos, draggedVel, isHoveringBody, selectedBodyId, trackedBodyId]);
+  }, [
+    currentState,
+    viewport,
+    trailHistory,
+    activeShowTrail,
+    lagrangePoints,
+    dimensions,
+    mode,
+    isPlacingBody,
+    hoverWorldPos,
+    placedWorldPos,
+    draggedVel,
+    isHoveringBody,
+    selectedBodyId,
+    trackedBodyId,
+  ]);
 
   return (
     <>

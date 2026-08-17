@@ -1,19 +1,11 @@
 import { BodyPlacementDialog } from '../BodyPlacementDialog/BodyPlacementDialog';
-import { BodyContextMenu } from '../BodyContextMenu/BodyContextMenu';
+import { BodyContextMenu, BodyContextMenuActions } from '../BodyContextMenu/BodyContextMenu';
 import { BodyEditDialog } from '../BodyEditDialog/BodyEditDialog';
 import { SandboxBody } from '../../types';
 
-export interface CanvasOverlaysProps {
+export interface CanvasOverlaysProps extends BodyContextMenuActions {
   contextMenu: { x: number; y: number; body: SandboxBody } | null;
   onContextMenuClose: () => void;
-  showFullMenu: boolean;
-  isTracked: boolean;
-  onTrackToggle: (body: SandboxBody) => void;
-  isInMiniview: boolean;
-  onMiniviewToggle: (body: SandboxBody) => void;
-  onEdit: (body: SandboxBody) => void;
-  onLockToggle: (body: SandboxBody) => void;
-  onDelete: (body: SandboxBody) => void;
   editingBody: SandboxBody | null;
   onEditConfirm: (updated: SandboxBody) => void;
   onEditCancel: () => void;

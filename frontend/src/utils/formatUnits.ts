@@ -2,6 +2,13 @@ const AU_IN_METERS = 1.495978707e11;
 const EARTH_MASS_KG = 5.9722e24;
 const SOLAR_MASS_KG = 1.989e30;
 
+const DISTANCE_UNITS = [
+  { threshold: 0.1 * AU_IN_METERS, divisor: AU_IN_METERS, suffix: ' AU', decimals: 3 },
+  { threshold: 1e9, divisor: 1e9, suffix: ' Gm', decimals: 2 },
+  { threshold: 1e6, divisor: 1e6, suffix: ' Mm', decimals: 2 },
+  { threshold: 1e3, divisor: 1e3, suffix: ' km', decimals: 2 },
+];
+
 /**
  * Formats a distance in meters as a human-readable string, auto-scaling to km, Mm, Gm, or AU.
  *
@@ -12,11 +19,9 @@ const SOLAR_MASS_KG = 1.989e30;
  */
 export function formatDistance(meters: number): string {
   const abs = Math.abs(meters);
-  if (abs >= 0.1 * AU_IN_METERS) return `${(meters / AU_IN_METERS).toFixed(3)} AU`;
-  if (abs >= 1e9) return `${(meters / 1e9).toFixed(2)} Gm`;
-  if (abs >= 1e6) return `${(meters / 1e6).toFixed(2)} Mm`;
-  if (abs >= 1e3) return `${(meters / 1e3).toFixed(2)} km`;
-  return `${meters.toFixed(1)} m`;
+  const unit = DISTANCE_UNITS.find((u) => abs >= u.threshold);
+  if (!unit) return `${meters.toFixed(1)} m`;
+  return `${(meters / unit.divisor).toFixed(unit.decimals)}${unit.suffix}`;
 }
 
 /**

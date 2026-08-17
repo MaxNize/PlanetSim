@@ -23,9 +23,7 @@ function setupHook(initialBodies: SandboxBody[] = []) {
     sandboxBodies = typeof updater === 'function' ? updater(sandboxBodies) : updater;
   });
   const setCurrentState = vi.fn();
-  const { result, rerender } = renderHook(() =>
-    useSandbox(sandboxBodies, setSandboxBodies, { ...baseState, bodies: sandboxBodies }, setCurrentState, vi.fn(), vi.fn(), vi.fn(), vi.fn(), null),
-  );
+  const { result, rerender } = renderHook(() => useSandbox(sandboxBodies, setSandboxBodies, { ...baseState, bodies: sandboxBodies }, setCurrentState, vi.fn(), vi.fn(), vi.fn(), vi.fn(), null));
   return { result, rerender, getSandboxBodies: () => sandboxBodies };
 }
 
