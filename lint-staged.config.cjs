@@ -11,6 +11,13 @@ module.exports = {
       `sh -c "cd frontend && prettier --write ${rel}"`,
     ];
   },
+  'frontend/*.config.{ts,js,cjs}': (files) => {
+    const rel = relativeToFrontend(files);
+    return [
+      `sh -c "cd frontend && eslint --max-warnings 0 --fix ${rel}"`,
+      `sh -c "cd frontend && prettier --write ${rel}"`,
+    ];
+  },
   'frontend/src/**/*.css': (files) => {
     const rel = relativeToFrontend(files);
     return [

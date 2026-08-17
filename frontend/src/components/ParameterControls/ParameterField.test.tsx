@@ -44,7 +44,7 @@ describe('ParameterField', () => {
 
   it('commits and blurs on Enter', () => {
     const props = renderField();
-    const input = screen.getByRole('textbox') as HTMLInputElement;
+    const input = screen.getByRole('textbox');
     fireEvent.keyDown(input, { key: 'Enter' });
     expect(props.onCommit).toHaveBeenCalled();
   });
