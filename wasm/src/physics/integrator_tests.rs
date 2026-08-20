@@ -61,9 +61,9 @@ fn integrate_step_n_body_test() {
     assert_eq!(list.len(), 3);
 
     // Locked body should not move
-    assert_eq!(list[2].position, (0.0, 1.0e7));
-    assert_eq!(list[2].velocity, (0.0, 0.0));
+    assert_eq!(list[2].position, Vec2::new(0.0, 1.0e7));
+    assert_eq!(list[2].velocity, Vec2::ZERO);
 
     // Unlocked body should move
-    assert_ne!(list[1].position, (1.0e6, 0.0));
+    assert_ne!(list[1].position, Vec2::new(1.0e6, 0.0));
 }

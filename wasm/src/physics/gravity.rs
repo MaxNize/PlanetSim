@@ -1,6 +1,6 @@
 //! Gravity helpers and Lagrange-point calculations for the physics engine.
 
-use super::types::{Body, LagrangePointSet};
+use super::types::{Body, LagrangePointSet, Vec2};
 
 /// Default gravitational constant in m^3 kg^-1 s^-2.
 pub const DEFAULT_GRAVITATIONAL_CONSTANT: f64 = 6.67430e-11;
@@ -13,10 +13,8 @@ pub const DEFAULT_GRAVITATIONAL_CONSTANT: f64 = 6.67430e-11;
 /// let d = distance((0.0, 0.0), (3.0, 4.0));
 /// assert_eq!(d, 5.0);
 /// ```
-pub fn distance(position1: (f64, f64), position2: (f64, f64)) -> f64 {
-    let delta_x = position2.0 - position1.0;
-    let delta_y = position2.1 - position1.1;
-    delta_x.hypot(delta_y)
+pub fn distance(position1: impl Into<Vec2>, position2: impl Into<Vec2>) -> f64 {
+    position1.into().distance(position2.into())
 }
 
 /// Computes the gravitational force magnitude between two bodies using Newton's law of universal gravitation:
@@ -84,10 +82,8 @@ pub fn lagrange_points(
     let separation = distance(primary.position, secondary.position);
     assert!(separation > 0.0, "bodies must not occupy the same position");
 
-    let delta_x = secondary.position.0 - primary.position.0;
-    let delta_y = secondary.position.1 - primary.position.1;
-    let direction = (delta_x / separation, delta_y / separation);
-    let perpendicular = (-direction.1, direction.0);
+    let direction = (secondary.position - primary.position) / separation;
+    let perpendicular = Vec2::new(-direction.y, direction.x);
     let barycenter = barycenter(primary, secondary);
     let mass_ratio = secondary.mass / (primary.mass + secondary.mass);
 
@@ -98,39 +94,24 @@ pub fn lagrange_points(
     let l1 = from_normalized_x(barycenter, direction, l1_x * separation);
     let l2 = from_normalized_x(barycenter, direction, l2_x * separation);
     let l3 = from_normalized_x(barycenter, direction, l3_x * separation);
-    let midpoint = (
-        (primary.position.0 + secondary.position.0) * 0.5,
-        (primary.position.1 + secondary.position.1) * 0.5,
-    );
+    let midpoint = (primary.position + secondary.position) * 0.5;
     let equilateral_offset = (3.0_f64.sqrt() * 0.5) * separation;
 
-    let l4 = (
-        midpoint.0 + perpendicular.0 * equilateral_offset,
-        midpoint.1 + perpendicular.1 * equilateral_offset,
-    );
-    let l5 = (
-        midpoint.0 - perpendicular.0 * equilateral_offset,
-        midpoint.1 - perpendicular.1 * equilateral_offset,
-    );
+    let l4 = midpoint + perpendicular * equilateral_offset;
+    let l5 = midpoint - perpendicular * equilateral_offset;
 
     LagrangePointSet { l1, l2, l3, l4, l5 }
 }
 
-fn barycenter(primary: &Body, secondary: &Body) -> (f64, f64) {
+fn barycenter(primary: &Body, secondary: &Body) -> Vec2 {
     let total_mass = primary.mass + secondary.mass;
     assert!(total_mass > 0.0, "total mass must be positive");
 
-    (
-        (primary.position.0 * primary.mass + secondary.position.0 * secondary.mass) / total_mass,
-        (primary.position.1 * primary.mass + secondary.position.1 * secondary.mass) / total_mass,
-    )
+    (primary.position * primary.mass + secondary.position * secondary.mass) / total_mass
 }
 
-fn from_normalized_x(barycenter: (f64, f64), direction: (f64, f64), offset: f64) -> (f64, f64) {
-    (
-        barycenter.0 + direction.0 * offset,
-        barycenter.1 + direction.1 * offset,
-    )
+fn from_normalized_x(barycenter: Vec2, direction: Vec2, offset: f64) -> Vec2 {
+    barycenter + direction * offset
 }
 
 fn solve_collinear_point(initial_guess: f64, mass_ratio: f64) -> f64 {
@@ -215,9 +196,9 @@ mod tests {
 
         let points = lagrange_points(&primary, &secondary, DEFAULT_GRAVITATIONAL_CONSTANT);
         let expected_l4_y = (3.0_f64.sqrt() * 0.5) * EARTH_MOON_DISTANCE;
-        assert!((points.l4.0 - EARTH_MOON_DISTANCE * 0.5).abs() < 1e-3);
-        assert!((points.l4.1 - expected_l4_y).abs() < 1e-3);
-        assert!((points.l5.0 - EARTH_MOON_DISTANCE * 0.5).abs() < 1e-3);
-        assert!((points.l5.1 + expected_l4_y).abs() < 1e-3);
+        assert!((points.l4.x - EARTH_MOON_DISTANCE * 0.5).abs() < 1e-3);
+        assert!((points.l4.y - expected_l4_y).abs() < 1e-3);
+        assert!((points.l5.x - EARTH_MOON_DISTANCE * 0.5).abs() < 1e-3);
+        assert!((points.l5.y + expected_l4_y).abs() < 1e-3);
     }
 }

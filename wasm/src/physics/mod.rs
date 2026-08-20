@@ -15,4 +15,5 @@ pub use gravity::{
     DEFAULT_GRAVITATIONAL_CONSTANT,
 };
 pub use integrator::{integrate_step, StepResult, MAX_TIME_STEP_SECONDS};
-pub use types::{Body, LagrangePointSet, PhysicsConfig, State};
+pub use types::{Body, LagrangePointSet, PhysicsConfig, State, Vec2};
+

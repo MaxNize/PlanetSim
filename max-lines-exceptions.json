@@ -21,6 +21,26 @@
             "approved_by": "arch-team"
         },
         {
+            "path": "wasm/src/physics/mod.rs",
+            "reason": "Physics re-exports and module definitions",
+            "approved_by": "arch-team"
+        },
+        {
+            "path": "wasm/src/physics/calculations.rs",
+            "reason": "Physics state calculations and energy computations",
+            "approved_by": "arch-team"
+        },
+        {
+            "path": "wasm/src/wasm/mod.rs",
+            "reason": "WASM Simulator binding implementation and JS interop",
+            "approved_by": "arch-team"
+        },
+        {
+            "path": "wasm/src/physics/types.rs",
+            "reason": "Vec2 2D vector algebra implementation and Serde tuple serialization",
+            "approved_by": "arch-team"
+        },
+        {
             "path": "wasm/src/physics/integrator.rs",
             "reason": "API documentation and runnable doctests for Velocity-Verlet integration",
             "approved_by": "arch-team"

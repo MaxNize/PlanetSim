@@ -47,15 +47,47 @@ function PresetSelector({ preset, setPreset, earthMoonLabel, binaryStarsLabel }:
   );
 }
 
+import { ThreeBodyControls } from './ThreeBodyControls';
+
+
+interface SpeedControlProps {
+  speedMultiplier: number;
+  setSpeedMultiplier: (v: number) => void;
+}
+
+function SpeedControl({ speedMultiplier, setSpeedMultiplier }: SpeedControlProps) {
+  const { t } = useI18n();
+  const [localSpeed, setLocalSpeed] = useState('');
+
+  useEffect(() => {
+    setLocalSpeed(speedMultiplier.toFixed(0));
+  }, [speedMultiplier]);
+
+  const commitSpeed = () => {
+    const v = parseFloat(localSpeed);
+    if (!isNaN(v) && v >= 1 && v <= 100000) setSpeedMultiplier(v);
+    else setLocalSpeed(speedMultiplier.toFixed(0));
+  };
+
+  return (
+    <div style={CONTROLS_LIST_STYLE}>
+      <ParameterField
+        label={t('controls.speedMultiplier')}
+        value={localSpeed}
+        onChangeText={setLocalSpeed}
+        onCommit={commitSpeed}
+        sliderMin={0}
+        sliderMax={5}
+        sliderVal={toLogValue(speedMultiplier)}
+        onSliderChange={(val) => setSpeedMultiplier(fromLogValue(val))}
+      />
+    </div>
+  );
+}
+
 /**
  * Renders parameter control inputs and preset selector buttons.
  */
-// Cyclomatic complexity is low (4); the high cognitive score is driven by 15 props and 7 hooks —
-// this is the standard "container passes all simulation-control state down to a presentational
-// component" pattern (Simulator.tsx owns the state, this just renders it). PresetSelector and
-// SandboxControls were already extracted above; further prop-bundling would need a matching
-// change in Simulator.tsx and doesn't reduce real complexity, just moves it into nested objects.
-// fallow-ignore-next-line complexity
 export function ParameterControls({
   massM1,
   setMassM1,
@@ -74,38 +106,6 @@ export function ParameterControls({
 }: ParameterControlsProps) {
   const { mode, setMode } = useSimulationContext();
   const { t } = useI18n();
-  const [localM1, setLocalM1] = useState('');
-  const [localM2, setLocalM2] = useState('');
-  const [localDist, setLocalDist] = useState('');
-  const [localSpeed, setLocalSpeed] = useState('');
-
-  useEffect(() => {
-    setLocalM1(massM1.toExponential(3));
-    setLocalM2(massM2.toExponential(3));
-    setLocalDist(distanceR.toExponential(3));
-    setLocalSpeed(speedMultiplier.toFixed(0));
-  }, [massM1, massM2, distanceR, speedMultiplier]);
-
-  const commitM1 = () => {
-    const v = parseFloat(localM1);
-    if (!isNaN(v) && v >= 1e21 && v <= 1e33) setMassM1(v);
-    else setLocalM1(massM1.toExponential(3));
-  };
-  const commitM2 = () => {
-    const v = parseFloat(localM2);
-    if (!isNaN(v) && v >= 1e21 && v <= 1e33) setMassM2(v);
-    else setLocalM2(massM2.toExponential(3));
-  };
-  const commitDist = () => {
-    const v = parseFloat(localDist);
-    if (!isNaN(v) && v >= 1e6 && v <= 1e11) setDistanceR(v);
-    else setLocalDist(distanceR.toExponential(3));
-  };
-  const commitSpeed = () => {
-    const v = parseFloat(localSpeed);
-    if (!isNaN(v) && v >= 1 && v <= 100000) setSpeedMultiplier(v);
-    else setLocalSpeed(speedMultiplier.toFixed(0));
-  };
 
   return (
     <div style={CONTAINER_STYLE}>
@@ -134,60 +134,23 @@ export function ParameterControls({
       {mode === 'sandbox' ? (
         <SandboxControls onOpenStressTest={onOpenStressTest} />
       ) : (
-        <div style={CONTROLS_LIST_STYLE}>
-          <ParameterField
-            label={t('controls.mass1')}
-            value={localM1}
-            onChangeText={setLocalM1}
-            onCommit={commitM1}
-            sliderMin={21}
-            sliderMax={33}
-            sliderVal={toLogValue(massM1)}
-            onSliderChange={(val) => setMassM1(fromLogValue(val))}
-            hint={formatMass(massM1)}
-          />
-          <ParameterField
-            label={t('controls.mass2')}
-            value={localM2}
-            onChangeText={setLocalM2}
-            onCommit={commitM2}
-            sliderMin={21}
-            sliderMax={33}
-            sliderVal={toLogValue(massM2)}
-            onSliderChange={(val) => setMassM2(fromLogValue(val))}
-            hint={formatMass(massM2)}
-          />
-          <ParameterField
-            label={t('controls.distanceR')}
-            value={localDist}
-            onChangeText={setLocalDist}
-            onCommit={commitDist}
-            sliderMin={6}
-            sliderMax={11}
-            sliderVal={toLogValue(distanceR)}
-            onSliderChange={(val) => setDistanceR(fromLogValue(val))}
-            hint={formatDistance(distanceR)}
-          />
-        </div>
+        <ThreeBodyControls
+          massM1={massM1}
+          setMassM1={setMassM1}
+          massM2={massM2}
+          setMassM2={setMassM2}
+          distanceR={distanceR}
+          setDistanceR={setDistanceR}
+        />
       )}
 
       <hr style={{ border: 'none', borderTop: '1px solid rgba(255, 255, 255, 0.08)', margin: '16px 0' }} />
 
-      <div style={CONTROLS_LIST_STYLE}>
-        <ParameterField
-          label={t('controls.speedMultiplier')}
-          value={localSpeed}
-          onChangeText={setLocalSpeed}
-          onCommit={commitSpeed}
-          sliderMin={0}
-          sliderMax={5}
-          sliderVal={toLogValue(speedMultiplier)}
-          onSliderChange={(val) => setSpeedMultiplier(fromLogValue(val))}
-        />
-      </div>
+      <SpeedControl speedMultiplier={speedMultiplier} setSpeedMultiplier={setSpeedMultiplier} />
 
       <hr style={{ border: 'none', borderTop: '1px solid rgba(255, 255, 255, 0.08)', margin: '16px 0' }} />
       <TrailControls />
     </div>
   );
 }
+
