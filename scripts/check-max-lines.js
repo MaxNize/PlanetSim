@@ -6,6 +6,9 @@
  * Validates that all source files comply with the 200-line maximum rule.
  * Consults max-lines-exceptions.json for approved exemptions.
  *
+ * Zero-dependency implementation (uses only Node.js standard fs and path modules)
+ * to allow execution in lean environments without installed node_modules.
+ *
  * Usage:
  *   node scripts/check-max-lines.js --exceptions max-lines-exceptions.json
  *
@@ -16,17 +19,17 @@
 
 const fs = require('fs');
 const path = require('path');
-const { globSync } = require('glob');
 
 const MAX_LINES = 200;
-const SKIP_DIRS = ['node_modules', 'target', 'dist', '.git', '.github', 'Docs/Wireframe'];
+const SKIP_DIRS = new Set(['node_modules', 'target', 'dist', '.git', '.github', 'Wireframe', 'pkg']);
+const ROOT_DIR = path.resolve(__dirname, '..');
 
 // Parse CLI args
 const args = process.argv.slice(2);
-let exceptionsPath = 'max-lines-exceptions.json';
+let exceptionsPath = path.join(ROOT_DIR, 'max-lines-exceptions.json');
 for (let i = 0; i < args.length; i++) {
     if (args[i] === '--exceptions' && args[i + 1]) {
-        exceptionsPath = args[i + 1];
+        exceptionsPath = path.resolve(args[i + 1]);
     }
 }
 
@@ -42,18 +45,33 @@ try {
 }
 
 /**
- * Check if a file path matches any exception glob pattern.
- * @param {string} filePath - relative file path
- * @returns {object|null} - matching exception or null
+ * Convert glob pattern to RegExp.
+ * @param {string} globPattern
+ * @returns {RegExp}
  */
-// fallow-ignore-next-line complexity
-function isExempt(filePath) {
-    const minimatchLib = require('minimatch');
-    const minimatch = (
-        minimatchLib && minimatchLib.minimatch
-    ) || (minimatchLib && minimatchLib.default) || minimatchLib;
-    for (const exempt of exceptions) {
-        if (minimatch(filePath, exempt.path)) {
+function globToRegex(globPattern) {
+    const normalized = globPattern.replace(/\\/g, '/');
+    const escaped = normalized
+        .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+        .replace(/\*\*/g, '.*')
+        .replace(/\*/g, '[^/]*');
+    return new RegExp(`^${escaped}$`);
+}
+
+const compiledExceptions = exceptions.map(ex => ({
+    ...ex,
+    regex: globToRegex(ex.path),
+}));
+
+/**
+ * Check if a file path matches any exception pattern.
+ * @param {string} relativeFilePath
+ * @returns {object|null}
+ */
+function isExempt(relativeFilePath) {
+    const normalized = relativeFilePath.replace(/\\/g, '/');
+    for (const exempt of compiledExceptions) {
+        if (exempt.regex.test(normalized)) {
             return exempt;
         }
     }
@@ -62,7 +80,7 @@ function isExempt(filePath) {
 
 /**
  * Count lines in a file.
- * @param {string} filePath - absolute file path
+ * @param {string} filePath
  * @returns {number}
  */
 function countLines(filePath) {
@@ -71,27 +89,44 @@ function countLines(filePath) {
 }
 
 /**
- * Walk directory recursively and find all source files.
- * @param {string} dir - directory to scan
- * @returns {string[]} - absolute file paths
+ * Recursively find source files.
+ * @param {string} dir
+ * @param {string} baseDir
+ * @param {string[]} fileList
+ * @returns {string[]}
  */
-function getSourceFiles(dir = '.') {
-    const patterns = [
-        'frontend/src/**/*.{ts,tsx}',
-        'wasm/src/**/*.rs',
-        'Docs/**/*.md',
-    ];
-
-    const fileSet = new Set();
-    for (const pattern of patterns) {
-        const files = globSync(pattern, {
-            ignore: SKIP_DIRS.map(d => `**/${d}/**`),
-            absolute: false,
-        });
-        files.forEach(f => fileSet.add(f));
+function walkDir(dir, baseDir, fileList = []) {
+    let entries = [];
+    try {
+        entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch {
+        return fileList;
     }
 
-    return Array.from(fileSet).sort();
+    for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        const relPath = path.relative(baseDir, fullPath).replace(/\\/g, '/');
+
+        if (entry.isDirectory()) {
+            if (!SKIP_DIRS.has(entry.name) && !relPath.startsWith('Docs/Wireframe')) {
+                walkDir(fullPath, baseDir, fileList);
+            }
+        } else if (entry.isFile()) {
+            if (
+                (relPath.startsWith('frontend/src/') && (relPath.endsWith('.ts') || relPath.endsWith('.tsx'))) ||
+                (relPath.startsWith('wasm/src/') && relPath.endsWith('.rs')) ||
+                (relPath.startsWith('Docs/') && relPath.endsWith('.md'))
+            ) {
+                fileList.push(relPath);
+            }
+        }
+    }
+    return fileList;
+}
+
+function getSourceFiles() {
+    const files = walkDir(ROOT_DIR, ROOT_DIR);
+    return files.sort();
 }
 
 // Main
@@ -99,7 +134,8 @@ const sourceFiles = getSourceFiles();
 let violations = [];
 
 for (const file of sourceFiles) {
-    const lineCount = countLines(file);
+    const absPath = path.join(ROOT_DIR, file);
+    const lineCount = countLines(absPath);
 
     if (lineCount > MAX_LINES) {
         const exempt = isExempt(file);
