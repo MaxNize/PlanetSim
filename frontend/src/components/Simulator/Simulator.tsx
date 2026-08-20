@@ -31,6 +31,7 @@ const CARD_STYLE = {
 /**
  * Container component that connects the global simulation context to presentational children.
  */
+// fallow-ignore-next-line complexity
 export function Simulator() {
   const {
     initialState,
