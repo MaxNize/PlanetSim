@@ -3,47 +3,42 @@
         {
             "path": "frontend/src/types/*.ts",
             "reason": "type clusters - related TypeScript interfaces and types grouped for maintainability",
-            "approved_by": "arch-team"
-        },
-        {
-            "path": "frontend/src/i18n/translations.ts",
-            "reason": "i18n translation dictionaries for multi-language support",
-            "approved_by": "arch-team"
+            "approved_by": "MaxNize"
         },
         {
             "path": "wasm/src/lib.rs",
             "reason": "rustdoc examples and WASM bindings - contains multiple documented exports with examples",
-            "approved_by": "arch-team"
+            "approved_by": "MaxNize"
         },
         {
             "path": "wasm/src/physics/gravity.rs",
             "reason": "API documentation and runnable doctests for gravitational calculations",
-            "approved_by": "arch-team"
+            "approved_by": "MaxNize"
         },
         {
             "path": "wasm/src/physics/mod.rs",
             "reason": "Physics re-exports and module definitions",
-            "approved_by": "arch-team"
+            "approved_by": "MaxNize"
         },
         {
             "path": "wasm/src/physics/calculations.rs",
             "reason": "Physics state calculations and energy computations",
-            "approved_by": "arch-team"
+            "approved_by": "MaxNize"
         },
         {
             "path": "wasm/src/wasm/mod.rs",
             "reason": "WASM Simulator binding implementation and JS interop",
-            "approved_by": "arch-team"
+            "approved_by": "MaxNize"
         },
         {
             "path": "wasm/src/physics/types.rs",
             "reason": "Vec2 2D vector algebra implementation and Serde tuple serialization",
-            "approved_by": "arch-team"
+            "approved_by": "MaxNize"
         },
         {
             "path": "wasm/src/physics/integrator.rs",
             "reason": "API documentation and runnable doctests for Velocity-Verlet integration",
-            "approved_by": "arch-team"
+            "approved_by": "MaxNize"
         },
         {
             "path": "Docs/Management/Project-Management/Specs/SPEC-001-project-setup-guardrails.md",
@@ -98,22 +93,22 @@
         {
             "path": "frontend/src/components/StressTest/StressTestModal.tsx",
             "reason": "Performance stress test benchmark modal containing controls and benchmark history list",
-            "approved_by": "arch-team"
+            "approved_by": "MaxNize"
         },
         {
             "path": "frontend/src/components/StressTest/StressTestModal.test.tsx",
             "reason": "Unit tests for StressTestModal covering quick spawn, benchmark runner, and threshold detection",
-            "approved_by": "arch-team"
+            "approved_by": "MaxNize"
         },
         {
             "path": "frontend/src/components/ParameterControls/ParameterControls.tsx",
             "reason": "Simulation system parameter controls panel container",
-            "approved_by": "arch-team"
+            "approved_by": "MaxNize"
         },
         {
             "path": "frontend/src/components/StateDisplay/StateDisplay.tsx",
             "reason": "Simulation telemetry display panel including real-time performance FPS telemetry",
-            "approved_by": "arch-team"
+            "approved_by": "MaxNize"
         }
     ]
 }
