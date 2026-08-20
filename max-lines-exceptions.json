@@ -81,6 +81,11 @@
             "approved_by": "arch-team"
         },
         {
+            "path": "frontend/src/components/StressTest/StressTestModal.test.tsx",
+            "reason": "Unit tests for StressTestModal covering quick spawn, benchmark runner, and threshold detection",
+            "approved_by": "arch-team"
+        },
+        {
             "path": "frontend/src/components/ParameterControls/ParameterControls.tsx",
             "reason": "Simulation system parameter controls panel container",
             "approved_by": "arch-team"
