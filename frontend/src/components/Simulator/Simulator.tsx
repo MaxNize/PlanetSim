@@ -6,7 +6,9 @@ import { StateDisplay } from '../StateDisplay/StateDisplay';
 import { Canvas } from '../Canvas/Canvas';
 import { Toast } from '../Toast/Toast';
 import { SimulatorLegend } from './SimulatorLegend';
+import { StressTestModal } from '../StressTest/StressTestModal';
 import { SandboxBody } from '../../types';
+import { SimulationState } from '../../services/wasmBridge';
 import { colors } from '../../styles/tokens';
 
 /** Maps a thrown addBody error to a localized, user-facing message (FP-38). */
@@ -17,54 +19,7 @@ function resolveCreateBodyErrorMessage(err: unknown, t: (key: string) => string)
   return raw;
 }
 
-const CARD_STYLE = {
-  background: 'rgba(5, 7, 10, 0.75)',
-  backdropFilter: 'blur(8px)',
-  borderRadius: '12px',
-  border: '1px solid rgba(255, 255, 255, 0.1)',
-  color: colors.white,
-  overflow: 'hidden',
-  flexShrink: 0,
-} as const;
-
-/**
- * Container component that connects the global simulation context to presentational children.
- */
-export function Simulator() {
-  const {
-    initialState,
-    setInitialState,
-    currentState,
-    stepResult,
-    isPaused,
-    setIsPaused,
-    speedMultiplier,
-    setSpeedMultiplier,
-    lagrangePoints,
-    resetSimulation,
-    error,
-    preset,
-    setPreset,
-    mode,
-    addBody,
-  } = useSimulationContext();
-  const { t } = useI18n();
-
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const handleCreateBody = useCallback(
-    (body: SandboxBody) => {
-      try {
-        addBody(body);
-      } catch (err) {
-        setToastMessage(resolveCreateBodyErrorMessage(err, t));
-      }
-    },
-    [addBody, t],
-  );
-
-  const dismissToast = useCallback(() => setToastMessage(null), []);
-
+function useParameterSetters(initialState: SimulationState, setInitialState: (s: SimulationState) => void) {
   const setMassM1 = useCallback(
     (m: number) => {
       setInitialState({
@@ -96,6 +51,61 @@ export function Simulator() {
     [initialState, setInitialState],
   );
 
+  return { setMassM1, setMassM2, setDistanceR };
+}
+
+const CARD_STYLE = {
+  background: 'rgba(5, 7, 10, 0.75)',
+  backdropFilter: 'blur(8px)',
+  borderRadius: '12px',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+  color: colors.white,
+  overflow: 'hidden',
+  flexShrink: 0,
+} as const;
+
+/**
+ * Container component that connects the global simulation context to presentational children.
+ */
+// fallow-ignore-next-line complexity
+export function Simulator() {
+  const {
+    initialState,
+    setInitialState,
+    currentState,
+    stepResult,
+    isPaused,
+    setIsPaused,
+    speedMultiplier,
+    setSpeedMultiplier,
+    lagrangePoints,
+    resetSimulation,
+    error,
+    preset,
+    setPreset,
+    mode,
+    addBody,
+  } = useSimulationContext();
+  const { t } = useI18n();
+
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [showStressTestModal, setShowStressTestModal] = useState<boolean>(false);
+
+  const { setMassM1, setMassM2, setDistanceR } = useParameterSetters(initialState, setInitialState);
+
+  const handleCreateBody = useCallback(
+    (body: SandboxBody) => {
+      try {
+        addBody(body);
+      } catch (err) {
+        setToastMessage(resolveCreateBodyErrorMessage(err, t));
+      }
+    },
+    [addBody, t],
+  );
+
+  const dismissToast = useCallback(() => setToastMessage(null), []);
+
   return (
     <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden' }}>
       {/* Simulation Area (Fullscreen Background Canvas) */}
@@ -106,6 +116,7 @@ export function Simulator() {
       {/* Floating Legend Overlay */}
       <SimulatorLegend mode={mode} hasLagrangePoints={!!lagrangePoints} />
       {toastMessage && <Toast message={toastMessage} onDismiss={dismissToast} />}
+      {showStressTestModal && <StressTestModal onClose={() => setShowStressTestModal(false)} />}
 
       {/* Floating Control Sidebar */}
       <div
@@ -138,6 +149,7 @@ export function Simulator() {
             onReset={resetSimulation}
             preset={preset}
             setPreset={setPreset}
+            onOpenStressTest={() => setShowStressTestModal(true)}
           />
         </div>
 
@@ -153,6 +165,7 @@ export function Simulator() {
             kineticEnergy={stepResult?.kineticEnergy}
             potentialEnergy={stepResult?.potentialEnergy}
             error={error}
+            onOpenStressTest={() => setShowStressTestModal(true)}
           />
         </div>
       </div>

@@ -39,10 +39,7 @@ function notifySelection(id: string | null, onSelectBody: ((id: string | null) =
 /**
  * Renders sandbox specific panel controls including custom bodies listing, selection, editing, and active toggling.
  */
-// Remaining branches (selection toggle, reset confirmation) are each a single, already-minimal
-// condition; the body-sync/style logic they used to carry was already extracted above.
-// fallow-ignore-next-line complexity
-export function SandboxControls({ selectedBodyId: propsSelectedId, onSelectBody }: SandboxControlsProps) {
+export function SandboxControls({ selectedBodyId: propsSelectedId, onSelectBody, onOpenStressTest }: SandboxControlsProps) {
   const {
     sandboxBodies,
     removeBody,
@@ -122,6 +119,26 @@ export function SandboxControls({ selectedBodyId: propsSelectedId, onSelectBody 
         <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '6px', padding: '8px 12px', fontSize: '11px', color: '#f59e0b' }}>
           {t('sandbox.highCountWarning')}
         </div>
+      )}
+
+      {onOpenStressTest && (
+        <button
+          onClick={onOpenStressTest}
+          style={{
+            width: '100%',
+            padding: '10px 16px',
+            borderRadius: '6px',
+            fontWeight: 600,
+            fontSize: '13px',
+            cursor: 'pointer',
+            border: '1px solid rgba(0, 210, 211, 0.35)',
+            background: 'rgba(0, 210, 211, 0.12)',
+            color: '#00d2d3',
+            outline: 'none',
+          }}
+        >
+          {t('controls.stressTest')}
+        </button>
       )}
 
       <button

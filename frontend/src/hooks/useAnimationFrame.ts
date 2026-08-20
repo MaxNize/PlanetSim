@@ -23,7 +23,9 @@ export function useAnimationFrame(callback: (deltaTime: number) => void, active:
     const animate = (time: number) => {
       if (previousTimeRef.current !== null) {
         const deltaTime = (time - previousTimeRef.current) / 1000.0; // convert milliseconds to seconds
-        callback(deltaTime);
+        if (deltaTime > 0) {
+          callback(deltaTime);
+        }
       }
       previousTimeRef.current = time;
       requestRef.current = requestAnimationFrame(animate);
