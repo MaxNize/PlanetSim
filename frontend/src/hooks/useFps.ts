@@ -6,6 +6,12 @@ export interface FpsMetrics {
   status: 'smooth' | 'moderate' | 'lag';
 }
 
+function calculateFpsMetrics(fps: number): FpsMetrics {
+  const frameTimeMs = fps > 0 ? 1000 / fps : 0;
+  const status: FpsMetrics['status'] = fps < 30 ? 'lag' : fps < 55 ? 'moderate' : 'smooth';
+  return { fps, frameTimeMs, status };
+}
+
 /**
  * Custom hook that tracks real-time frames per second (FPS) and frame render time (ms)
  * using performance.now() and requestAnimationFrame.
@@ -30,7 +36,6 @@ export function useFps(active: boolean = true): FpsMetrics {
       return;
     }
 
-    // fallow-ignore-next-line complexity
     const loop = (now: number) => {
       const times = frameTimesRef.current;
       times.push(now);
@@ -41,16 +46,7 @@ export function useFps(active: boolean = true): FpsMetrics {
       }
 
       if (now - lastUpdateRef.current >= 200) {
-        const fps = times.length;
-        const frameTimeMs = fps > 0 ? 1000 / fps : 0;
-        let status: 'smooth' | 'moderate' | 'lag' = 'smooth';
-        if (fps < 30) {
-          status = 'lag';
-        } else if (fps < 55) {
-          status = 'moderate';
-        }
-
-        setMetrics({ fps, frameTimeMs, status });
+        setMetrics(calculateFpsMetrics(times.length));
         lastUpdateRef.current = now;
       }
 

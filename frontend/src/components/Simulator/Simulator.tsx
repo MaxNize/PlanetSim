@@ -8,6 +8,7 @@ import { Toast } from '../Toast/Toast';
 import { SimulatorLegend } from './SimulatorLegend';
 import { StressTestModal } from '../StressTest/StressTestModal';
 import { SandboxBody } from '../../types';
+import { SimulationState } from '../../services/wasmBridge';
 import { colors } from '../../styles/tokens';
 
 /** Maps a thrown addBody error to a localized, user-facing message (FP-38). */
@@ -16,6 +17,41 @@ function resolveCreateBodyErrorMessage(err: unknown, t: (key: string) => string)
   if (raw.startsWith('Maximum')) return t('sandbox.maxBodiesReached');
   if (raw.startsWith('Overlap')) return t('sandbox.overlapDetected');
   return raw;
+}
+
+function useParameterSetters(initialState: SimulationState, setInitialState: (s: SimulationState) => void) {
+  const setMassM1 = useCallback(
+    (m: number) => {
+      setInitialState({
+        ...initialState,
+        primary: { ...initialState.primary, mass: m },
+      });
+    },
+    [initialState, setInitialState],
+  );
+
+  const setMassM2 = useCallback(
+    (m: number) => {
+      setInitialState({
+        ...initialState,
+        secondary: { ...initialState.secondary, mass: m },
+      });
+    },
+    [initialState, setInitialState],
+  );
+
+  const setDistanceR = useCallback(
+    (d: number) => {
+      setInitialState({
+        ...initialState,
+        secondary: { ...initialState.secondary, position: [d, 0.0] },
+        testParticle: { ...initialState.testParticle, position: [d * 0.78, 0.0] },
+      });
+    },
+    [initialState, setInitialState],
+  );
+
+  return { setMassM1, setMassM2, setDistanceR };
 }
 
 const CARD_STYLE = {
@@ -55,6 +91,8 @@ export function Simulator() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showStressTestModal, setShowStressTestModal] = useState<boolean>(false);
 
+  const { setMassM1, setMassM2, setDistanceR } = useParameterSetters(initialState, setInitialState);
+
   const handleCreateBody = useCallback(
     (body: SandboxBody) => {
       try {
@@ -67,37 +105,6 @@ export function Simulator() {
   );
 
   const dismissToast = useCallback(() => setToastMessage(null), []);
-
-  const setMassM1 = useCallback(
-    (m: number) => {
-      setInitialState({
-        ...initialState,
-        primary: { ...initialState.primary, mass: m },
-      });
-    },
-    [initialState, setInitialState],
-  );
-
-  const setMassM2 = useCallback(
-    (m: number) => {
-      setInitialState({
-        ...initialState,
-        secondary: { ...initialState.secondary, mass: m },
-      });
-    },
-    [initialState, setInitialState],
-  );
-
-  const setDistanceR = useCallback(
-    (d: number) => {
-      setInitialState({
-        ...initialState,
-        secondary: { ...initialState.secondary, position: [d, 0.0] },
-        testParticle: { ...initialState.testParticle, position: [d * 0.78, 0.0] },
-      });
-    },
-    [initialState, setInitialState],
-  );
 
   return (
     <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden' }}>
