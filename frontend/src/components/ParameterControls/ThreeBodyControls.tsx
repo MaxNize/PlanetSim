@@ -16,14 +16,10 @@ interface ThreeBodyControlsProps {
   setDistanceR: (v: number) => void;
 }
 
-export function ThreeBodyControls({
-  massM1,
-  setMassM1,
-  massM2,
-  setMassM2,
-  distanceR,
-  setDistanceR,
-}: ThreeBodyControlsProps) {
+/**
+ * Presentational component for 3-body system parameter controls (masses and distance).
+ */
+export function ThreeBodyControls({ massM1, setMassM1, massM2, setMassM2, distanceR, setDistanceR }: ThreeBodyControlsProps) {
   const { t } = useI18n();
   const [localM1, setLocalM1] = useState('');
   const [localM2, setLocalM2] = useState('');
