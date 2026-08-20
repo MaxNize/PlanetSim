@@ -15,6 +15,7 @@ on:
 jobs:
   commit-lint:
     name: Commit Message Lint
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: read
