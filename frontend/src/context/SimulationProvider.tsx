@@ -9,6 +9,7 @@ import { useSandbox } from './useSandbox';
 import { useTrailHistory } from './useTrailHistory';
 import { useBodyTracking } from '../hooks/useBodyTracking';
 import { useMiniview } from '../hooks/useMiniview';
+import { useFps } from '../hooks/useFps';
 
 function enrichBodies(
   bodies: (Body & { id?: string; name?: string; color?: string; locked?: boolean })[],
@@ -132,9 +133,20 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     [simulator, mode],
   );
 
-  const { setMode, addBody, removeBody, updateBody } = useSandbox(sandboxBodies, setSandboxBodies, currentState, setCurrentState, setInitialState, setIsPaused, setStepResult, setModeState, simulator);
+  const { setMode, addBody, addBodies, removeBody, updateBody } = useSandbox(
+    sandboxBodies,
+    setSandboxBodies,
+    currentState,
+    setCurrentState,
+    setInitialState,
+    setIsPaused,
+    setStepResult,
+    setModeState,
+    simulator,
+  );
   const { trackedBodyId, setTrackedBodyId, toggleTracking } = useBodyTracking(currentState, mode);
   const { miniviewBodyId, setMiniviewBodyId, toggleMiniview } = useMiniview(currentState, mode);
+  const { fps, frameTimeMs, status: fpsStatus } = useFps(!isPaused);
 
   return (
     <simulationContext.Provider
@@ -164,6 +176,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         setMode,
         sandboxBodies,
         addBody,
+        addBodies,
         removeBody,
         updateBody,
         selectedBodyId,
@@ -174,6 +187,9 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         miniviewBodyId,
         setMiniviewBodyId,
         toggleMiniview,
+        fps,
+        frameTimeMs,
+        fpsStatus,
       }}
     >
       {children}

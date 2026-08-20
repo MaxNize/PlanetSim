@@ -15,6 +15,7 @@ export interface ParameterControlsProps {
   onReset: () => void;
   preset: 'earth-moon' | 'binary-stars' | 'custom';
   setPreset: (preset: 'earth-moon' | 'binary-stars' | 'custom') => void;
+  onOpenStressTest?: () => void;
 }
 
 /**
@@ -31,6 +32,7 @@ export interface StateDisplayProps {
   kineticEnergy: number | undefined;
   potentialEnergy: number | undefined;
   error: string | null;
+  onOpenStressTest?: () => void;
 }
 
 /**
@@ -68,4 +70,5 @@ export interface SandboxBody {
 export interface SandboxControlsProps {
   selectedBodyId?: string | null;
   onSelectBody?: (id: string | null) => void;
+  onOpenStressTest?: () => void;
 }
