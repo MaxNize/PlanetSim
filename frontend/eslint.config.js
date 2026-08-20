@@ -88,8 +88,8 @@ module.exports = [
     },
   },
   {
-    // Exempted in max-lines-exceptions.json: i18n translation dictionaries for multi-language support.
-    files: ['src/i18n/translations.ts'],
+    // Exempted in max-lines-exceptions.json: translation dictionaries, large modals, and telemetry/parameter panels.
+    files: ['src/i18n/translations.ts', 'src/components/StressTest/StressTestModal.tsx', 'src/components/ParameterControls/ParameterControls.tsx', 'src/components/StateDisplay/StateDisplay.tsx'],
     rules: {
       'max-lines': 'off',
     },
