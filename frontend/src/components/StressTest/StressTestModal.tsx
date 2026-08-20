@@ -1,160 +1,22 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React from 'react';
 import { useSimulationContext } from '../../context/SimulationContext';
 import { useI18n } from '../../context/I18nContext';
-import { generateStressTestBodies } from '../../utils/stressTestUtils';
+import { useStressTestBenchmark } from './useStressTestBenchmark';
 import { colors } from '../../styles/tokens';
-
-interface BenchmarkStage {
-  bodyCount: number;
-  avgFps: number;
-  status: 'passing' | 'dropping';
-}
 
 interface StressTestModalProps {
   onClose: () => void;
 }
-
-const BATCH_SIZES = [25, 50, 75, 100, 150, 200, 250, 300, 400, 500, 600, 750, 1000];
 
 /**
  *
  */
 // fallow-ignore-next-line complexity
 export function StressTestModal({ onClose }: StressTestModalProps) {
-  const { mode, setMode, currentState, addBodies, fps, setIsPaused } = useSimulationContext();
+  const { fps } = useSimulationContext();
   const { t } = useI18n();
 
-  const [isRunning, setIsRunning] = useState(false);
-  const [benchmarkStep, setBenchmarkStep] = useState<number | null>(null);
-  const [stages, setStages] = useState<BenchmarkStage[]>([]);
-  const [thresholdResult, setThresholdResult] = useState<{ bodyCount: number; avgFps: number } | null>(null);
-  const [statusText, setStatusText] = useState<string | null>(null);
-
-  const fpsSamplesRef = useRef<number[]>([]);
-
-  const fpsRef = useRef(fps);
-  useEffect(() => {
-    fpsRef.current = fps;
-  }, [fps]);
-
-  const currentStateRef = useRef(currentState);
-  useEffect(() => {
-    currentStateRef.current = currentState;
-  }, [currentState]);
-
-  const addBodiesRef = useRef(addBodies);
-  useEffect(() => {
-    addBodiesRef.current = addBodies;
-  }, [addBodies]);
-
-  // Collect live FPS samples while benchmark is running
-  useEffect(() => {
-    if (isRunning) {
-      fpsSamplesRef.current.push(fps);
-    }
-  }, [fps, isRunning]);
-
-  const activeBodyCount = mode === 'sandbox' && currentState.bodies ? currentState.bodies.length : 3;
-
-  const spawnBulkBodies = useCallback(
-    (count: number) => {
-      if (mode !== 'sandbox') {
-        setMode('sandbox');
-      }
-      setIsPaused(false);
-
-      const currentCount = currentState.bodies ? currentState.bodies.length : 3;
-      const newBodies = generateStressTestBodies(count, currentCount);
-
-      try {
-        addBodiesRef.current(newBodies);
-      } catch (e) {
-        console.warn('Could not add bodies during stress test:', e);
-      }
-    },
-    [mode, setMode, setIsPaused, currentState.bodies],
-  );
-
-  const stopBenchmark = useCallback(() => {
-    setIsRunning(false);
-    setBenchmarkStep(null);
-    setStatusText(null);
-  }, []);
-
-  const startBenchmark = useCallback(() => {
-    if (mode !== 'sandbox') {
-      setMode('sandbox');
-    }
-    setIsPaused(false);
-
-    setStages([]);
-    setThresholdResult(null);
-    setIsRunning(true);
-    setStatusText(t('stressTest.testing'));
-    fpsSamplesRef.current = [];
-    setBenchmarkStep(0);
-  }, [mode, setMode, setIsPaused, t]);
-
-  // Step-by-step benchmark runner driven purely by benchmarkStep state transitions
-  // fallow-ignore-next-line complexity
-  useEffect(() => {
-    if (!isRunning || benchmarkStep === null) return;
-
-    fpsSamplesRef.current = [];
-
-    // fallow-ignore-next-line complexity
-    const timer = setTimeout(() => {
-      const samples = fpsSamplesRef.current;
-      const avg = samples.length > 0 ? samples.reduce((a, b) => a + b, 0) / samples.length : fpsRef.current;
-      fpsSamplesRef.current = [];
-
-      const latestState = currentStateRef.current;
-      const liveBodies = mode === 'sandbox' && latestState.bodies ? latestState.bodies.length : 3;
-      const roundedAvg = Math.round(avg * 10) / 10;
-      const isDropping = roundedAvg < 58.0;
-
-      const newStage: BenchmarkStage = {
-        bodyCount: liveBodies,
-        avgFps: roundedAvg,
-        status: isDropping ? 'dropping' : 'passing',
-      };
-
-      setStages((prev) => [...prev, newStage]);
-
-      // Only treat performance drop as threshold after baseline stage
-      if (isDropping && benchmarkStep > 0) {
-        setThresholdResult({ bodyCount: liveBodies, avgFps: roundedAvg });
-        setIsRunning(false);
-        setBenchmarkStep(null);
-        setStatusText(null);
-        return;
-      }
-
-      if (benchmarkStep >= BATCH_SIZES.length) {
-        setIsRunning(false);
-        setBenchmarkStep(null);
-        setStatusText(null);
-        return;
-      }
-
-      // Calculate next target count and spawn additional bodies for next step
-      const targetCount = BATCH_SIZES[benchmarkStep];
-      const needed = Math.max(0, targetCount - liveBodies);
-
-      if (needed > 0) {
-        const generated = generateStressTestBodies(needed, liveBodies);
-        try {
-          addBodiesRef.current(generated);
-        } catch (err) {
-          console.warn(err);
-        }
-      }
-
-      setBenchmarkStep((prev) => (prev !== null ? prev + 1 : null));
-    }, 1400);
-
-    return () => clearTimeout(timer);
-  }, [isRunning, benchmarkStep, mode]);
+  const { isRunning, activeBodyCount, stages, thresholdResult, statusText, startBenchmark, stopBenchmark, spawnBulkBodies } = useStressTestBenchmark();
 
   return (
     <div
