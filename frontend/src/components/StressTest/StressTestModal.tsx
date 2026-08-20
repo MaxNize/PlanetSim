@@ -19,6 +19,7 @@ const BATCH_SIZES = [25, 50, 75, 100, 150, 200, 250, 300, 400, 500, 600, 750, 10
 /**
  *
  */
+// fallow-ignore-next-line complexity
 export function StressTestModal({ onClose }: StressTestModalProps) {
   const { mode, setMode, currentState, addBodies, fps, setIsPaused } = useSimulationContext();
   const { t } = useI18n();
@@ -95,6 +96,7 @@ export function StressTestModal({ onClose }: StressTestModalProps) {
   }, [mode, setMode, setIsPaused, t]);
 
   // Step-by-step benchmark runner driven purely by benchmarkStep state transitions
+  // fallow-ignore-next-line complexity
   useEffect(() => {
     if (!isRunning || benchmarkStep === null) return;
 

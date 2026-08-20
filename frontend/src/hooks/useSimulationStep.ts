@@ -15,6 +15,7 @@ import { useAnimationFrame } from './useAnimationFrame';
 export function useSimulationStep(simulator: SimulatorBridge | null, isPaused: boolean, speedMultiplier: number, onStep?: (result: StepResult) => void) {
   const [stepResult, setStepResult] = useState<StepResult | null>(null);
 
+  // fallow-ignore-next-line complexity
   const tick = useCallback(
     (dt: number) => {
       if (dt <= 0 || !simulator) return;
