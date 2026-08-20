@@ -6,6 +6,7 @@ import { StateDisplay } from '../StateDisplay/StateDisplay';
 import { Canvas } from '../Canvas/Canvas';
 import { Toast } from '../Toast/Toast';
 import { SimulatorLegend } from './SimulatorLegend';
+import { StressTestModal } from '../StressTest/StressTestModal';
 import { SandboxBody } from '../../types';
 import { colors } from '../../styles/tokens';
 
@@ -51,6 +52,7 @@ export function Simulator() {
   const { t } = useI18n();
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [showStressTestModal, setShowStressTestModal] = useState<boolean>(false);
 
   const handleCreateBody = useCallback(
     (body: SandboxBody) => {
@@ -106,6 +108,7 @@ export function Simulator() {
       {/* Floating Legend Overlay */}
       <SimulatorLegend mode={mode} hasLagrangePoints={!!lagrangePoints} />
       {toastMessage && <Toast message={toastMessage} onDismiss={dismissToast} />}
+      {showStressTestModal && <StressTestModal onClose={() => setShowStressTestModal(false)} />}
 
       {/* Floating Control Sidebar */}
       <div
@@ -138,6 +141,7 @@ export function Simulator() {
             onReset={resetSimulation}
             preset={preset}
             setPreset={setPreset}
+            onOpenStressTest={() => setShowStressTestModal(true)}
           />
         </div>
 
@@ -153,6 +157,7 @@ export function Simulator() {
             kineticEnergy={stepResult?.kineticEnergy}
             potentialEnergy={stepResult?.potentialEnergy}
             error={error}
+            onOpenStressTest={() => setShowStressTestModal(true)}
           />
         </div>
       </div>

@@ -17,7 +17,7 @@ export function useSimulationStep(simulator: SimulatorBridge | null, isPaused: b
 
   const tick = useCallback(
     (dt: number) => {
-      if (!simulator) return;
+      if (dt <= 0 || !simulator) return;
 
       const simDt = dt * speedMultiplier;
       try {

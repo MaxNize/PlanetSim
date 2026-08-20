@@ -37,7 +37,7 @@ export function useCanvasViewport({ canvasRef, currentState, trackedBodyId }: Ca
 
   const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
     const zoomFactor = e.deltaY > 0 ? 0.85 : 1.15;
-    setViewport((prev) => ({ ...prev, scale: Math.max(1e-9, Math.min(1e-4, prev.scale * zoomFactor)) }));
+    setViewport((prev) => ({ ...prev, scale: Math.max(1e-15, Math.min(1e-4, prev.scale * zoomFactor)) }));
   };
 
   return { viewport, setViewport, dimensions, handleWheel };

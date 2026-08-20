@@ -33,6 +33,7 @@ export interface SimulationContextType {
   setMode: (mode: SimulationMode) => void;
   sandboxBodies: SandboxBody[];
   addBody: (body: SandboxBody) => void;
+  addBodies: (bodies: SandboxBody[]) => void;
   removeBody: (id: string) => void;
   updateBody: (id: string, updates: Partial<SandboxBody>) => void;
   selectedBodyId: string | null;
@@ -45,6 +46,10 @@ export interface SimulationContextType {
   miniviewBodyId: string | null;
   setMiniviewBodyId: (id: string | null) => void;
   toggleMiniview: (body: SandboxBody) => void;
+  // FPS Performance metrics
+  fps: number;
+  frameTimeMs: number;
+  fpsStatus: 'smooth' | 'moderate' | 'lag';
 }
 
 export const simulationContext = createContext<SimulationContextType | null>(null);
