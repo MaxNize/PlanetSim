@@ -102,6 +102,7 @@ export function StressTestModal({ onClose }: StressTestModalProps) {
 
     fpsSamplesRef.current = [];
 
+    // fallow-ignore-next-line complexity
     const timer = setTimeout(() => {
       const samples = fpsSamplesRef.current;
       const avg = samples.length > 0 ? samples.reduce((a, b) => a + b, 0) / samples.length : fpsRef.current;
