@@ -70,6 +70,7 @@ export function ParameterControls({
   onReset,
   preset,
   setPreset,
+  onOpenStressTest,
 }: ParameterControlsProps) {
   const { mode, setMode } = useSimulationContext();
   const { t } = useI18n();
@@ -131,7 +132,7 @@ export function ParameterControls({
       </div>
 
       {mode === 'sandbox' ? (
-        <SandboxControls />
+        <SandboxControls onOpenStressTest={onOpenStressTest} />
       ) : (
         <div style={CONTROLS_LIST_STYLE}>
           <ParameterField

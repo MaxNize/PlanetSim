@@ -8,7 +8,7 @@ import { SimulationState, SimulatorBridge, StepResult } from '../services/wasmBr
  * at 100 bodies, ~1.3ms/step at 200, ~7.1ms/step at 500 (60 FPS gives a ~16.6ms/frame budget, shared
  * with rendering). 300 keeps physics well under that budget with headroom for rendering.
  */
-export const MAX_SANDBOX_BODIES = 300;
+export const MAX_SANDBOX_BODIES = 1000;
 
 interface LatestBody {
   id?: string;
@@ -161,5 +161,17 @@ export function useSandbox(
     [sandboxBodies, currentState, simulator, setSandboxBodies, setCurrentState],
   );
 
-  return { setMode, addBody, removeBody, updateBody };
+  const addBodies = useCallback(
+    (newBodies: SandboxBody[]) => {
+      if (sandboxBodies.length + newBodies.length > MAX_SANDBOX_BODIES) {
+        throw new Error(`Maximum ${MAX_SANDBOX_BODIES} bodies reached`);
+      }
+      const latestBodies = currentState.bodies || sandboxBodies;
+      const updatedSandbox = syncBodyKinematics(sandboxBodies, latestBodies);
+      commitSandboxBodies([...updatedSandbox, ...newBodies], currentState, setSandboxBodies, setCurrentState, simulator);
+    },
+    [sandboxBodies, currentState, simulator, setSandboxBodies, setCurrentState],
+  );
+
+  return { setMode, addBody, addBodies, removeBody, updateBody };
 }

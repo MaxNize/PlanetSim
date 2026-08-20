@@ -1,7 +1,9 @@
+import React from 'react';
 import { BodyPlacementDialog } from '../BodyPlacementDialog/BodyPlacementDialog';
 import { BodyContextMenu, BodyContextMenuActions } from '../BodyContextMenu/BodyContextMenu';
 import { BodyEditDialog } from '../BodyEditDialog/BodyEditDialog';
 import { SandboxBody } from '../../types';
+import { useSimulationContext } from '../../context/SimulationContext';
 
 export interface CanvasOverlaysProps extends BodyContextMenuActions {
   contextMenu: { x: number; y: number; body: SandboxBody } | null;
@@ -16,9 +18,7 @@ export interface CanvasOverlaysProps extends BodyContextMenuActions {
   onPlacementDialogCancel: () => void;
 }
 
-/** Renders the context menu, edit dialog, and placement dialog overlays for the canvas, each conditionally. */
-// 3 independently-optional overlays bundled into one component to keep Canvas itself small; the
-// prop count is the sum of what each of those 3 pieces needs, not accidental sprawl.
+/** Renders the context menu, edit dialog, placement dialog, and live FPS HUD overlay on the canvas. */
 // fallow-ignore-next-line complexity
 export function CanvasOverlays({
   contextMenu,
@@ -40,8 +40,50 @@ export function CanvasOverlays({
   onPlacementConfirm,
   onPlacementDialogCancel,
 }: CanvasOverlaysProps) {
+  const { fps, fpsStatus, mode, currentState } = useSimulationContext();
+  const bodyCount = mode === 'sandbox' && currentState.bodies ? currentState.bodies.length : 3;
+
   return (
     <>
+      {/* Floating Canvas HUD for FPS and Body Count */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '16px',
+          left: '16px',
+          zIndex: 10,
+          background: 'rgba(5, 7, 10, 0.75)',
+          backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          borderRadius: '8px',
+          padding: '6px 12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: '12px',
+          fontWeight: 600,
+          color: '#fff',
+          pointerEvents: 'none',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span
+            style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: fpsStatus === 'smooth' ? '#2ed573' : fpsStatus === 'moderate' ? '#feca57' : '#ff6b6b',
+              boxShadow: `0 0 8px ${fpsStatus === 'smooth' ? '#2ed573' : fpsStatus === 'moderate' ? '#feca57' : '#ff6b6b'}`,
+            }}
+          />
+          <span style={{ color: fpsStatus === 'smooth' ? '#2ed573' : fpsStatus === 'moderate' ? '#feca57' : '#ff6b6b' }}>{fps !== undefined ? fps : 60} FPS</span>
+        </div>
+        <span style={{ color: 'rgba(255, 255, 255, 0.2)' }}>|</span>
+        <span style={{ color: '#cbd5e1' }}>{bodyCount} Bodies</span>
+      </div>
+
       {contextMenu && (
         <BodyContextMenu
           body={contextMenu.body}
