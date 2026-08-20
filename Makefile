@@ -38,16 +38,16 @@ build:
 
 lint:
 	@echo "Running linters"
-	cd frontend && npm run lint || true
-	cd wasm && cargo clippy --all-targets -- -D warnings || true
-	./scripts/check_rust_naming.sh || true
+	cd frontend && npm run lint
+	cd wasm && cargo clippy --all-targets -- -D warnings
+	./scripts/check_rust_naming.sh
 	@echo "Checking max-lines compliance..."
-	node scripts/check-max-lines.js --exceptions max-lines-exceptions.json || true
+	node scripts/check-max-lines.js --exceptions max-lines-exceptions.json
 	@echo "Checking markdown linting..."
-	npm run lint:md || true
+	npm run lint:md
 
 format:
-	cd frontend && npm run format || true
+	cd frontend && npm run format
 
 test:
 	@echo "Running tests"
