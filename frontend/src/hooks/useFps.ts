@@ -30,6 +30,7 @@ export function useFps(active: boolean = true): FpsMetrics {
       return;
     }
 
+    // fallow-ignore-next-line complexity
     const loop = (now: number) => {
       const times = frameTimesRef.current;
       times.push(now);

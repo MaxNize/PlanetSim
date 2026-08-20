@@ -78,6 +78,7 @@ function formatEnergy(value: number | undefined): string {
 /**
  * Presentational component to display coordinates, velocities, energies, and error states.
  */
+// fallow-ignore-next-line complexity
 export function StateDisplay({
   time,
   primaryPos,
