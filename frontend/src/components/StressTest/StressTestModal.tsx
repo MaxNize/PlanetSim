@@ -88,11 +88,13 @@ export function StressTestModal({ onClose }: StressTestModalProps) {
           }}
         >
           <div>
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: colors.textMuted }}>Current Workload:</span>
-            <div style={{ fontSize: '18px', fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" }}>{activeBodyCount} Bodies</div>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: colors.textMuted }}>{t('stressTest.currentWorkload')}</span>
+            <div style={{ fontSize: '18px', fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" }}>
+              {activeBodyCount} {t('stressTest.bodies')}
+            </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: colors.textMuted }}>Live Frame Rate:</span>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: colors.textMuted }}>{t('stressTest.liveFrameRate')}</span>
             <div
               style={{
                 fontSize: '18px',
@@ -194,11 +196,13 @@ export function StressTestModal({ onClose }: StressTestModalProps) {
         {/* Stage Log Table */}
         {stages.length > 0 && (
           <div data-testid="benchmark-log-history" style={{ background: 'rgba(0, 0, 0, 0.3)', borderRadius: '10px', padding: '12px', maxHeight: '160px', overflowY: 'auto' }}>
-            <div style={{ fontSize: '11px', textTransform: 'uppercase', color: colors.textMuted, marginBottom: '8px', fontWeight: 600 }}>Benchmark Log History</div>
+            <div style={{ fontSize: '11px', textTransform: 'uppercase', color: colors.textMuted, marginBottom: '8px', fontWeight: 600 }}>{t('stressTest.logHistory')}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontFamily: "'JetBrains Mono', monospace", fontSize: '12px' }}>
               {stages.map((st, idx) => (
                 <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', color: st.status === 'dropping' ? '#ff6b6b' : '#2ed573' }}>
-                  <span>{st.bodyCount} Bodies</span>
+                  <span>
+                    {st.bodyCount} {t('stressTest.bodies')}
+                  </span>
                   <span>{st.avgFps} FPS</span>
                 </div>
               ))}

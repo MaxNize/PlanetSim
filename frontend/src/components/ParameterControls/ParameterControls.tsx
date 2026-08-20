@@ -7,7 +7,6 @@ import { useSimulationContext } from '../../context/SimulationContext';
 import { useI18n } from '../../context/I18nContext';
 import { CONTAINER_STYLE, HEADER_STYLE, CONTROLS_LIST_STYLE, BUTTONS_ROW_STYLE, PLAY_BUTTON_STYLE, RESET_BUTTON_STYLE, TABS_STYLE, TAB_BUTTON_STYLE } from './styles';
 import { colors } from '../../styles/tokens';
-import { formatMass, formatDistance } from '../../utils/formatUnits';
 
 const toLogValue = (val: number) => Math.log10(val);
 const fromLogValue = (logVal: number) => Math.pow(10, logVal);
@@ -48,7 +47,6 @@ function PresetSelector({ preset, setPreset, earthMoonLabel, binaryStarsLabel }:
 }
 
 import { ThreeBodyControls } from './ThreeBodyControls';
-
 
 interface SpeedControlProps {
   speedMultiplier: number;
@@ -134,14 +132,7 @@ export function ParameterControls({
       {mode === 'sandbox' ? (
         <SandboxControls onOpenStressTest={onOpenStressTest} />
       ) : (
-        <ThreeBodyControls
-          massM1={massM1}
-          setMassM1={setMassM1}
-          massM2={massM2}
-          setMassM2={setMassM2}
-          distanceR={distanceR}
-          setDistanceR={setDistanceR}
-        />
+        <ThreeBodyControls massM1={massM1} setMassM1={setMassM1} massM2={massM2} setMassM2={setMassM2} distanceR={distanceR} setDistanceR={setDistanceR} />
       )}
 
       <hr style={{ border: 'none', borderTop: '1px solid rgba(255, 255, 255, 0.08)', margin: '16px 0' }} />
@@ -153,4 +144,3 @@ export function ParameterControls({
     </div>
   );
 }
-
