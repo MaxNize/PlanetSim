@@ -12,6 +12,7 @@ const MAX_SUB_STEP_SECONDS = 5;
 /** Hard cap on sub-steps per animation frame, bounding worst-case per-frame WASM cost at extreme speed multipliers. */
 const MAX_SUB_STEPS_PER_FRAME = 200;
 
+// fallow-ignore-next-line complexity
 function performStep(simulator: SimulatorBridge | null, dt: number, speedMultiplier: number): StepResult | null {
   if (dt <= 0 || !simulator) return null;
   const totalDt = dt * speedMultiplier;

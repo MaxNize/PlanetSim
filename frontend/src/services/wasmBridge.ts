@@ -68,12 +68,14 @@ function isVec2(value: unknown): value is [number, number] {
   return Array.isArray(value) && value.length === 2 && isFiniteNumber(value[0]) && isFiniteNumber(value[1]);
 }
 
+// fallow-ignore-next-line complexity
 function isBody(value: unknown): value is Body {
   if (typeof value !== 'object' || value === null) return false;
   const b = value as Record<string, unknown>;
   return isVec2(b.position) && isVec2(b.velocity) && isFiniteNumber(b.mass) && isFiniteNumber(b.radius);
 }
 
+// fallow-ignore-next-line complexity
 function isSimulationState(value: unknown): value is SimulationState {
   if (typeof value !== 'object' || value === null) return false;
   const s = value as Record<string, unknown>;
@@ -83,12 +85,14 @@ function isSimulationState(value: unknown): value is SimulationState {
   return true;
 }
 
+// fallow-ignore-next-line complexity
 function isStepResult(value: unknown): value is StepResult {
   if (typeof value !== 'object' || value === null) return false;
   const r = value as Record<string, unknown>;
   return isSimulationState(r.newState) && isFiniteNumber(r.kineticEnergy) && isFiniteNumber(r.potentialEnergy);
 }
 
+// fallow-ignore-next-line complexity
 function isLagrangePointSet(value: unknown): value is LagrangePointSet {
   if (typeof value !== 'object' || value === null) return false;
   const l = value as Record<string, unknown>;

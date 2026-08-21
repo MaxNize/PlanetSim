@@ -1,41 +1,10 @@
 import { useMemo } from 'react';
 import { SimulationState, StepResult, LagrangePointSet } from '../services/wasmBridge';
-import { TrailHistory, SimulationMode, SandboxBody } from '../types';
-import { SimulationContextType, PresetType } from './SimulationContext';
+import { TrailHistory } from '../types';
+import { SimulationContextType } from './SimulationContext';
 import { SimulationAnimationContextType } from './SimulationAnimationContext';
 
-interface UiContextInputs {
-  initialState: SimulationState;
-  setInitialState: (state: SimulationState) => void;
-  isPaused: boolean;
-  setIsPaused: (paused: boolean) => void;
-  speedMultiplier: number;
-  setSpeedMultiplier: (multiplier: number) => void;
-  clearTrailHistory: () => void;
-  showTrail: boolean;
-  setShowTrail: (show: boolean) => void;
-  trailLength: number;
-  setTrailLength: (length: number) => void;
-  resetSimulation: () => void;
-  error: string | null;
-  preset: PresetType;
-  setPreset: (preset: PresetType) => void;
-  mode: SimulationMode;
-  setMode: (mode: SimulationMode) => void;
-  sandboxBodies: SandboxBody[];
-  addBody: (body: SandboxBody) => void;
-  addBodies: (bodies: SandboxBody[]) => void;
-  removeBody: (id: string) => void;
-  updateBody: (id: string, updates: Partial<SandboxBody>) => void;
-  selectedBodyId: string | null;
-  setSelectedBodyId: (id: string | null) => void;
-  trackedBodyId: string | null;
-  setTrackedBodyId: (id: string | null) => void;
-  toggleTracking: (body: SandboxBody) => void;
-  miniviewBodyId: string | null;
-  setMiniviewBodyId: (id: string | null) => void;
-  toggleMiniview: (body: SandboxBody) => void;
-}
+type UiContextInputs = SimulationContextType;
 
 interface AnimationContextInputs {
   currentState: SimulationState;

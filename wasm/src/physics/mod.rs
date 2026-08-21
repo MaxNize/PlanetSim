@@ -3,8 +3,11 @@
 pub mod calculations;
 pub mod gravity;
 pub mod integrator;
+mod integrator_energy;
+mod integrator_kinematics;
 pub mod n_body;
 pub mod types;
+pub mod vec2;
 
 #[cfg(test)]
 pub mod fixtures;

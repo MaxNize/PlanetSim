@@ -20,7 +20,7 @@ describe('TrailControls', () => {
     contextMock.showTrail = true;
     render(<TrailControls />);
 
-    const checkbox = screen.getByRole('checkbox');
+    const checkbox = screen.getByRole<HTMLInputElement>('checkbox');
     expect(checkbox.checked).toBe(true);
 
     fireEvent.click(checkbox);
