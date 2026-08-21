@@ -43,6 +43,27 @@ describe('useSimulationStep hook', () => {
     expect(result.current.stepResult).toBe(stepResult);
   });
 
+  it('breaks a large scaled time step into bounded sub-steps instead of one huge leap', () => {
+    const stepResult = { time: 1.0 } as unknown as StepResult;
+    const simulator = { step: vi.fn(() => stepResult) } as unknown as SimulatorBridge;
+
+    const raf = mockRequestAnimationFrame();
+    // dt ~0.0167s * 10000x speed ~= 167s of simulation time in one frame.
+    const { result } = renderHook(() => useSimulationStep(simulator, false, 10000));
+
+    act(() => {
+      raf.fire(1000.0);
+      raf.fire(1016.7);
+    });
+
+    const calls = (simulator.step as ReturnType<typeof vi.fn>).mock.calls as [number][];
+    expect(calls.length).toBeGreaterThan(1);
+    calls.forEach(([subDt]) => expect(subDt).toBeLessThanOrEqual(5));
+    const total = calls.reduce((sum, [subDt]) => sum + subDt, 0);
+    expect(total).toBeCloseTo(0.0167 * 10000, 0);
+    expect(result.current.stepResult).toBe(stepResult);
+  });
+
   it('does nothing when the simulator is null', () => {
     const raf = mockRequestAnimationFrame();
     const { result } = renderHook(() => useSimulationStep(null, false, 1));

@@ -26,9 +26,10 @@ fn integrate_step_advances_time_and_preserves_circular_orbit_energy_reasonably()
     let initial_energy =
         kinetic_energy(&initial_state) + potential_energy(&initial_state);
     let mut state = initial_state;
+    let mut scratch = NBodyScratch::default();
 
     for _ in 0..500 {
-        state = integrate_step(&state, 10.0).new_state;
+        state = integrate_step(&state, 10.0, &mut scratch).new_state;
     }
 
     let final_energy = kinetic_energy(&state) + potential_energy(&state);
@@ -53,7 +54,8 @@ fn integrate_step_n_body_test() {
         Some(vec![b1, b2, b3]),
     );
 
-    let res = integrate_step(&initial_state, 10.0);
+    let mut scratch = NBodyScratch::default();
+    let res = integrate_step(&initial_state, 10.0, &mut scratch);
     let next_state = res.new_state;
 
     assert_eq!(next_state.time, 10.0);

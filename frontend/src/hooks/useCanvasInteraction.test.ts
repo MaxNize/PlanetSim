@@ -3,6 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useCanvasInteraction } from './useCanvasInteraction';
 import { simulationContext, DEFAULT_INITIAL_STATE } from '../context/SimulationContext';
+import { simulationAnimationContext } from '../context/SimulationAnimationContext';
 import { SandboxBody } from '../types';
 
 const trackedBody: SandboxBody = { id: 'body-0', position: [1e8, 2e8], velocity: [0, 0], mass: 1e24, radius: 1e6, color: '#fff', name: 'Tracked' };
@@ -36,7 +37,8 @@ function renderWithContext(mode: 'sandbox' | '3body', bodies: SandboxBody[]) {
     },
   };
 
-  const wrapper = ({ children }: { children: React.ReactNode }) => React.createElement(simulationContext.Provider, { value: contextValue }, children);
+  const wrapper = ({ children }: { children: React.ReactNode }) =>
+    React.createElement(simulationContext.Provider, { value: contextValue }, React.createElement(simulationAnimationContext.Provider, { value: contextValue }, children));
 
   const { result, rerender } = renderHook(() => useCanvasInteraction({ canvasRef }), { wrapper });
   rerenderFn = rerender;

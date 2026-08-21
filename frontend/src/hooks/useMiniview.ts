@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { SimulationState } from '../services/wasmBridge';
 import { SandboxBody, SimulationMode } from '../types';
 
@@ -21,9 +21,9 @@ export function useMiniview(currentState: SimulationState, mode: SimulationMode)
     }
   }, [currentState, miniviewBodyId]);
 
-  const toggleMiniview = (body: SandboxBody) => {
+  const toggleMiniview = useCallback((body: SandboxBody) => {
     setMiniviewBodyId((prev) => (prev === body.id ? null : body.id));
-  };
+  }, []);
 
   return { miniviewBodyId, setMiniviewBodyId, toggleMiniview };
 }

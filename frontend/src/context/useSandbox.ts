@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { SandboxBody, SimulationMode } from '../types';
 import { SimulationState, SimulatorBridge, StepResult } from '../services/wasmBridge';
 
@@ -74,8 +74,18 @@ export function useSandbox(
   setModeState: React.Dispatch<React.SetStateAction<SimulationMode>>,
   simulator: SimulatorBridge | null,
 ) {
+  // currentState/sandboxBodies change up to 60x/sec while the simulation runs. Reading them via
+  // ref (kept fresh on every render) instead of a useCallback dependency keeps setMode/addBody/etc.
+  // referentially stable across animation frames, so consumers subscribed only to these actions
+  // (not to currentState itself) don't re-render on every step.
+  const currentStateRef = useRef(currentState);
+  currentStateRef.current = currentState;
+  const sandboxBodiesRef = useRef(sandboxBodies);
+  sandboxBodiesRef.current = sandboxBodies;
+
   const setMode = useCallback(
     (newMode: SimulationMode) => {
+      const currentState = currentStateRef.current;
       setModeState(newMode);
       setIsPaused(true);
       setStepResult(null);
@@ -125,31 +135,37 @@ export function useSandbox(
         }
       }
     },
-    [currentState, simulator, setModeState, setIsPaused, setStepResult, setSandboxBodies, setCurrentState],
+    [simulator, setModeState, setIsPaused, setStepResult, setSandboxBodies, setCurrentState],
   );
 
   const addBody = useCallback(
     (body: SandboxBody) => {
+      const currentState = currentStateRef.current;
+      const sandboxBodies = sandboxBodiesRef.current;
       if (sandboxBodies.length >= MAX_SANDBOX_BODIES) throw new Error(`Maximum ${MAX_SANDBOX_BODIES} bodies reached`);
       const latestBodies = currentState.bodies || sandboxBodies;
       if (hasOverlap(body, latestBodies)) throw new Error('Overlap detected with another body');
       const updatedSandbox = syncBodyKinematics(sandboxBodies, latestBodies);
       commitSandboxBodies([...updatedSandbox, body], currentState, setSandboxBodies, setCurrentState, simulator);
     },
-    [sandboxBodies, currentState, simulator, setSandboxBodies, setCurrentState],
+    [simulator, setSandboxBodies, setCurrentState],
   );
 
   const removeBody = useCallback(
     (id: string) => {
+      const currentState = currentStateRef.current;
+      const sandboxBodies = sandboxBodiesRef.current;
       const latestBodies = currentState.bodies || sandboxBodies;
       const updatedSandbox = syncBodyKinematics(sandboxBodies, latestBodies).filter((b) => b.id !== id);
       commitSandboxBodies(updatedSandbox, currentState, setSandboxBodies, setCurrentState, simulator);
     },
-    [sandboxBodies, currentState, simulator, setSandboxBodies, setCurrentState],
+    [simulator, setSandboxBodies, setCurrentState],
   );
 
   const updateBody = useCallback(
     (id: string, updates: Partial<SandboxBody>) => {
+      const currentState = currentStateRef.current;
+      const sandboxBodies = sandboxBodiesRef.current;
       const latestBodies = currentState.bodies || sandboxBodies;
       const updatedSandbox = sandboxBodies.map((sb, idx) => {
         const { position, velocity } = resolveCurrentKinematics(sb, latestBodies, idx);
@@ -158,11 +174,13 @@ export function useSandbox(
       });
       commitSandboxBodies(updatedSandbox, currentState, setSandboxBodies, setCurrentState, simulator);
     },
-    [sandboxBodies, currentState, simulator, setSandboxBodies, setCurrentState],
+    [simulator, setSandboxBodies, setCurrentState],
   );
 
   const addBodies = useCallback(
     (newBodies: SandboxBody[]) => {
+      const currentState = currentStateRef.current;
+      const sandboxBodies = sandboxBodiesRef.current;
       if (sandboxBodies.length + newBodies.length > MAX_SANDBOX_BODIES) {
         throw new Error(`Maximum ${MAX_SANDBOX_BODIES} bodies reached`);
       }
@@ -170,7 +188,7 @@ export function useSandbox(
       const updatedSandbox = syncBodyKinematics(sandboxBodies, latestBodies);
       commitSandboxBodies([...updatedSandbox, ...newBodies], currentState, setSandboxBodies, setCurrentState, simulator);
     },
-    [sandboxBodies, currentState, simulator, setSandboxBodies, setCurrentState],
+    [simulator, setSandboxBodies, setCurrentState],
   );
 
   return { setMode, addBody, addBodies, removeBody, updateBody };

@@ -89,6 +89,20 @@ function countLines(filePath) {
 }
 
 /**
+ * Check whether a path refers to a test file, which is excluded from the line limit.
+ * @param {string} relativeFilePath
+ * @returns {boolean}
+ */
+function isTestFile(relativeFilePath) {
+    const normalized = relativeFilePath.replace(/\\/g, '/');
+    return (
+        /\.test\.(ts|tsx)$/.test(normalized) ||
+        /_tests?\.rs$/.test(normalized) ||
+        /\/tests\.rs$/.test(normalized)
+    );
+}
+
+/**
  * Recursively find source files.
  * @param {string} dir
  * @param {string} baseDir
@@ -112,6 +126,9 @@ function walkDir(dir, baseDir, fileList = []) {
                 walkDir(fullPath, baseDir, fileList);
             }
         } else if (entry.isFile()) {
+            if (isTestFile(relPath)) {
+                continue;
+            }
             if (
                 (relPath.startsWith('frontend/src/') && (relPath.endsWith('.ts') || relPath.endsWith('.tsx'))) ||
                 (relPath.startsWith('wasm/src/') && relPath.endsWith('.rs')) ||

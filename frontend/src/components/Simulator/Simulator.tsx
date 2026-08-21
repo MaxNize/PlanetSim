@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useSimulationContext } from '../../context/SimulationContext';
+import { useSimulationAnimation } from '../../context/SimulationAnimationContext';
 import { useI18n } from '../../context/I18nContext';
 import { ParameterControls } from '../ParameterControls/ParameterControls';
 import { StateDisplay } from '../StateDisplay/StateDisplay';
@@ -69,27 +70,14 @@ const CARD_STYLE = {
  */
 // fallow-ignore-next-line complexity
 export function Simulator() {
-  const {
-    initialState,
-    setInitialState,
-    currentState,
-    stepResult,
-    isPaused,
-    setIsPaused,
-    speedMultiplier,
-    setSpeedMultiplier,
-    lagrangePoints,
-    resetSimulation,
-    error,
-    preset,
-    setPreset,
-    mode,
-    addBody,
-  } = useSimulationContext();
+  const { initialState, setInitialState, isPaused, setIsPaused, speedMultiplier, setSpeedMultiplier, resetSimulation, error, preset, setPreset, mode, addBody } = useSimulationContext();
+  const { currentState, stepResult, lagrangePoints } = useSimulationAnimation();
   const { t } = useI18n();
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showStressTestModal, setShowStressTestModal] = useState<boolean>(false);
+  const openStressTest = useCallback(() => setShowStressTestModal(true), []);
+  const closeStressTest = useCallback(() => setShowStressTestModal(false), []);
 
   const { setMassM1, setMassM2, setDistanceR } = useParameterSetters(initialState, setInitialState);
 
@@ -116,7 +104,7 @@ export function Simulator() {
       {/* Floating Legend Overlay */}
       <SimulatorLegend mode={mode} hasLagrangePoints={!!lagrangePoints} />
       {toastMessage && <Toast message={toastMessage} onDismiss={dismissToast} />}
-      {showStressTestModal && <StressTestModal onClose={() => setShowStressTestModal(false)} />}
+      {showStressTestModal && <StressTestModal onClose={closeStressTest} />}
 
       {/* Floating Control Sidebar */}
       <div
@@ -149,7 +137,7 @@ export function Simulator() {
             onReset={resetSimulation}
             preset={preset}
             setPreset={setPreset}
-            onOpenStressTest={() => setShowStressTestModal(true)}
+            onOpenStressTest={openStressTest}
           />
         </div>
 
@@ -165,7 +153,7 @@ export function Simulator() {
             kineticEnergy={stepResult?.kineticEnergy}
             potentialEnergy={stepResult?.potentialEnergy}
             error={error}
-            onOpenStressTest={() => setShowStressTestModal(true)}
+            onOpenStressTest={openStressTest}
           />
         </div>
       </div>

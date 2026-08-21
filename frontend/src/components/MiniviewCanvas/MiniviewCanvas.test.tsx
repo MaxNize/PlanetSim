@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { simulationContext, DEFAULT_INITIAL_STATE } from '../../context/SimulationContext';
+import { simulationAnimationContext } from '../../context/SimulationAnimationContext';
 import { MiniviewCanvas } from './MiniviewCanvas';
 import * as CanvasRendererModule from '../../services/CanvasRenderer';
 
@@ -16,7 +17,9 @@ function renderMiniview() {
   };
   render(
     <simulationContext.Provider value={mockContextValue as any}>
-      <MiniviewCanvas bodyId="body-0" onClose={vi.fn()} />
+      <simulationAnimationContext.Provider value={mockContextValue as any}>
+        <MiniviewCanvas bodyId="body-0" onClose={vi.fn()} />
+      </simulationAnimationContext.Provider>
     </simulationContext.Provider>,
   );
 }

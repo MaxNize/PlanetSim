@@ -2,11 +2,13 @@ import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import { useSimulationContext } from './SimulationContext';
+import { useSimulationAnimation } from './SimulationAnimationContext';
 import { SimulationProvider } from './SimulationProvider';
 
 // Helper component to consume context and expose fields for assertion
 function TestConsumer() {
-  const { currentState, initialState, isPaused, setIsPaused, speedMultiplier, setSpeedMultiplier, resetSimulation, history, preset, setPreset } = useSimulationContext();
+  const { initialState, isPaused, setIsPaused, speedMultiplier, setSpeedMultiplier, resetSimulation, preset, setPreset } = useSimulationContext();
+  const { currentState, history } = useSimulationAnimation();
 
   return (
     <div>

@@ -85,8 +85,14 @@ function SpeedControl({ speedMultiplier, setSpeedMultiplier }: SpeedControlProps
 
 /**
  * Renders parameter control inputs and preset selector buttons.
+ *
+ * Memoized: this panel only reads low-frequency SimulationContext state (mode/setMode), but its
+ * parent (Simulator) also subscribes to the 60Hz SimulationAnimationContext for live telemetry —
+ * without React.memo, every animation frame would still re-render this whole control panel via
+ * the normal parent-to-child cascade, even though none of its own inputs changed.
  */
-export function ParameterControls({
+// eslint-disable-next-line @typescript-eslint/naming-convention -- React.memo(Component) is the standard PascalCase idiom; the rule has no carve-out for it.
+export const ParameterControls = React.memo(function ParameterControls({
   massM1,
   setMassM1,
   massM2,
@@ -143,4 +149,4 @@ export function ParameterControls({
       <TrailControls />
     </div>
   );
-}
+});

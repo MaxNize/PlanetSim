@@ -1,25 +1,24 @@
 import { createContext, useContext } from 'react';
-import { SimulationState, StepResult, LagrangePointSet } from '../services/wasmBridge';
-import { TrailHistory, SimulationMode, SandboxBody } from '../types';
+import { SimulationState } from '../services/wasmBridge';
+import { SimulationMode, SandboxBody } from '../types';
 import { DEFAULT_INITIAL_STATE, PresetType, EARTH_MOON_PRESET, BINARY_STARS_PRESET } from './presets';
 
 export { DEFAULT_INITIAL_STATE, EARTH_MOON_PRESET, BINARY_STARS_PRESET };
 export type { PresetType };
 
+/**
+ * Low-frequency simulation UI state — presets, pause/speed controls, sandbox body list,
+ * selection. Updates only on user interaction, unlike {@link SimulationAnimationContextType}
+ * which changes on every animation frame. See `context/SimulationAnimationContext.tsx`.
+ */
 export interface SimulationContextType {
   initialState: SimulationState;
   setInitialState: (state: SimulationState) => void;
-  currentState: SimulationState;
-  stepResult: StepResult | null;
   isPaused: boolean;
   setIsPaused: (paused: boolean) => void;
   speedMultiplier: number;
   setSpeedMultiplier: (multiplier: number) => void;
-  lagrangePoints: LagrangePointSet | null;
-  trailHistory: TrailHistory;
   clearTrailHistory: () => void;
-  history: [number, number][]; // Backwards compatibility
-  clearHistory: () => void; // Backwards compatibility
   showTrail: boolean;
   setShowTrail: (show: boolean) => void;
   trailLength: number;
@@ -46,10 +45,6 @@ export interface SimulationContextType {
   miniviewBodyId: string | null;
   setMiniviewBodyId: (id: string | null) => void;
   toggleMiniview: (body: SandboxBody) => void;
-  // FPS Performance metrics
-  fps: number;
-  frameTimeMs: number;
-  fpsStatus: 'smooth' | 'moderate' | 'lag';
 }
 
 export const simulationContext = createContext<SimulationContextType | null>(null);

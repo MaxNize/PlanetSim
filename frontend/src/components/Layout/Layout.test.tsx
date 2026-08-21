@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { simulationContext, DEFAULT_INITIAL_STATE } from '../../context/SimulationContext';
+import { simulationAnimationContext } from '../../context/SimulationAnimationContext';
 import { Layout } from './Layout';
 
 describe('Layout component', () => {
@@ -26,7 +27,9 @@ describe('Layout component', () => {
 
     render(
       <simulationContext.Provider value={mockContextValue as any}>
-        <Layout />
+        <simulationAnimationContext.Provider value={mockContextValue as any}>
+          <Layout />
+        </simulationAnimationContext.Provider>
       </simulationContext.Provider>,
     );
 

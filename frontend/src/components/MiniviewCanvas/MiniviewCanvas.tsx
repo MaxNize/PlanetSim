@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { useSimulationContext } from '../../context/SimulationContext';
+import { useSimulationAnimation } from '../../context/SimulationAnimationContext';
 import { CanvasRenderer, ViewportConfig } from '../../services/CanvasRenderer';
 import { useI18n } from '../../context/I18nContext';
 import { colors } from '../../styles/tokens';
@@ -26,7 +27,8 @@ function computeFocusViewport(body: { position: [number, number]; radius: number
 export function MiniviewCanvas({ bodyId, onClose }: MiniviewCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<CanvasRenderer | null>(null);
-  const { currentState, trailHistory, lagrangePoints, selectedBodyId } = useSimulationContext();
+  const { selectedBodyId } = useSimulationContext();
+  const { currentState, trailHistory, lagrangePoints } = useSimulationAnimation();
   const { t } = useI18n();
   const [zoomFactor, setZoomFactor] = useState(1);
 

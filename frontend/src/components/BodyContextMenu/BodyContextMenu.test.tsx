@@ -117,4 +117,25 @@ describe('BodyContextMenu Component', () => {
 
     expect(screen.getByText(/Hide Miniview/)).toBeInTheDocument();
   });
+
+  it('closes when a mousedown lands outside the menu', () => {
+    const props = renderMenu();
+
+    fireEvent.mouseDown(document.body);
+    expect(props.onClose).toHaveBeenCalled();
+  });
+
+  it('does not close when a mousedown lands inside the menu', () => {
+    const props = renderMenu();
+
+    fireEvent.mouseDown(screen.getByTestId('body-context-menu'));
+    expect(props.onClose).not.toHaveBeenCalled();
+  });
+
+  it('renders the delete option in a muted color when the body is locked', () => {
+    renderMenu({ body: { ...mockBody, locked: true } });
+
+    const deleteBtn = screen.getByText('❌ Delete');
+    expect(deleteBtn.style.color).toBe('rgb(100, 116, 139)');
+  });
 });

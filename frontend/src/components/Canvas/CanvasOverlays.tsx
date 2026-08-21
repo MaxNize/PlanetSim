@@ -4,6 +4,7 @@ import { BodyContextMenu, BodyContextMenuActions } from '../BodyContextMenu/Body
 import { BodyEditDialog } from '../BodyEditDialog/BodyEditDialog';
 import { SandboxBody } from '../../types';
 import { useSimulationContext } from '../../context/SimulationContext';
+import { useSimulationAnimation } from '../../context/SimulationAnimationContext';
 
 export interface CanvasOverlaysProps extends BodyContextMenuActions {
   contextMenu: { x: number; y: number; body: SandboxBody } | null;
@@ -40,7 +41,8 @@ export function CanvasOverlays({
   onPlacementConfirm,
   onPlacementDialogCancel,
 }: CanvasOverlaysProps) {
-  const { fps, fpsStatus, mode, currentState } = useSimulationContext();
+  const { mode } = useSimulationContext();
+  const { fps, fpsStatus, currentState } = useSimulationAnimation();
   const bodyCount = mode === 'sandbox' && currentState.bodies ? currentState.bodies.length : 3;
 
   return (

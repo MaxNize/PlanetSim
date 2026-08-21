@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::gravity::{acceleration_from_force, distance, force_between};
-use super::n_body::integrate_n_body;
+use super::n_body::{integrate_n_body, NBodyScratch};
 use super::types::{Body, State, Vec2};
 
 /// Maximum allowed time step in simulation seconds.
@@ -29,18 +29,19 @@ pub struct StepResult {
 ///
 /// # Examples
 /// ```
-/// use planet_sim_wasm::physics::{Body, State, integrate_step, Vec2};
+/// use planet_sim_wasm::physics::{Body, NBodyScratch, State, integrate_step, Vec2};
 ///
 /// let primary = Body::new(Vec2::new(0.0, 0.0), Vec2::new(0.0, 0.0), 1.989e30, 6.96e8);
 /// let secondary = Body::new(Vec2::new(1.496e11, 0.0), Vec2::new(0.0, 29780.0), 5.972e24, 6.371e6);
 /// let test_particle = Body::new(Vec2::new(1.50e11, 0.0), Vec2::new(0.0, 30000.0), 1000.0, 10.0);
 /// let state = State::new(primary, secondary, test_particle, 0.0, 6.67430e-11);
 ///
-/// let result = integrate_step(&state, 1.0);
+/// let mut scratch = NBodyScratch::default();
+/// let result = integrate_step(&state, 1.0, &mut scratch);
 /// assert!(result.new_state.time > 0.0);
 /// assert!(result.kinetic_energy > 0.0);
 /// ```
-pub fn integrate_step(state: &State, dt: f64) -> StepResult {
+pub fn integrate_step(state: &State, dt: f64, n_body_scratch: &mut NBodyScratch) -> StepResult {
     assert!(dt > 0.0, "dt must be positive");
     assert!(
         dt < MAX_TIME_STEP_SECONDS,
@@ -50,7 +51,7 @@ pub fn integrate_step(state: &State, dt: f64) -> StepResult {
     let g = state.gravitational_constant;
 
     if let Some(ref list) = state.bodies {
-        let new_bodies = integrate_n_body(list, g, dt);
+        let new_bodies = integrate_n_body(list, g, dt, n_body_scratch);
 
         let mut ke = 0.0;
         for b in &new_bodies {
@@ -166,8 +167,8 @@ fn advance_vel_and_body(
 
 fn pairwise_acc(src: &Body, tgt: &Body, g: f64) -> Vec2 {
     let r = distance(src.position, tgt.position);
-    assert!(r > 0.0, "bodies must not occupy the same position");
-
+    // Coincident (or NaN) bodies are softened rather than panicking: r.max(1000.0)
+    // returns 1000.0 for r == 0.0 or r.is_nan(), matching n_body_acc's guard behavior.
     let r_safe = r.max(1000.0);
     let force = force_between(src.mass, tgt.mass, r_safe, g);
     let a_mag = acceleration_from_force(force, tgt.mass);

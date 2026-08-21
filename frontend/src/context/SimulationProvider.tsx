@@ -1,15 +1,17 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { SimulationState, StepResult, LagrangePointSet, Body, SimulatorBridge } from '../services/wasmBridge';
 import { useSimulation } from '../hooks/useSimulation';
 import { useSimulationStep } from '../hooks/useSimulationStep';
 import { SimulationMode, SandboxBody } from '../types';
 import { DEFAULT_INITIAL_STATE, PresetType, getPresetState } from './presets';
 import { simulationContext } from './SimulationContext';
+import { simulationAnimationContext } from './SimulationAnimationContext';
 import { useSandbox } from './useSandbox';
 import { useTrailHistory } from './useTrailHistory';
 import { useBodyTracking } from '../hooks/useBodyTracking';
 import { useMiniview } from '../hooks/useMiniview';
 import { useFps } from '../hooks/useFps';
+import { useSimulationContextValues } from './useSimulationContextValues';
 
 function enrichBodies(
   bodies: (Body & { id?: string; name?: string; color?: string; locked?: boolean })[],
@@ -36,12 +38,12 @@ function refreshLagrangePoints(simulator: SimulatorBridge, setLagrangePoints: (p
 }
 
 /**
- * Context provider that manages the simulation engine state and lifecycle.
+ * Context provider managing the simulation engine state and lifecycle. This is the app's single
+ * top-level state provider; its high hook count is the React context-provider pattern itself (one
+ * useState/useCallback per piece of shared state), not accidental branching — the preset/sandbox/
+ * trail concerns already extracted into useSandbox/useTrailHistory/presets/useSimulationContextValues
+ * are as far as this can be decomposed without prop-drilling multiple contexts through every consumer.
  */
-// This is the app's single top-level state provider; its high hook count is the React context-provider
-// pattern itself (one useState/useCallback per piece of shared state), not accidental branching — the
-// preset/sandbox/trail concerns already extracted into useSandbox/useTrailHistory/presets are as far as
-// this can be decomposed without prop-drilling multiple contexts through every consumer.
 // fallow-ignore-next-line complexity
 export function SimulationProvider({ children }: { children: React.ReactNode }) {
   const [mode, setModeState] = useState<SimulationMode>('3body');
@@ -55,7 +57,6 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
   const [lagrangePoints, setLagrangePoints] = useState<LagrangePointSet | null>(null);
   const [resetCounter, setResetCounter] = useState<number>(0);
   const [preset, setPresetState] = useState<PresetType>('earth-moon');
-
   const { simulator, error } = useSimulation(initialState, resetCounter);
   const { trailHistory, trailLength, recordStep, resetTrail, setTrailLength } = useTrailHistory(DEFAULT_INITIAL_STATE);
 
@@ -91,8 +92,12 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
   );
 
   const { stepResult, setStepResult } = useSimulationStep(simulator, isPaused, speedMultiplier, handleStep);
-
-  const clearTrailHistory = useCallback(() => resetTrail(currentState), [currentState, resetTrail]);
+  // currentState updates up to 60x/sec while running; reading it via ref instead of a useCallback
+  // dependency keeps clearTrailHistory referentially stable so it can live in the low-frequency
+  // SimulationContext without dragging that context's value into churning every animation frame.
+  const currentStateRef = useRef(currentState);
+  currentStateRef.current = currentState;
+  const clearTrailHistory = useCallback(() => resetTrail(currentStateRef.current), [resetTrail]);
 
   const resetSimulation = useCallback(() => {
     resetTrail(initialState);
@@ -148,51 +153,47 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
   const { miniviewBodyId, setMiniviewBodyId, toggleMiniview } = useMiniview(currentState, mode);
   const { fps, frameTimeMs, status: fpsStatus } = useFps(!isPaused);
 
+  // Split into two contexts (low-frequency UI state vs. 60Hz animation data) so components that
+  // only need e.g. the preset/pause controls don't re-render on every simulation step.
+  const { uiContextValue, animationContextValue } = useSimulationContextValues(
+    {
+      initialState,
+      setInitialState: setInitialStateAndSync,
+      isPaused,
+      setIsPaused,
+      speedMultiplier,
+      setSpeedMultiplier,
+      clearTrailHistory,
+      showTrail,
+      setShowTrail,
+      trailLength,
+      setTrailLength,
+      resetSimulation,
+      error,
+      preset,
+      setPreset,
+      mode,
+      setMode,
+      sandboxBodies,
+      addBody,
+      addBodies,
+      removeBody,
+      updateBody,
+      selectedBodyId,
+      setSelectedBodyId,
+      trackedBodyId,
+      setTrackedBodyId,
+      toggleTracking,
+      miniviewBodyId,
+      setMiniviewBodyId,
+      toggleMiniview,
+    },
+    { currentState, stepResult, lagrangePoints, trailHistory, clearTrailHistory, fps, frameTimeMs, fpsStatus },
+  );
+
   return (
-    <simulationContext.Provider
-      value={{
-        initialState,
-        setInitialState: setInitialStateAndSync,
-        currentState,
-        stepResult,
-        isPaused,
-        setIsPaused,
-        speedMultiplier,
-        setSpeedMultiplier,
-        lagrangePoints,
-        trailHistory,
-        clearTrailHistory,
-        history: trailHistory.testParticle,
-        clearHistory: clearTrailHistory,
-        showTrail,
-        setShowTrail,
-        trailLength,
-        setTrailLength,
-        resetSimulation,
-        error,
-        preset,
-        setPreset,
-        mode,
-        setMode,
-        sandboxBodies,
-        addBody,
-        addBodies,
-        removeBody,
-        updateBody,
-        selectedBodyId,
-        setSelectedBodyId,
-        trackedBodyId,
-        setTrackedBodyId,
-        toggleTracking,
-        miniviewBodyId,
-        setMiniviewBodyId,
-        toggleMiniview,
-        fps,
-        frameTimeMs,
-        fpsStatus,
-      }}
-    >
-      {children}
+    <simulationContext.Provider value={uiContextValue}>
+      <simulationAnimationContext.Provider value={animationContextValue}>{children}</simulationAnimationContext.Provider>
     </simulationContext.Provider>
   );
 }

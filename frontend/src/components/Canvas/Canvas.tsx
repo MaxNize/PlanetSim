@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { useSimulationContext } from '../../context/SimulationContext';
+import { useSimulationAnimation } from '../../context/SimulationAnimationContext';
 import { CanvasRenderer } from '../../services/CanvasRenderer';
 import { useCanvasInteraction } from '../../hooks/useCanvasInteraction';
 import { computePlacementPreview, getCanvasCursor } from './canvasVisuals';
@@ -23,7 +24,8 @@ export function Canvas({ showTrail = true, onPlacementComplete }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<CanvasRenderer | null>(null);
 
-  const { currentState, lagrangePoints, trailHistory, showTrail: contextShowTrail, selectedBodyId, removeBody, updateBody, miniviewBodyId, setMiniviewBodyId, toggleMiniview } = useSimulationContext();
+  const { showTrail: contextShowTrail, selectedBodyId, removeBody, updateBody, miniviewBodyId, setMiniviewBodyId, toggleMiniview } = useSimulationContext();
+  const { currentState, lagrangePoints, trailHistory } = useSimulationAnimation();
   const activeShowTrail = showTrail && contextShowTrail;
 
   const {
