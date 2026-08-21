@@ -60,6 +60,41 @@ export interface LagrangePointSet {
   l5: [number, number];
 }
 
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+function isVec2(value: unknown): value is [number, number] {
+  return Array.isArray(value) && value.length === 2 && isFiniteNumber(value[0]) && isFiniteNumber(value[1]);
+}
+
+function isBody(value: unknown): value is Body {
+  if (typeof value !== 'object' || value === null) return false;
+  const b = value as Record<string, unknown>;
+  return isVec2(b.position) && isVec2(b.velocity) && isFiniteNumber(b.mass) && isFiniteNumber(b.radius);
+}
+
+function isSimulationState(value: unknown): value is SimulationState {
+  if (typeof value !== 'object' || value === null) return false;
+  const s = value as Record<string, unknown>;
+  if (!isBody(s.primary) || !isBody(s.secondary) || !isBody(s.testParticle)) return false;
+  if (!isFiniteNumber(s.time) || !isFiniteNumber(s.gravitationalConstant)) return false;
+  if (s.bodies !== undefined && (!Array.isArray(s.bodies) || !s.bodies.every(isBody))) return false;
+  return true;
+}
+
+function isStepResult(value: unknown): value is StepResult {
+  if (typeof value !== 'object' || value === null) return false;
+  const r = value as Record<string, unknown>;
+  return isSimulationState(r.newState) && isFiniteNumber(r.kineticEnergy) && isFiniteNumber(r.potentialEnergy);
+}
+
+function isLagrangePointSet(value: unknown): value is LagrangePointSet {
+  if (typeof value !== 'object' || value === null) return false;
+  const l = value as Record<string, unknown>;
+  return isVec2(l.l1) && isVec2(l.l2) && isVec2(l.l3) && isVec2(l.l4) && isVec2(l.l5);
+}
+
 /**
  * Service bridge wrapper providing type-safe interaction with the WebAssembly physics engine.
  *
@@ -87,7 +122,11 @@ export class SimulatorBridge {
    * @returns The updated simulation state and energy breakdown
    */
   public step(dt: number): StepResult {
-    return this.simulator.step(dt) as StepResult;
+    const result: unknown = this.simulator.step(dt);
+    if (!isStepResult(result)) {
+      throw new Error('WASM simulator returned a malformed StepResult');
+    }
+    return result;
   }
 
   /**
@@ -95,7 +134,11 @@ export class SimulatorBridge {
    * @returns Current simulation state object
    */
   public getState(): SimulationState {
-    return this.simulator.get_state() as SimulationState;
+    const state: unknown = this.simulator.get_state();
+    if (!isSimulationState(state)) {
+      throw new Error('WASM simulator returned a malformed SimulationState');
+    }
+    return state;
   }
 
   /**
@@ -103,7 +146,11 @@ export class SimulatorBridge {
    * @returns LagrangePointSet coordinates in meters
    */
   public getLagrangePoints(): LagrangePointSet {
-    return this.simulator.get_lagrange_points() as LagrangePointSet;
+    const points: unknown = this.simulator.get_lagrange_points();
+    if (!isLagrangePointSet(points)) {
+      throw new Error('WASM simulator returned a malformed LagrangePointSet');
+    }
+    return points;
   }
 
   /**

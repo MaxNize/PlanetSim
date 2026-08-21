@@ -1,4 +1,5 @@
 import { useSimulationContext } from '../context/SimulationContext';
+import { useSimulationAnimation } from '../context/SimulationAnimationContext';
 import { useCanvasViewport } from './useCanvasViewport';
 import { useCanvasPointer } from './useCanvasPointer';
 
@@ -13,7 +14,8 @@ interface CanvasInteractionOptions {
  * separate "placement mode" toggle is needed (FP-38).
  */
 export function useCanvasInteraction({ canvasRef }: CanvasInteractionOptions) {
-  const { currentState, setSelectedBodyId, sandboxBodies, mode, trackedBodyId, setTrackedBodyId, toggleTracking } = useSimulationContext();
+  const { setSelectedBodyId, sandboxBodies, mode, trackedBodyId, setTrackedBodyId, toggleTracking } = useSimulationContext();
+  const { currentState } = useSimulationAnimation();
 
   const { viewport, setViewport, dimensions, handleWheel } = useCanvasViewport({ canvasRef, currentState, trackedBodyId });
 

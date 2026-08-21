@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { SimulationState } from '../services/wasmBridge';
 import { SandboxBody, SimulationMode } from '../types';
 
@@ -24,9 +24,9 @@ export function useBodyTracking(currentState: SimulationState, mode: SimulationM
     }
   }, [currentState, trackedBodyId]);
 
-  const toggleTracking = (body: SandboxBody) => {
+  const toggleTracking = useCallback((body: SandboxBody) => {
     setTrackedBodyId((prev) => (prev === body.id ? null : body.id));
-  };
+  }, []);
 
   return { trackedBodyId, setTrackedBodyId, toggleTracking };
 }

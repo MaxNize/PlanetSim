@@ -123,10 +123,7 @@ fn solve_collinear_point(initial_guess: f64, mass_ratio: f64) -> f64 {
             return x;
         }
 
-        let step = x.abs().max(1.0) * 1e-8;
-        let derivative = (collinear_equation(x + step, mass_ratio)
-            - collinear_equation(x - step, mass_ratio))
-            / (2.0 * step);
+        let derivative = collinear_equation_derivative(x, mass_ratio);
         if derivative.abs() < 1e-14 {
             break;
         }
@@ -149,56 +146,18 @@ fn collinear_equation(x: f64, mass_ratio: f64) -> f64 {
     x - primary_term - secondary_term
 }
 
-#[cfg(test)]
-mod tests {
-    use super::{
-        acceleration_from_force, distance, force_between, gravitational_force, lagrange_points,
-        DEFAULT_GRAVITATIONAL_CONSTANT,
-    };
-    use crate::physics::fixtures::*;
-    use crate::physics::types::Body;
+/// Analytic derivative of [`collinear_equation`] with respect to `x`.
+///
+/// For `f(u) = u / |u|^3` (with `u` linear in `x`), `f'(u) = -2 / |u|^3` — a closed form free of
+/// the cancellation error that plagues a finite-difference approximation near the singularities
+/// at `x = -mass_ratio` and `x = 1 - mass_ratio`.
+fn collinear_equation_derivative(x: f64, mass_ratio: f64) -> f64 {
+    let u = x + mass_ratio;
+    let w = x - 1.0 + mass_ratio;
 
-    #[test]
-    fn distance_between_earth_and_moon_matches_fixture() {
-        let computed_distance = distance((0.0, 0.0), (EARTH_MOON_DISTANCE, 0.0));
-        assert!((computed_distance - EARTH_MOON_DISTANCE).abs() < 1e-6);
-    }
-
-    #[test]
-    fn force_between_earth_and_moon_matches_expected_value() {
-        let force = force_between(
-            EARTH_MASS,
-            MOON_MASS,
-            EARTH_MOON_DISTANCE,
-            DEFAULT_GRAVITATIONAL_CONSTANT,
-        );
-        let expected_force = 1.982054291079361e20;
-        assert!((force - expected_force).abs() < 1e16);
-    }
-
-    #[test]
-    fn gravitational_force_uses_default_constant() {
-        let force = gravitational_force(EARTH_MASS, MOON_MASS, EARTH_MOON_DISTANCE);
-        let expected_force = 1.982054291079361e20;
-        assert!((force - expected_force).abs() < 1e16);
-    }
-
-    #[test]
-    fn acceleration_is_force_divided_by_mass() {
-        let acceleration = acceleration_from_force(12.0, 3.0);
-        assert!((acceleration - 4.0).abs() < f64::EPSILON);
-    }
-
-    #[test]
-    fn lagrange_points_return_equilateral_l4_l5() {
-        let primary = Body::new((0.0, 0.0), (0.0, 0.0), EARTH_MASS, 6.371e6);
-        let secondary = Body::new((EARTH_MOON_DISTANCE, 0.0), (0.0, 0.0), MOON_MASS, 1.737e6);
-
-        let points = lagrange_points(&primary, &secondary, DEFAULT_GRAVITATIONAL_CONSTANT);
-        let expected_l4_y = (3.0_f64.sqrt() * 0.5) * EARTH_MOON_DISTANCE;
-        assert!((points.l4.x - EARTH_MOON_DISTANCE * 0.5).abs() < 1e-3);
-        assert!((points.l4.y - expected_l4_y).abs() < 1e-3);
-        assert!((points.l5.x - EARTH_MOON_DISTANCE * 0.5).abs() < 1e-3);
-        assert!((points.l5.y + expected_l4_y).abs() < 1e-3);
-    }
+    1.0 + 2.0 * (1.0 - mass_ratio) / u.abs().powi(3) + 2.0 * mass_ratio / w.abs().powi(3)
 }
+
+#[cfg(test)]
+#[path = "gravity_tests.rs"]
+mod tests;

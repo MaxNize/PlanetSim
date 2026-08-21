@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { simulationContext } from '../../context/SimulationContext';
+import { simulationAnimationContext } from '../../context/SimulationAnimationContext';
 import { Simulator } from './Simulator';
 import { SimulationState } from '../../services/wasmBridge';
 
@@ -35,7 +36,9 @@ describe('Simulator container component', () => {
 
     render(
       <simulationContext.Provider value={mockContextValue as any}>
-        <Simulator />
+        <simulationAnimationContext.Provider value={mockContextValue as any}>
+          <Simulator />
+        </simulationAnimationContext.Provider>
       </simulationContext.Provider>,
     );
 
@@ -82,7 +85,9 @@ describe('Simulator container component', () => {
 
     render(
       <simulationContext.Provider value={mockContextValue as any}>
-        <Simulator />
+        <simulationAnimationContext.Provider value={mockContextValue as any}>
+          <Simulator />
+        </simulationAnimationContext.Provider>
       </simulationContext.Provider>,
     );
 

@@ -12,4 +12,7 @@ export const colors = {
   textPrimary: '#f8fafc',
   textMuted: '#94a3b8',
   white: '#fff',
+  primaryBody: '#f0932b',
+  secondaryBody: '#48dbfb',
+  testParticleBody: '#2ed573',
 } as const;

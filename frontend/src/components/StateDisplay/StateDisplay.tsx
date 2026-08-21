@@ -1,5 +1,6 @@
 import { StateDisplayProps } from '../../types';
 import { useSimulationContext } from '../../context/SimulationContext';
+import { useSimulationAnimation } from '../../context/SimulationAnimationContext';
 import { useI18n } from '../../context/I18nContext';
 import { SimulationMode } from '../../types';
 import { colors } from '../../styles/tokens';
@@ -85,7 +86,7 @@ const STATUS_KEYS: Record<'smooth' | 'moderate' | 'lag', string> = {
 
 // fallow-ignore-next-line complexity
 function PerformanceDisplay({ onOpenStressTest }: { onOpenStressTest?: () => void }) {
-  const { fps, frameTimeMs, fpsStatus } = useSimulationContext();
+  const { fps, frameTimeMs, fpsStatus } = useSimulationAnimation();
   const { t } = useI18n();
 
   const statusColor = STATUS_COLORS[fpsStatus] || STATUS_COLORS.smooth;
@@ -146,7 +147,8 @@ export function StateDisplay({
   error,
   onOpenStressTest,
 }: StateDisplayProps) {
-  const { mode, currentState } = useSimulationContext();
+  const { mode } = useSimulationContext();
+  const { currentState } = useSimulationAnimation();
   const { t } = useI18n();
   const totalEnergy = kineticEnergy !== undefined && potentialEnergy !== undefined ? kineticEnergy + potentialEnergy : undefined;
   const posLabel = t('telemetry.position');

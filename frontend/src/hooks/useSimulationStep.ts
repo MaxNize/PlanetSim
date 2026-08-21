@@ -2,10 +2,30 @@ import { useCallback, useState } from 'react';
 import { SimulatorBridge, StepResult } from '../services/wasmBridge';
 import { useAnimationFrame } from './useAnimationFrame';
 
+/**
+ * Largest single Velocity-Verlet sub-step, in simulation seconds. The integrator's error
+ * grows as O(dt^2), so a scaled-up frame delta (e.g. 0.016s * 100000x speed = 1600s) is
+ * broken into sub-steps no larger than this to keep orbits from visibly drifting.
+ */
+const MAX_SUB_STEP_SECONDS = 5;
+
+/** Hard cap on sub-steps per animation frame, bounding worst-case per-frame WASM cost at extreme speed multipliers. */
+const MAX_SUB_STEPS_PER_FRAME = 200;
+
 function performStep(simulator: SimulatorBridge | null, dt: number, speedMultiplier: number): StepResult | null {
   if (dt <= 0 || !simulator) return null;
+  const totalDt = dt * speedMultiplier;
+  if (totalDt <= 0) return null;
+
+  const steps = Math.min(Math.max(1, Math.ceil(totalDt / MAX_SUB_STEP_SECONDS)), MAX_SUB_STEPS_PER_FRAME);
+  const subDt = totalDt / steps;
+
   try {
-    return simulator.step(dt * speedMultiplier);
+    let result: StepResult | null = null;
+    for (let i = 0; i < steps; i += 1) {
+      result = simulator.step(subDt);
+    }
+    return result;
   } catch (err) {
     console.error('Simulation step failed:', err);
     return null;

@@ -6,7 +6,15 @@ import { StateDisplay } from './StateDisplay';
 vi.mock('../../context/SimulationContext', () => ({
   useSimulationContext: () => ({
     mode: '3body',
+  }),
+}));
+
+vi.mock('../../context/SimulationAnimationContext', () => ({
+  useSimulationAnimation: () => ({
     currentState: {},
+    fps: 60,
+    frameTimeMs: 16.7,
+    fpsStatus: 'smooth',
   }),
 }));
 

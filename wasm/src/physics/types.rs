@@ -259,3 +259,7 @@ pub struct LagrangePointSet {
     pub l5: Vec2,
 }
 
+#[cfg(test)]
+#[path = "types_tests.rs"]
+mod tests;
+

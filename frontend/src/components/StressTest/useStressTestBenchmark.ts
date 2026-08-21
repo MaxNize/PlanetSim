@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSimulationContext } from '../../context/SimulationContext';
+import { useSimulationAnimation } from '../../context/SimulationAnimationContext';
 import { useI18n } from '../../context/I18nContext';
 import { generateStressTestBodies } from '../../utils/stressTestUtils';
 
@@ -27,7 +28,8 @@ function shouldStopBenchmark(isDropping: boolean, step: number | null): boolean 
  */
 // fallow-ignore-next-line complexity
 export function useStressTestBenchmark() {
-  const { mode, setMode, currentState, addBodies, fps, setIsPaused } = useSimulationContext();
+  const { mode, setMode, addBodies, setIsPaused } = useSimulationContext();
+  const { currentState, fps } = useSimulationAnimation();
   const { t } = useI18n();
 
   const [isRunning, setIsRunning] = useState(false);

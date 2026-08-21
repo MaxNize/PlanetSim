@@ -94,4 +94,15 @@ describe('SimulatorBridge integration tests', () => {
     expect(() => bridge.step(0)).toThrow();
     expect(() => bridge.step(-10)).toThrow();
   });
+
+  it('should throw error on NaN dt instead of corrupting the physics state', () => {
+    const initialState = createTestState();
+    const bridge = new SimulatorBridge(initialState);
+
+    expect(() => bridge.step(NaN)).toThrow();
+
+    // The state must remain untouched by the rejected step.
+    const state = bridge.getState();
+    expect(state.time).toBe(0.0);
+  });
 });
