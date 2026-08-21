@@ -128,3 +128,35 @@ describe('useSandbox simulator sync', () => {
     expect(simulator.setState).toHaveBeenCalled();
   });
 });
+
+describe('useSandbox setMode back to 3body', () => {
+  it('drops the sandbox bodies list and syncs the simulator when switching to 3body', () => {
+    const simulator = { setState: vi.fn() } as unknown as SimulatorBridge;
+    const { result, setCurrentState } = setupHook([makeSpacedBody(0)], simulator);
+
+    act(() => result.current.setMode('3body'));
+
+    expect(setCurrentState).toHaveBeenCalledWith(expect.objectContaining({ bodies: undefined }));
+    expect(simulator.setState).toHaveBeenCalledWith(expect.objectContaining({ bodies: undefined }));
+  });
+
+  it('logs and does not throw when simulator.setState fails while switching to 3body', () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const simulator = {
+      setState: vi.fn(() => {
+        throw new Error('boom');
+      }),
+    } as unknown as SimulatorBridge;
+    const { result } = setupHook([makeSpacedBody(0)], simulator);
+
+    expect(() => act(() => result.current.setMode('3body'))).not.toThrow();
+    expect(consoleError).toHaveBeenCalled();
+
+    consoleError.mockRestore();
+  });
+
+  it('does not touch the simulator when switching to 3body without one', () => {
+    const { result } = setupHook([makeSpacedBody(0)], null);
+    expect(() => act(() => result.current.setMode('3body'))).not.toThrow();
+  });
+});

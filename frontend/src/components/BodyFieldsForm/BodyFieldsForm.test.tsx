@@ -85,6 +85,15 @@ describe('BodyFieldsForm', () => {
     expect(props.onVelDirChange).toHaveBeenCalledWith(180);
   });
 
+  it('falls back to 0 for non-numeric velocity magnitude/direction input', () => {
+    const props = renderForm();
+    fireEvent.change(screen.getByDisplayValue('1000'), { target: { value: '' } });
+    expect(props.onVelMagChange).toHaveBeenCalledWith(0);
+
+    fireEvent.change(screen.getByDisplayValue('90'), { target: { value: '' } });
+    expect(props.onVelDirChange).toHaveBeenCalledWith(0);
+  });
+
   it('propagates the color change', () => {
     const props = renderForm();
     const colorInput = document.querySelector('input[type="color"]') as HTMLInputElement;

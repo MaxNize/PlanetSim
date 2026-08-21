@@ -63,6 +63,12 @@ fn vec2_zero_constant() {
 }
 
 #[test]
+fn vec2_deserialize_rejects_malformed_input() {
+    let result: Result<Vec2, _> = serde_json::from_str("\"not a vec2\"");
+    assert!(result.is_err());
+}
+
+#[test]
 fn vec2_serializes_and_deserializes_as_tuple() {
     let v = Vec2::new(1.0, -2.5);
     let json = serde_json::to_string(&v).unwrap();

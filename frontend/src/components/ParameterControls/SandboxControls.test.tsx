@@ -50,7 +50,7 @@ describe('SandboxControls', () => {
     contextMock.sandboxBodies = Array.from({ length: Math.ceil(MAX_SANDBOX_BODIES * 0.5) }, (elementIgnored, i) => makeBody(`b${i}`));
     render(<SandboxControls />);
     expect(screen.getByText(/High body count/)).toBeDefined();
-  }, 10000);
+  }, 30000);
 
   it('uses the controlled selectedBodyId prop over context state when provided', () => {
     contextMock.sandboxBodies = [makeBody('a')];

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useSimulation } from './useSimulation';
 import { SimulationState } from '../services/wasmBridge';
@@ -31,5 +31,26 @@ describe('useSimulation hook', () => {
 
     expect(result.current.simulator).toBeNull();
     expect(result.current.error).not.toBeNull();
+  });
+
+  it('should fall back to a generic message when a non-Error value is thrown', async () => {
+    vi.resetModules();
+    vi.doMock('../services/wasmBridge', () => ({
+      SimulatorBridge: class {
+        constructor() {
+          // eslint-disable-next-line @typescript-eslint/only-throw-error -- intentionally not an Error, to exercise the non-Error catch branch.
+          throw 'boom';
+        }
+      },
+    }));
+
+    const { useSimulation: useSimulationWithMock } = await import('./useSimulation.js');
+    const { result } = renderHook(() => useSimulationWithMock(createValidState(), 0));
+
+    expect(result.current.simulator).toBeNull();
+    expect(result.current.error).toBe('Failed to initialize simulator');
+
+    vi.doUnmock('../services/wasmBridge');
+    vi.resetModules();
   });
 });

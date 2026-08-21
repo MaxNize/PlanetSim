@@ -138,4 +138,23 @@ describe('BodyContextMenu Component', () => {
     const deleteBtn = screen.getByText('❌ Delete');
     expect(deleteBtn.style.color).toBe('rgb(100, 116, 139)');
   });
+
+  it('applies a hover background on mouse enter for an enabled item, and clears it on mouse leave', () => {
+    renderMenu();
+    const editBtn = screen.getByText('✏️ Edit');
+
+    fireEvent.mouseEnter(editBtn);
+    expect(editBtn.style.backgroundColor).toBe('rgba(59, 130, 246, 0.2)');
+
+    fireEvent.mouseLeave(editBtn);
+    expect(editBtn.style.backgroundColor).toBe('transparent');
+  });
+
+  it('does not apply a hover background on mouse enter for the disabled delete item', () => {
+    renderMenu({ body: { ...mockBody, locked: true } });
+    const deleteBtn = screen.getByText('❌ Delete');
+
+    fireEvent.mouseEnter(deleteBtn);
+    expect(deleteBtn.style.backgroundColor).toBe('transparent');
+  });
 });

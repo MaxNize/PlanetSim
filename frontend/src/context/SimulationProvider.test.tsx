@@ -15,11 +15,18 @@ vi.mock('../hooks/useSimulation', () => ({
 }));
 
 function TestConsumer() {
-  const { setInitialState } = useSimulationContext();
+  const { setInitialState, preset, setPreset } = useSimulationContext();
   return (
-    <button data-testid="btn-set-state" onClick={() => setInitialState({ ...DEFAULT_INITIAL_STATE, time: 42 })}>
-      Set
-    </button>
+    <div>
+      <span data-testid="preset">{preset}</span>
+      <button data-testid="btn-set-state" onClick={() => setInitialState({ ...DEFAULT_INITIAL_STATE, time: 42 })}>
+        Set
+      </button>
+      {/* @ts-expect-error -- deliberately not a valid PresetType, to exercise getPresetState's null fallback */}
+      <button data-testid="btn-preset-invalid" onClick={() => setPreset('not-a-real-preset')}>
+        InvalidPreset
+      </button>
+    </div>
   );
 }
 
@@ -67,5 +74,37 @@ describe('SimulationProvider error handling', () => {
     expect(consoleError).toHaveBeenCalled();
     expect(mockSimulator.setState).toHaveBeenCalled();
     consoleError.mockRestore();
+  });
+
+  it('syncs the simulator and refreshes Lagrange points when setInitialState succeeds', () => {
+    render(
+      <SimulationProvider>
+        <TestConsumer />
+      </SimulationProvider>,
+    );
+    mockSimulator.getLagrangePoints.mockClear();
+
+    act(() => {
+      screen.getByTestId('btn-set-state').click();
+    });
+
+    expect(mockSimulator.setState).toHaveBeenCalled();
+    expect(mockSimulator.getLagrangePoints).toHaveBeenCalled();
+  });
+
+  it('leaves preset and state unchanged when setPreset is given an unrecognized preset', () => {
+    render(
+      <SimulationProvider>
+        <TestConsumer />
+      </SimulationProvider>,
+    );
+
+    expect(screen.getByTestId('preset').textContent).toBe('earth-moon');
+
+    act(() => {
+      screen.getByTestId('btn-preset-invalid').click();
+    });
+
+    expect(screen.getByTestId('preset').textContent).toBe('earth-moon');
   });
 });

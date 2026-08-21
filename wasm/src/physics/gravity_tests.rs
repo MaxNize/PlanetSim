@@ -1,5 +1,6 @@
 use super::{
-    acceleration_from_force, distance, force_between, gravitational_force, lagrange_points,
+    acceleration_from_force, collinear_equation, collinear_equation_derivative, distance,
+    force_between, gravitational_force, lagrange_points, solve_collinear_point,
     DEFAULT_GRAVITATIONAL_CONSTANT,
 };
 use crate::physics::fixtures::*;
@@ -34,6 +35,37 @@ fn gravitational_force_uses_default_constant() {
 fn acceleration_is_force_divided_by_mass() {
     let acceleration = acceleration_from_force(12.0, 3.0);
     assert!((acceleration - 4.0).abs() < f64::EPSILON);
+}
+
+#[test]
+fn solve_collinear_point_breaks_and_returns_the_guess_when_the_derivative_vanishes() {
+    // solve_collinear_point's Newton iteration guards against dividing by a near-zero
+    // derivative (it would blow up the step size) by breaking out of the loop and returning
+    // the current guess unchanged. Physical mass ratios (0 < r < 1) never actually vanish the
+    // derivative — it stays strictly positive there — so this locates a root of the derivative
+    // itself for an unphysical (but not otherwise invalid) mass_ratio via bisection, independent
+    // of solve_collinear_point, to exercise that guard directly.
+    let mass_ratio = -1.0;
+    let mut lo = 3.0_f64;
+    let mut hi = 3.3_f64;
+    assert!(collinear_equation_derivative(lo, mass_ratio) * collinear_equation_derivative(hi, mass_ratio) < 0.0);
+
+    for _ in 0..200 {
+        let mid = (lo + hi) / 2.0;
+        if collinear_equation_derivative(lo, mass_ratio) * collinear_equation_derivative(mid, mass_ratio) <= 0.0 {
+            hi = mid;
+        } else {
+            lo = mid;
+        }
+    }
+    let vanishing_point = (lo + hi) / 2.0;
+    assert!(collinear_equation_derivative(vanishing_point, mass_ratio).abs() < 1e-14);
+    // The root itself must not also be a root of collinear_equation, otherwise the loop would
+    // return via its other early exit (the |f(x)| < 1e-14 check) instead of the derivative guard.
+    assert!(collinear_equation(vanishing_point, mass_ratio).abs() > 1e-6);
+
+    let result = solve_collinear_point(vanishing_point, mass_ratio);
+    assert_eq!(result, vanishing_point);
 }
 
 #[test]
