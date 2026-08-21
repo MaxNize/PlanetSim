@@ -64,6 +64,22 @@ describe('useSimulationStep hook', () => {
     expect(result.current.stepResult).toBe(stepResult);
   });
 
+  it('does nothing when the speed multiplier scales dt down to zero', () => {
+    const stepResult = { time: 1.0 } as unknown as StepResult;
+    const simulator = { step: vi.fn(() => stepResult) } as unknown as SimulatorBridge;
+
+    const raf = mockRequestAnimationFrame();
+    const { result } = renderHook(() => useSimulationStep(simulator, false, 0));
+
+    act(() => {
+      raf.fire(1000.0);
+      raf.fire(1016.7);
+    });
+
+    expect(simulator.step).not.toHaveBeenCalled();
+    expect(result.current.stepResult).toBeNull();
+  });
+
   it('does nothing when the simulator is null', () => {
     const raf = mockRequestAnimationFrame();
     const { result } = renderHook(() => useSimulationStep(null, false, 1));

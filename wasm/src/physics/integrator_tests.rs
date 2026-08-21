@@ -69,3 +69,25 @@ fn integrate_step_n_body_test() {
     // Unlocked body should move
     assert_ne!(list[1].position, Vec2::new(1.0e6, 0.0));
 }
+
+#[test]
+fn integrate_step_skips_potential_energy_for_coincident_n_body_pairs() {
+    // Two locked bodies at the exact same position never move apart, so their pairwise
+    // distance stays zero. The N-body potential energy sum must skip that pair (it would
+    // otherwise divide by zero in force_between) rather than poisoning the total with NaN.
+    let a = Body::new_locked((5.0e5, 5.0e5), (0.0, 0.0), 1.0e20, 1.0, true);
+    let b = Body::new_locked((5.0e5, 5.0e5), (0.0, 0.0), 1.0e20, 1.0, true);
+
+    let initial_state = State::new_with_bodies(
+        a,
+        a,
+        a,
+        0.0,
+        DEFAULT_GRAVITATIONAL_CONSTANT,
+        Some(vec![a, b]),
+    );
+    let mut scratch = NBodyScratch::default();
+    let result = integrate_step(&initial_state, 10.0, &mut scratch);
+
+    assert_eq!(result.potential_energy, 0.0);
+}

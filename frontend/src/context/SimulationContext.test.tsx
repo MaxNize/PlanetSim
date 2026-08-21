@@ -34,6 +34,16 @@ function TestConsumer() {
   );
 }
 
+describe('useSimulationContext guard', () => {
+  it('throws when used outside a SimulationProvider', () => {
+    function Unwrapped() {
+      useSimulationContext();
+      return null;
+    }
+    expect(() => render(<Unwrapped />)).toThrow('useSimulationContext must be used within a SimulationProvider');
+  });
+});
+
 describe('SimulationContext and SimulationProvider', () => {
   it('should provide default simulation state and update values', () => {
     render(
@@ -141,5 +151,54 @@ describe('SimulationContext and SimulationProvider', () => {
     });
 
     expect(screen.getByTestId('body-custom-1').textContent).toBe('5e+24:500000000,100000000:#00ff00');
+  });
+
+  it('clears selectedBodyId once the selected body no longer exists in sandboxBodies', () => {
+    function SelectionTestConsumer() {
+      const { setMode, addBody, removeBody, selectedBodyId, setSelectedBodyId } = useSimulationContext();
+      return (
+        <div>
+          <button data-testid="btn-mode-sandbox" onClick={() => setMode('sandbox')}>
+            Sandbox Mode
+          </button>
+          <button
+            data-testid="btn-add-body"
+            onClick={() =>
+              addBody({
+                id: 'custom-1',
+                position: [5e8, 1e8],
+                velocity: [100, 200],
+                mass: 1e24,
+                radius: 1e6,
+                color: '#ff0000',
+              })
+            }
+          >
+            Add Body
+          </button>
+          <button data-testid="btn-select" onClick={() => setSelectedBodyId('custom-1')}>
+            Select
+          </button>
+          <button data-testid="btn-remove" onClick={() => removeBody('custom-1')}>
+            Remove
+          </button>
+          <span data-testid="selected">{selectedBodyId ?? 'none'}</span>
+        </div>
+      );
+    }
+
+    render(
+      <SimulationProvider>
+        <SelectionTestConsumer />
+      </SimulationProvider>,
+    );
+
+    act(() => screen.getByTestId('btn-mode-sandbox').click());
+    act(() => screen.getByTestId('btn-add-body').click());
+    act(() => screen.getByTestId('btn-select').click());
+    expect(screen.getByTestId('selected').textContent).toBe('custom-1');
+
+    act(() => screen.getByTestId('btn-remove').click());
+    expect(screen.getByTestId('selected').textContent).toBe('none');
   });
 });

@@ -34,4 +34,9 @@ describe('findBodyAtPosition', () => {
   it('returns null when no body is within range', () => {
     expect(findBodyAtPosition([5e8, 5e8], bodies, 1e-6)).toBeNull();
   });
+
+  it('falls back to the default hit radius when a body has a falsy radius', () => {
+    const zeroRadiusBody: SandboxBody = { id: 'z', position: [2e8, 0], velocity: [0, 0], mass: 1, radius: 0, color: '#fff' };
+    expect(findBodyAtPosition([2e8, 0], [zeroRadiusBody], 1e-6)?.id).toBe('z');
+  });
 });

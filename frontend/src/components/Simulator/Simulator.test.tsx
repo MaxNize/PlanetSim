@@ -14,33 +14,47 @@ const mockState: SimulationState = {
   gravitationalConstant: 6.67e-11,
 };
 
+function makeContextValue(overrides: Record<string, unknown> = {}) {
+  return {
+    initialState: mockState,
+    setInitialState: vi.fn(),
+    currentState: mockState,
+    stepResult: null,
+    isPaused: true,
+    setIsPaused: vi.fn(),
+    speedMultiplier: 1000.0,
+    setSpeedMultiplier: vi.fn(),
+    lagrangePoints: null,
+    history: [],
+    clearHistory: vi.fn(),
+    resetSimulation: vi.fn(),
+    error: null,
+    preset: 'earth-moon' as const,
+    setPreset: vi.fn(),
+    ...overrides,
+  };
+}
+
+function renderSimulator(mockContextValue: Record<string, unknown>) {
+  return render(
+    <simulationContext.Provider value={mockContextValue as any}>
+      <simulationAnimationContext.Provider value={mockContextValue as any}>
+        <Simulator />
+      </simulationAnimationContext.Provider>
+    </simulationContext.Provider>,
+  );
+}
+
+function placeBodyAndConfirm() {
+  const canvasElement = screen.getByLabelText('Celestial simulation rendering area');
+  fireEvent.mouseDown(canvasElement, { button: 0, clientX: 1000, clientY: 1000 });
+  fireEvent.mouseUp(canvasElement, { clientX: 1000, clientY: 1000 });
+  fireEvent.click(screen.getByText('Confirm'));
+}
+
 describe('Simulator container component', () => {
   it('should render and bind to SimulationContext values', () => {
-    const mockContextValue = {
-      initialState: mockState,
-      setInitialState: vi.fn(),
-      currentState: mockState,
-      stepResult: null,
-      isPaused: true,
-      setIsPaused: vi.fn(),
-      speedMultiplier: 1000.0,
-      setSpeedMultiplier: vi.fn(),
-      lagrangePoints: null,
-      history: [],
-      clearHistory: vi.fn(),
-      resetSimulation: vi.fn(),
-      error: 'Mock engine error',
-      preset: 'earth-moon' as const,
-      setPreset: vi.fn(),
-    };
-
-    render(
-      <simulationContext.Provider value={mockContextValue as any}>
-        <simulationAnimationContext.Provider value={mockContextValue as any}>
-          <Simulator />
-        </simulationAnimationContext.Provider>
-      </simulationContext.Provider>,
-    );
+    renderSimulator(makeContextValue({ error: 'Mock engine error' }));
 
     // Assert container renders headings from presentational children
     expect(screen.getByText('Simulation System')).toBeDefined();
@@ -57,46 +71,57 @@ describe('Simulator container component', () => {
     const addBody = vi.fn(() => {
       throw new Error('Maximum 300 bodies reached');
     });
-    const mockContextValue = {
-      initialState: mockState,
-      setInitialState: vi.fn(),
-      currentState: mockState,
-      stepResult: null,
-      isPaused: true,
-      setIsPaused: vi.fn(),
-      speedMultiplier: 1000.0,
-      setSpeedMultiplier: vi.fn(),
-      lagrangePoints: null,
-      history: [],
-      clearHistory: vi.fn(),
-      resetSimulation: vi.fn(),
-      error: null,
-      preset: 'earth-moon' as const,
-      setPreset: vi.fn(),
-      mode: 'sandbox' as const,
-      setMode: vi.fn(),
-      sandboxBodies: [],
-      addBody,
-      removeBody: vi.fn(),
-      updateBody: vi.fn(),
-      selectedBodyId: null,
-      setSelectedBodyId: vi.fn(),
-    };
+    renderSimulator(makeContextValue({ mode: 'sandbox', setMode: vi.fn(), sandboxBodies: [], addBody, removeBody: vi.fn(), updateBody: vi.fn(), selectedBodyId: null, setSelectedBodyId: vi.fn() }));
 
-    render(
-      <simulationContext.Provider value={mockContextValue as any}>
-        <simulationAnimationContext.Provider value={mockContextValue as any}>
-          <Simulator />
-        </simulationAnimationContext.Provider>
-      </simulationContext.Provider>,
-    );
-
-    const canvasElement = screen.getByLabelText('Celestial simulation rendering area');
-    fireEvent.mouseDown(canvasElement, { button: 0, clientX: 1000, clientY: 1000 });
-    fireEvent.mouseUp(canvasElement, { clientX: 1000, clientY: 1000 });
-    fireEvent.click(screen.getByText('Confirm'));
+    placeBodyAndConfirm();
 
     expect(addBody).toHaveBeenCalled();
     expect(screen.getByText(/Maximum body count reached/)).toBeDefined();
+  });
+
+  it('shows an overlap toast when addBody throws an overlap error (FP-38)', () => {
+    const addBody = vi.fn(() => {
+      throw new Error('Overlap detected with another body');
+    });
+    renderSimulator(makeContextValue({ mode: 'sandbox', setMode: vi.fn(), sandboxBodies: [], addBody, removeBody: vi.fn(), updateBody: vi.fn(), selectedBodyId: null, setSelectedBodyId: vi.fn() }));
+
+    placeBodyAndConfirm();
+
+    expect(screen.getByText(/overlaps an existing one/)).toBeDefined();
+  });
+
+  it('shows the raw error message for an unrecognized addBody failure', () => {
+    const addBody = vi.fn(() => {
+      throw new Error('Something unexpected happened');
+    });
+    renderSimulator(makeContextValue({ mode: 'sandbox', setMode: vi.fn(), sandboxBodies: [], addBody, removeBody: vi.fn(), updateBody: vi.fn(), selectedBodyId: null, setSelectedBodyId: vi.fn() }));
+
+    placeBodyAndConfirm();
+
+    expect(screen.getByText(/Something unexpected happened/)).toBeDefined();
+  });
+
+  it('propagates mass1/mass2/distance edits from ParameterControls up through setInitialState', () => {
+    const setInitialState = vi.fn();
+    renderSimulator(makeContextValue({ setInitialState }));
+
+    const [mass1Input, mass2Input, distInput] = screen.getAllByRole('textbox');
+
+    fireEvent.change(mass1Input, { target: { value: '6e24' } });
+    fireEvent.blur(mass1Input);
+    expect(setInitialState).toHaveBeenLastCalledWith(expect.objectContaining({ primary: expect.objectContaining({ mass: 6e24 }) }));
+
+    fireEvent.change(mass2Input, { target: { value: '8e22' } });
+    fireEvent.blur(mass2Input);
+    expect(setInitialState).toHaveBeenLastCalledWith(expect.objectContaining({ secondary: expect.objectContaining({ mass: 8e22 }) }));
+
+    fireEvent.change(distInput, { target: { value: '4e8' } });
+    fireEvent.blur(distInput);
+    expect(setInitialState).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        secondary: expect.objectContaining({ position: [4e8, 0.0] }),
+        testParticle: expect.objectContaining({ position: [4e8 * 0.78, 0.0] }),
+      }),
+    );
   });
 });
