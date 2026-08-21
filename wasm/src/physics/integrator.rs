@@ -2,9 +2,11 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::gravity::{acceleration_from_force, distance, force_between};
+use super::gravity::{distance, force_between};
+use super::integrator_energy::{kinetic_energy, potential_energy};
+use super::integrator_kinematics::{advance_pos, advance_vel_and_body, pairwise_acc, tp_acc};
 use super::n_body::{integrate_n_body, NBodyScratch};
-use super::types::{Body, State, Vec2};
+use super::types::{Body, State};
 
 /// Maximum allowed time step in simulation seconds.
 pub const MAX_TIME_STEP_SECONDS: f64 = 86_400.0;
@@ -145,57 +147,6 @@ pub fn integrate_step(state: &State, dt: f64, n_body_scratch: &mut NBodyScratch)
         }
     }
 }
-
-pub(crate) fn advance_pos(p: Vec2, v: Vec2, a: Vec2, dt: f64) -> Vec2 {
-    p + v * dt + a * (0.5 * dt * dt)
-}
-
-fn advance_vel_and_body(
-    b: Body,
-    a_init: Vec2,
-    a_final: Vec2,
-    dt: f64,
-    pos: Vec2,
-) -> Body {
-    Body::new(
-        pos,
-        b.velocity + (a_init + a_final) * (0.5 * dt),
-        b.mass,
-        b.radius,
-    )
-}
-
-fn pairwise_acc(src: &Body, tgt: &Body, g: f64) -> Vec2 {
-    let r = distance(src.position, tgt.position);
-    // Coincident (or NaN) bodies are softened rather than panicking: r.max(1000.0)
-    // returns 1000.0 for r == 0.0 or r.is_nan(), matching n_body_acc's guard behavior.
-    let r_safe = r.max(1000.0);
-    let force = force_between(src.mass, tgt.mass, r_safe, g);
-    let a_mag = acceleration_from_force(force, tgt.mass);
-
-    (src.position - tgt.position) * (a_mag / r_safe)
-}
-
-fn tp_acc(p: &Body, s: &Body, t: &Body, g: f64) -> Vec2 {
-    pairwise_acc(p, t, g) + pairwise_acc(s, t, g)
-}
-
-fn kinetic_energy(state: &State) -> f64 {
-    let ke = |b: &Body| 0.5 * b.mass * b.velocity.length_sq();
-    ke(&state.primary) + ke(&state.secondary) + ke(&state.test_particle)
-}
-
-fn potential_energy(state: &State) -> f64 {
-    let g = state.gravitational_constant;
-    let d_ps = distance(state.primary.position, state.secondary.position);
-    let d_pt = distance(state.primary.position, state.test_particle.position);
-    let d_st = distance(state.secondary.position, state.test_particle.position);
-
-    -force_between(state.primary.mass, state.secondary.mass, d_ps, g) * d_ps
-        - force_between(state.primary.mass, state.test_particle.mass, d_pt, g) * d_pt
-        - force_between(state.secondary.mass, state.test_particle.mass, d_st, g) * d_st
-}
-
 
 #[cfg(test)]
 #[path = "integrator_tests.rs"]

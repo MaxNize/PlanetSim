@@ -109,6 +109,7 @@ function isTestFile(relativeFilePath) {
  * @param {string[]} fileList
  * @returns {string[]}
  */
+// fallow-ignore-next-line complexity
 function walkDir(dir, baseDir, fileList = []) {
     let entries = [];
     try {

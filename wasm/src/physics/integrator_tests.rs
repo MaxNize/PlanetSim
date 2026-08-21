@@ -1,6 +1,6 @@
 use super::*;
 use crate::physics::gravity::DEFAULT_GRAVITATIONAL_CONSTANT;
-use crate::physics::types::{Body, State};
+use crate::physics::types::{Body, State, Vec2};
 
 fn circular_orbit_state() -> State {
     let separation = 1.0e6;

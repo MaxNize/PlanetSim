@@ -19,7 +19,7 @@ function renderControls(overrides: Partial<Parameters<typeof ThreeBodyControls>[
 describe('ThreeBodyControls', () => {
   it('renders one text input per parameter, seeded from the current values', () => {
     const props = renderControls();
-    const inputs = screen.getAllByRole('textbox');
+    const inputs = screen.getAllByRole<HTMLInputElement>('textbox');
     expect(inputs).toHaveLength(3);
     expect(inputs[0].value).toBe(props.massM1.toExponential(3));
     expect(inputs[1].value).toBe(props.massM2.toExponential(3));
@@ -28,7 +28,7 @@ describe('ThreeBodyControls', () => {
 
   it('commits a valid mass1 value within [1e21, 1e33] on blur', () => {
     const props = renderControls();
-    const [m1] = screen.getAllByRole('textbox');
+    const [m1] = screen.getAllByRole<HTMLInputElement>('textbox');
     fireEvent.change(m1, { target: { value: '3e24' } });
     fireEvent.blur(m1);
     expect(props.setMassM1).toHaveBeenCalledWith(3e24);
@@ -36,7 +36,7 @@ describe('ThreeBodyControls', () => {
 
   it('rejects a non-numeric mass1 and reverts the field on blur', () => {
     const props = renderControls();
-    const [m1] = screen.getAllByRole('textbox');
+    const [m1] = screen.getAllByRole<HTMLInputElement>('textbox');
     fireEvent.change(m1, { target: { value: 'not-a-number' } });
     fireEvent.blur(m1);
     expect(props.setMassM1).not.toHaveBeenCalled();
@@ -45,7 +45,7 @@ describe('ThreeBodyControls', () => {
 
   it('rejects a mass1 below the lower bound and reverts the field', () => {
     const props = renderControls();
-    const [m1] = screen.getAllByRole('textbox');
+    const [m1] = screen.getAllByRole<HTMLInputElement>('textbox');
     fireEvent.change(m1, { target: { value: '1e20' } });
     fireEvent.blur(m1);
     expect(props.setMassM1).not.toHaveBeenCalled();
@@ -54,7 +54,7 @@ describe('ThreeBodyControls', () => {
 
   it('rejects a mass1 above the upper bound and reverts the field', () => {
     const props = renderControls();
-    const [m1] = screen.getAllByRole('textbox');
+    const [m1] = screen.getAllByRole<HTMLInputElement>('textbox');
     fireEvent.change(m1, { target: { value: '1e34' } });
     fireEvent.blur(m1);
     expect(props.setMassM1).not.toHaveBeenCalled();
@@ -63,7 +63,7 @@ describe('ThreeBodyControls', () => {
 
   it('commits a valid mass2 value on blur', () => {
     const props = renderControls();
-    const [, m2] = screen.getAllByRole('textbox');
+    const [, m2] = screen.getAllByRole<HTMLInputElement>('textbox');
     fireEvent.change(m2, { target: { value: '4e22' } });
     fireEvent.blur(m2);
     expect(props.setMassM2).toHaveBeenCalledWith(4e22);
@@ -71,7 +71,7 @@ describe('ThreeBodyControls', () => {
 
   it('rejects an out-of-range mass2 and reverts the field', () => {
     const props = renderControls();
-    const [, m2] = screen.getAllByRole('textbox');
+    const [, m2] = screen.getAllByRole<HTMLInputElement>('textbox');
     fireEvent.change(m2, { target: { value: '1e40' } });
     fireEvent.blur(m2);
     expect(props.setMassM2).not.toHaveBeenCalled();
@@ -80,7 +80,7 @@ describe('ThreeBodyControls', () => {
 
   it('commits a valid distance value within [1e6, 1e11] on blur', () => {
     const props = renderControls();
-    const [, , dist] = screen.getAllByRole('textbox');
+    const [, , dist] = screen.getAllByRole<HTMLInputElement>('textbox');
     fireEvent.change(dist, { target: { value: '5e8' } });
     fireEvent.blur(dist);
     expect(props.setDistanceR).toHaveBeenCalledWith(5e8);
@@ -88,7 +88,7 @@ describe('ThreeBodyControls', () => {
 
   it('rejects an out-of-range distance and reverts the field', () => {
     const props = renderControls();
-    const [, , dist] = screen.getAllByRole('textbox');
+    const [, , dist] = screen.getAllByRole<HTMLInputElement>('textbox');
     fireEvent.change(dist, { target: { value: '1e2' } });
     fireEvent.blur(dist);
     expect(props.setDistanceR).not.toHaveBeenCalled();

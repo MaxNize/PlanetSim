@@ -1,7 +1,7 @@
 //! Generalized N-body physics integrator.
 
 use super::gravity::{acceleration_from_force, distance, force_between};
-use super::integrator::advance_pos;
+use super::integrator_kinematics::advance_pos;
 use super::types::{Body, Vec2};
 
 /// Symplectic Velocity-Verlet integration for N arbitrary bodies.
@@ -80,8 +80,8 @@ impl NBodyScratch {
 
 /// Computes the net gravitational acceleration on a body due to all other bodies.
 ///
-/// Runs in $\mathcal{O}(N)$ time via a single pass over the full body list; prefer
-/// [`compute_accelerations`] when accelerations for *all* bodies are needed, since it
+/// Runs in $\mathcal{O}(N)$ time via a single pass over the full body list; prefer the
+/// crate-internal pairwise accelerator when accelerations for *all* bodies are needed, since it
 /// applies Newton's third law ($F_{ij} = -F_{ji}$) to halve the pairwise work from
 /// $N(N-1)$ to $N(N-1)/2$.
 pub fn n_body_acc(bodies: &[Body], idx: usize, g: f64) -> Vec2 {
