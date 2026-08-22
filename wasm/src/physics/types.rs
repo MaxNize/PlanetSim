@@ -2,12 +2,14 @@
 
 use serde::{Deserialize, Serialize};
 
+pub use super::vec2::Vec2;
+
 /// A body with position, velocity, mass, and radius.
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Body {
-    pub position: (f64, f64),
-    pub velocity: (f64, f64),
+    pub position: Vec2,
+    pub velocity: Vec2,
     pub mass: f64,
     pub radius: f64,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -16,10 +18,10 @@ pub struct Body {
 
 impl Body {
     /// Creates a new body.
-    pub const fn new(position: (f64, f64), velocity: (f64, f64), mass: f64, radius: f64) -> Self {
+    pub fn new(position: impl Into<Vec2>, velocity: impl Into<Vec2>, mass: f64, radius: f64) -> Self {
         Self {
-            position,
-            velocity,
+            position: position.into(),
+            velocity: velocity.into(),
             mass,
             radius,
             locked: None,
@@ -27,16 +29,16 @@ impl Body {
     }
 
     /// Creates a new body with locked status.
-    pub const fn new_locked(
-        position: (f64, f64),
-        velocity: (f64, f64),
+    pub fn new_locked(
+        position: impl Into<Vec2>,
+        velocity: impl Into<Vec2>,
         mass: f64,
         radius: f64,
         locked: bool,
     ) -> Self {
         Self {
-            position,
-            velocity,
+            position: position.into(),
+            velocity: velocity.into(),
             mass,
             radius,
             locked: Some(locked),
@@ -139,9 +141,14 @@ impl State {
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LagrangePointSet {
-    pub l1: (f64, f64),
-    pub l2: (f64, f64),
-    pub l3: (f64, f64),
-    pub l4: (f64, f64),
-    pub l5: (f64, f64),
+    pub l1: Vec2,
+    pub l2: Vec2,
+    pub l3: Vec2,
+    pub l4: Vec2,
+    pub l5: Vec2,
 }
+
+#[cfg(test)]
+#[path = "types_tests.rs"]
+mod tests;
+

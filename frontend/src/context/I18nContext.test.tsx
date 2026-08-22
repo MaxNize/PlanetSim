@@ -54,4 +54,19 @@ describe('I18nContext and I18nProvider', () => {
     expect(screen.getByTestId('lang').textContent).toBe('tlh');
     expect(screen.getByTestId('title').textContent).toBe('3-Hov System SeHlaw Quj');
   });
+
+  it('returns the raw key when it is missing from both the active language and English', () => {
+    function MissingKeyComponent() {
+      const { t } = useI18n();
+      return <span data-testid="missing">{t('this.key.does.not.exist')}</span>;
+    }
+
+    render(
+      <I18nProvider>
+        <MissingKeyComponent />
+      </I18nProvider>,
+    );
+
+    expect(screen.getByTestId('missing').textContent).toBe('this.key.does.not.exist');
+  });
 });

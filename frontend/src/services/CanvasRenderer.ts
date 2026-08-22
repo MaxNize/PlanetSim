@@ -2,6 +2,7 @@ import { SimulationState, LagrangePointSet, Body } from './wasmBridge';
 import { TrailHistory } from '../types';
 import { drawTrail, drawLagrangePoints, drawOverlay, drawBodyLabel, drawVelocityArrow, drawRing } from './canvasHelpers';
 import { ViewportConfig, worldToCanvas as toCanvas, canvasToWorld as toWorld } from './canvasCoords';
+import { BodyGradientCache } from './BodyGradientCache';
 import { colors } from '../styles/tokens';
 
 export type { ViewportConfig };
@@ -18,6 +19,7 @@ export interface BodyMarkers {
 export class CanvasRenderer {
   private ctx: CanvasRenderingContext2D | null;
   private canvas: HTMLCanvasElement;
+  private gradientCache = new BodyGradientCache();
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -97,9 +99,9 @@ export class CanvasRenderer {
     wtc: (pos: [number, number]) => { x: number; y: number },
   ): void {
     const fixedBodies = [
-      { id: 'primary', body: state.primary, color: '#f0932b', trail: trailHistory.primary },
-      { id: 'secondary', body: state.secondary, color: '#48dbfb', trail: trailHistory.secondary },
-      { id: 'testParticle', body: state.testParticle, color: '#2ed573', trail: trailHistory.testParticle },
+      { id: 'primary', body: state.primary, color: colors.primaryBody, trail: trailHistory.primary },
+      { id: 'secondary', body: state.secondary, color: colors.secondaryBody, trail: trailHistory.secondary },
+      { id: 'testParticle', body: state.testParticle, color: colors.testParticleBody, trail: trailHistory.testParticle },
     ];
     fixedBodies.forEach(({ id, body, color, trail }) => {
       if (showTrail) drawTrail(ctx, trail, color, wtc);
@@ -171,16 +173,13 @@ export class CanvasRenderer {
     const { x, y } = this.worldToCanvas(pos, viewport, width, height);
     const radius = Math.max(4, physicalRadius * viewport.scale);
 
+    this.ctx.save();
+    this.ctx.translate(x, y);
     this.ctx.beginPath();
-    this.ctx.arc(x, y, radius, 0, Math.PI * 2);
-
-    const gradient = this.ctx.createRadialGradient(x, y, radius * 0.1, x, y, radius);
-    gradient.addColorStop(0, colors.white);
-    gradient.addColorStop(0.3, color);
-    gradient.addColorStop(1, '#000000');
-
-    this.ctx.fillStyle = gradient;
+    this.ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    this.ctx.fillStyle = this.gradientCache.get(this.ctx, color, radius);
     this.ctx.fill();
+    this.ctx.restore();
 
     const ctx = this.ctx;
     const rings: { active: boolean; color: string; lineWidth: number; offset: number }[] = [

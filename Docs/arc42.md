@@ -178,7 +178,7 @@ React Context (`SimulationContext`) allen Komponenten `currentState`, `mode`, `s
 
 ### 5.4 Abhängigkeitsgraph (Feature-Ebene)
 
-Der vollständige Feature-Abhängigkeitsgraph (SPEC-001…SPEC-014) ist in `Docs/Guides/architecture.md#dependency-graph`
+Der vollständige Feature-Abhängigkeitsgraph (SPEC-001…SPEC-017) ist in `Docs/Guides/architecture.md#dependency-graph`
 dokumentiert und wird hier nicht dupliziert.
 
 ---
@@ -291,7 +291,7 @@ Entscheidungen werden als ADRs (Kontext → Optionen → Entscheidung) unter `Do
 | [ADR-003](./ADRs/ADR-003-colocated-files.md) | Colocated Components (Implementierung + Tests im selben Ordner) |
 
 Feature-/Architektur-Spezifikationen mit detaillierten Entscheidungen zu Umsetzung und Akzeptanzkriterien:
-`Docs/Management/Project-Management/Specs/SPEC-001` bis `SPEC-014` (siehe Abhängigkeitsgraph in Kapitel 5.4).
+`Docs/Management/Project-Management/Specs/SPEC-001` bis `SPEC-017` (siehe Abhängigkeitsgraph in Kapitel 5.4).
 
 ---
 

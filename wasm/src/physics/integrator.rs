@@ -2,9 +2,11 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::gravity::{acceleration_from_force, distance, force_between};
+use super::gravity::{distance, force_between};
+use super::integrator_energy::{kinetic_energy, potential_energy};
+use super::integrator_kinematics::{advance_pos, advance_vel_and_body, pairwise_acc, tp_acc};
+use super::n_body::{integrate_n_body, NBodyScratch};
 use super::types::{Body, State};
-use super::n_body::integrate_n_body;
 
 /// Maximum allowed time step in simulation seconds.
 pub const MAX_TIME_STEP_SECONDS: f64 = 86_400.0;
@@ -29,18 +31,19 @@ pub struct StepResult {
 ///
 /// # Examples
 /// ```
-/// use planet_sim_wasm::physics::{Body, State, integrate_step};
+/// use planet_sim_wasm::physics::{Body, NBodyScratch, State, integrate_step, Vec2};
 ///
-/// let primary = Body::new((0.0, 0.0), (0.0, 0.0), 1.989e30, 6.96e8);
-/// let secondary = Body::new((1.496e11, 0.0), (0.0, 29780.0), 5.972e24, 6.371e6);
-/// let test_particle = Body::new((1.50e11, 0.0), (0.0, 30000.0), 1000.0, 10.0);
+/// let primary = Body::new(Vec2::new(0.0, 0.0), Vec2::new(0.0, 0.0), 1.989e30, 6.96e8);
+/// let secondary = Body::new(Vec2::new(1.496e11, 0.0), Vec2::new(0.0, 29780.0), 5.972e24, 6.371e6);
+/// let test_particle = Body::new(Vec2::new(1.50e11, 0.0), Vec2::new(0.0, 30000.0), 1000.0, 10.0);
 /// let state = State::new(primary, secondary, test_particle, 0.0, 6.67430e-11);
 ///
-/// let result = integrate_step(&state, 1.0);
+/// let mut scratch = NBodyScratch::default();
+/// let result = integrate_step(&state, 1.0, &mut scratch);
 /// assert!(result.new_state.time > 0.0);
 /// assert!(result.kinetic_energy > 0.0);
 /// ```
-pub fn integrate_step(state: &State, dt: f64) -> StepResult {
+pub fn integrate_step(state: &State, dt: f64, n_body_scratch: &mut NBodyScratch) -> StepResult {
     assert!(dt > 0.0, "dt must be positive");
     assert!(
         dt < MAX_TIME_STEP_SECONDS,
@@ -50,11 +53,11 @@ pub fn integrate_step(state: &State, dt: f64) -> StepResult {
     let g = state.gravitational_constant;
 
     if let Some(ref list) = state.bodies {
-        let new_bodies = integrate_n_body(list, g, dt);
+        let new_bodies = integrate_n_body(list, g, dt, n_body_scratch);
 
         let mut ke = 0.0;
         for b in &new_bodies {
-            ke += 0.5 * b.mass * (b.velocity.0.powi(2) + b.velocity.1.powi(2));
+            ke += 0.5 * b.mass * b.velocity.length_sq();
         }
 
         let mut pe = 0.0;
@@ -144,65 +147,6 @@ pub fn integrate_step(state: &State, dt: f64) -> StepResult {
         }
     }
 }
-
-pub(crate) fn advance_pos(p: (f64, f64), v: (f64, f64), a: (f64, f64), dt: f64) -> (f64, f64) {
-    let h = 0.5 * dt * dt;
-    (p.0 + v.0 * dt + a.0 * h, p.1 + v.1 * dt + a.1 * h)
-}
-
-fn advance_vel_and_body(
-    b: Body,
-    a_init: (f64, f64),
-    a_final: (f64, f64),
-    dt: f64,
-    pos: (f64, f64),
-) -> Body {
-    Body::new(
-        pos,
-        (
-            b.velocity.0 + 0.5 * (a_init.0 + a_final.0) * dt,
-            b.velocity.1 + 0.5 * (a_init.1 + a_final.1) * dt,
-        ),
-        b.mass,
-        b.radius,
-    )
-}
-
-fn pairwise_acc(src: &Body, tgt: &Body, g: f64) -> (f64, f64) {
-    let r = distance(src.position, tgt.position);
-    assert!(r > 0.0, "bodies must not occupy the same position");
-
-    let r_safe = r.max(1000.0);
-    let force = force_between(src.mass, tgt.mass, r_safe, g);
-    let a_mag = acceleration_from_force(force, tgt.mass);
-
-    let dx = src.position.0 - tgt.position.0;
-    let dy = src.position.1 - tgt.position.1;
-    (dx * a_mag / r_safe, dy * a_mag / r_safe)
-}
-
-fn tp_acc(p: &Body, s: &Body, t: &Body, g: f64) -> (f64, f64) {
-    let a_p = pairwise_acc(p, t, g);
-    let a_s = pairwise_acc(s, t, g);
-    (a_p.0 + a_s.0, a_p.1 + a_s.1)
-}
-
-fn kinetic_energy(state: &State) -> f64 {
-    let ke = |b: &Body| 0.5 * b.mass * (b.velocity.0.powi(2) + b.velocity.1.powi(2));
-    ke(&state.primary) + ke(&state.secondary) + ke(&state.test_particle)
-}
-
-fn potential_energy(state: &State) -> f64 {
-    let g = state.gravitational_constant;
-    let d_ps = distance(state.primary.position, state.secondary.position);
-    let d_pt = distance(state.primary.position, state.test_particle.position);
-    let d_st = distance(state.secondary.position, state.test_particle.position);
-
-    -force_between(state.primary.mass, state.secondary.mass, d_ps, g) * d_ps
-        - force_between(state.primary.mass, state.test_particle.mass, d_pt, g) * d_pt
-        - force_between(state.secondary.mass, state.test_particle.mass, d_st, g) * d_st
-}
-
 
 #[cfg(test)]
 #[path = "integrator_tests.rs"]

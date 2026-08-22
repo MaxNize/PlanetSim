@@ -142,4 +142,34 @@ describe('ParameterControls component', () => {
 
     expect(props.setMassM1).toHaveBeenCalledWith(2e24);
   });
+
+  it('rejects an out-of-range speed multiplier and reverts the field on blur', () => {
+    render(<ParameterControls {...props} />);
+    const speedInput = screen.getAllByRole('textbox')[3] as HTMLInputElement;
+
+    fireEvent.change(speedInput, { target: { value: '999999' } });
+    fireEvent.blur(speedInput);
+
+    expect(props.setSpeedMultiplier).not.toHaveBeenCalled();
+    expect(speedInput.value).toBe(props.speedMultiplier.toFixed(0));
+  });
+
+  it('commits a valid speed multiplier within [1, 100000] on blur', () => {
+    render(<ParameterControls {...props} />);
+    const speedInput = screen.getAllByRole('textbox')[3] as HTMLInputElement;
+
+    fireEvent.change(speedInput, { target: { value: '5000' } });
+    fireEvent.blur(speedInput);
+
+    expect(props.setSpeedMultiplier).toHaveBeenLastCalledWith(5000);
+  });
+
+  it('converts the speed slider drag to a linear value via the log scale', () => {
+    render(<ParameterControls {...props} />);
+    const speedSlider = document.querySelectorAll('input[type="range"]')[3] as HTMLInputElement;
+
+    fireEvent.change(speedSlider, { target: { value: '4' } });
+
+    expect(props.setSpeedMultiplier).toHaveBeenLastCalledWith(10000);
+  });
 });

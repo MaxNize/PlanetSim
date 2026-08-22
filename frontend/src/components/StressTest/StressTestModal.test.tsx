@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { simulationContext } from '../../context/SimulationContext';
+import { simulationAnimationContext } from '../../context/SimulationAnimationContext';
 import { StressTestModal } from './StressTestModal';
 import { SimulationState } from '../../services/wasmBridge';
 
@@ -36,7 +37,9 @@ describe('StressTestModal component', () => {
 
     render(
       <simulationContext.Provider value={mockContextValue as any}>
-        <StressTestModal onClose={vi.fn()} />
+        <simulationAnimationContext.Provider value={mockContextValue as any}>
+          <StressTestModal onClose={vi.fn()} />
+        </simulationAnimationContext.Provider>
       </simulationContext.Provider>,
     );
 
@@ -59,7 +62,9 @@ describe('StressTestModal component', () => {
 
     render(
       <simulationContext.Provider value={mockContextValue as any}>
-        <StressTestModal onClose={onClose} />
+        <simulationAnimationContext.Provider value={mockContextValue as any}>
+          <StressTestModal onClose={onClose} />
+        </simulationAnimationContext.Provider>
       </simulationContext.Provider>,
     );
 
@@ -84,7 +89,9 @@ describe('StressTestModal component', () => {
 
     render(
       <simulationContext.Provider value={mockContextValue as any}>
-        <StressTestModal onClose={vi.fn()} />
+        <simulationAnimationContext.Provider value={mockContextValue as any}>
+          <StressTestModal onClose={vi.fn()} />
+        </simulationAnimationContext.Provider>
       </simulationContext.Provider>,
     );
 
@@ -110,7 +117,9 @@ describe('StressTestModal component', () => {
 
     render(
       <simulationContext.Provider value={mockContextValue as any}>
-        <StressTestModal onClose={vi.fn()} />
+        <simulationAnimationContext.Provider value={mockContextValue as any}>
+          <StressTestModal onClose={vi.fn()} />
+        </simulationAnimationContext.Provider>
       </simulationContext.Provider>,
     );
 
@@ -141,7 +150,9 @@ describe('StressTestModal component', () => {
 
     render(
       <simulationContext.Provider value={mockContextValue as any}>
-        <StressTestModal onClose={vi.fn()} />
+        <simulationAnimationContext.Provider value={mockContextValue as any}>
+          <StressTestModal onClose={vi.fn()} />
+        </simulationAnimationContext.Provider>
       </simulationContext.Provider>,
     );
 
@@ -173,7 +184,9 @@ describe('StressTestModal component', () => {
 
     const { rerender } = render(
       <simulationContext.Provider value={mockContextValue as any}>
-        <StressTestModal onClose={vi.fn()} />
+        <simulationAnimationContext.Provider value={mockContextValue as any}>
+          <StressTestModal onClose={vi.fn()} />
+        </simulationAnimationContext.Provider>
       </simulationContext.Provider>,
     );
 
@@ -188,7 +201,9 @@ describe('StressTestModal component', () => {
     currentFps = 45;
     rerender(
       <simulationContext.Provider value={mockContextValue as any}>
-        <StressTestModal onClose={vi.fn()} />
+        <simulationAnimationContext.Provider value={mockContextValue as any}>
+          <StressTestModal onClose={vi.fn()} />
+        </simulationAnimationContext.Provider>
       </simulationContext.Provider>,
     );
 

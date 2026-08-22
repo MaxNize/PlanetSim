@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 const LEGEND_STYLE = {
   position: 'absolute',
   bottom: '24px',
@@ -20,8 +22,14 @@ interface SimulatorLegendProps {
   hasLagrangePoints: boolean;
 }
 
-/** Floating legend explaining the canvas's current color coding. */
-export function SimulatorLegend({ mode, hasLagrangePoints }: SimulatorLegendProps) {
+/**
+ * Floating legend explaining the canvas's current color coding.
+ * Memoized: `hasLagrangePoints` is a boolean derived from the 60Hz lagrangePoints state upstream,
+ * so without React.memo this would re-render every animation frame despite its own props rarely
+ * changing value (see ParameterControls for the same pattern).
+ */
+// eslint-disable-next-line @typescript-eslint/naming-convention -- React.memo(Component) is the standard PascalCase idiom; the rule has no carve-out for it.
+export const SimulatorLegend = memo(function SimulatorLegend({ mode, hasLagrangePoints }: SimulatorLegendProps) {
   return (
     <div style={LEGEND_STYLE}>
       {mode === 'sandbox' ? (
@@ -36,4 +44,4 @@ export function SimulatorLegend({ mode, hasLagrangePoints }: SimulatorLegendProp
       )}
     </div>
   );
-}
+});

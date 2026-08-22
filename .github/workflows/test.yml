@@ -197,17 +197,35 @@ jobs:
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
 
       - name: Cache Cargo dependencies
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: wasm
 
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+
       - name: Run Cargo Clippy
         run: cd wasm && cargo clippy --all-targets -- -D warnings
 
       - name: Run Cargo tests
         run: cd wasm && cargo test
+
+      - name: Enforce 100% coverage for the physics engine
+        run: ./scripts/check_rust_coverage.sh
+
+      - name: Generate coverage HTML report
+        run: cd wasm && cargo llvm-cov --html --ignore-filename-regex 'wasm/mod\.rs$' --no-clean
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-coverage
+          path: target/llvm-cov/html/
+          if-no-files-found: error
 
       - name: Run doctests
         run: cd wasm && cargo test --doc

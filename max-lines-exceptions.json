@@ -1,99 +1,54 @@
 {
-    "exemptions": [
-        {
-            "path": "frontend/src/types/*.ts",
-            "reason": "type clusters - related TypeScript interfaces and types grouped for maintainability",
-            "approved_by": "arch-team"
-        },
-        {
-            "path": "frontend/src/i18n/translations.ts",
-            "reason": "i18n translation dictionaries for multi-language support",
-            "approved_by": "arch-team"
-        },
-        {
-            "path": "wasm/src/lib.rs",
-            "reason": "rustdoc examples and WASM bindings - contains multiple documented exports with examples",
-            "approved_by": "arch-team"
-        },
-        {
-            "path": "wasm/src/physics/gravity.rs",
-            "reason": "API documentation and runnable doctests for gravitational calculations",
-            "approved_by": "arch-team"
-        },
-        {
-            "path": "wasm/src/physics/integrator.rs",
-            "reason": "API documentation and runnable doctests for Velocity-Verlet integration",
-            "approved_by": "arch-team"
-        },
-        {
-            "path": "Docs/Management/Project-Management/Specs/SPEC-001-project-setup-guardrails.md",
-            "reason": "Project spec — accepted length",
-            "approved_by": "MaxNize"
-        },
-        {
-            "path": "Docs/Management/Project-Management/Specs/SPEC-006-canvas-rendering.md",
-            "reason": "Project spec — accepted length",
-            "approved_by": "MaxNize"
-        },
-        {
-            "path": "Docs/Management/Project-Management/Specs/SPEC-007-parameter-controls.md",
-            "reason": "Project spec — accepted length",
-            "approved_by": "MaxNize"
-        },
-        {
-            "path": "Docs/Management/Project-Management/Specs/SPEC-008-trajectory-visualization.md",
-            "reason": "Project spec — accepted length",
-            "approved_by": "MaxNize"
-        },
-        {
-            "path": "Docs/Management/Project-Management/Specs/SPEC-009-sandbox-placement.md",
-            "reason": "Project spec — accepted length",
-            "approved_by": "MaxNize"
-        },
-        {
-            "path": "Docs/Management/Project-Management/Specs/SPEC-010-object-manipulation.md",
-            "reason": "Project spec — accepted length",
-            "approved_by": "MaxNize"
-        },
-        {
-            "path": "Docs/Management/Project-Management/Specs/SPEC-011-cicd-pipeline.md",
-            "reason": "Project spec — accepted length",
-            "approved_by": "MaxNize"
-        },
-        {
-            "path": "Docs/Management/Project-Management/Specs/SPEC-013-api-documentation.md",
-            "reason": "Project spec — accepted length",
-            "approved_by": "MaxNize"
-        },
-        {
-            "path": "Docs/Management/Project-Management/Specs/SPEC-014-developer-guide.md",
-            "reason": "Project spec — accepted length",
-            "approved_by": "MaxNize"
-        },
-        {
-            "path": "Docs/arc42.md",
-            "reason": "Full 12-chapter arc42 architecture document (FP-40) — accepted length",
-            "approved_by": "MaxNize"
-        },
-        {
-            "path": "frontend/src/components/StressTest/StressTestModal.tsx",
-            "reason": "Performance stress test benchmark modal containing controls and benchmark history list",
-            "approved_by": "arch-team"
-        },
-        {
-            "path": "frontend/src/components/StressTest/StressTestModal.test.tsx",
-            "reason": "Unit tests for StressTestModal covering quick spawn, benchmark runner, and threshold detection",
-            "approved_by": "arch-team"
-        },
-        {
-            "path": "frontend/src/components/ParameterControls/ParameterControls.tsx",
-            "reason": "Simulation system parameter controls panel container",
-            "approved_by": "arch-team"
-        },
-        {
-            "path": "frontend/src/components/StateDisplay/StateDisplay.tsx",
-            "reason": "Simulation telemetry display panel including real-time performance FPS telemetry",
-            "approved_by": "arch-team"
-        }
-    ]
+  "exemptions": [
+    {
+      "path": "Docs/Management/Project-Management/Specs/SPEC-001-project-setup-guardrails.md",
+      "reason": "Project spec — accepted length",
+      "approved_by": "MaxNize"
+    },
+    {
+      "path": "Docs/Management/Project-Management/Specs/SPEC-006-canvas-rendering.md",
+      "reason": "Project spec — accepted length",
+      "approved_by": "MaxNize"
+    },
+    {
+      "path": "Docs/Management/Project-Management/Specs/SPEC-007-parameter-controls.md",
+      "reason": "Project spec — accepted length",
+      "approved_by": "MaxNize"
+    },
+    {
+      "path": "Docs/Management/Project-Management/Specs/SPEC-008-trajectory-visualization.md",
+      "reason": "Project spec — accepted length",
+      "approved_by": "MaxNize"
+    },
+    {
+      "path": "Docs/Management/Project-Management/Specs/SPEC-009-sandbox-placement.md",
+      "reason": "Project spec — accepted length",
+      "approved_by": "MaxNize"
+    },
+    {
+      "path": "Docs/Management/Project-Management/Specs/SPEC-010-object-manipulation.md",
+      "reason": "Project spec — accepted length",
+      "approved_by": "MaxNize"
+    },
+    {
+      "path": "Docs/Management/Project-Management/Specs/SPEC-011-cicd-pipeline.md",
+      "reason": "Project spec — accepted length",
+      "approved_by": "MaxNize"
+    },
+    {
+      "path": "Docs/Management/Project-Management/Specs/SPEC-013-api-documentation.md",
+      "reason": "Project spec — accepted length",
+      "approved_by": "MaxNize"
+    },
+    {
+      "path": "Docs/Management/Project-Management/Specs/SPEC-014-developer-guide.md",
+      "reason": "Project spec — accepted length",
+      "approved_by": "MaxNize"
+    },
+    {
+      "path": "Docs/arc42.md",
+      "reason": "Full 12-chapter arc42 architecture document (FP-40) — accepted length",
+      "approved_by": "MaxNize"
+    }
+  ]
 }

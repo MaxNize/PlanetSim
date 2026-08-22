@@ -3,11 +3,20 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { StateDisplay } from './StateDisplay';
 
+const contextMock: { mode: '3body' | 'sandbox' } = { mode: '3body' };
+const animationMock: { currentState: { bodies?: unknown[] }; fps: number; frameTimeMs: number; fpsStatus: string } = {
+  currentState: {},
+  fps: 60,
+  frameTimeMs: 16.7,
+  fpsStatus: 'smooth',
+};
+
 vi.mock('../../context/SimulationContext', () => ({
-  useSimulationContext: () => ({
-    mode: '3body',
-    currentState: {},
-  }),
+  useSimulationContext: () => contextMock,
+}));
+
+vi.mock('../../context/SimulationAnimationContext', () => ({
+  useSimulationAnimation: () => animationMock,
 }));
 
 describe('StateDisplay component', () => {
@@ -42,5 +51,36 @@ describe('StateDisplay component', () => {
 
     // Assert error state
     expect(screen.getByText(/⚠️ Error: Test engine warning/)).toBeDefined();
+  });
+
+  it('renders sandbox bodies, falling back to a generated name/color when unset', () => {
+    contextMock.mode = 'sandbox';
+    animationMock.currentState = {
+      bodies: [
+        { id: 'a', name: 'Named Body', color: '#123456', position: [1e6, 0], velocity: [0, 0] },
+        { position: [2e6, 0], velocity: [0, 0] },
+      ],
+    };
+
+    const props = {
+      time: 0,
+      primaryPos: [0, 0] as [number, number],
+      primaryVel: [0, 0] as [number, number],
+      secondaryPos: [0, 0] as [number, number],
+      secondaryVel: [0, 0] as [number, number],
+      testParticlePos: [0, 0] as [number, number],
+      testParticleVel: [0, 0] as [number, number],
+      kineticEnergy: undefined,
+      potentialEnergy: undefined,
+      error: null,
+    };
+
+    render(<StateDisplay {...props} />);
+
+    expect(screen.getByText('Named Body')).toBeDefined();
+    expect(screen.getByText('Body 2')).toBeDefined();
+
+    contextMock.mode = '3body';
+    animationMock.currentState = {};
   });
 });

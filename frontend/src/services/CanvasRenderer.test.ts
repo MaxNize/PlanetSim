@@ -19,6 +19,9 @@ describe('CanvasRenderer', () => {
       addColorStop: vi.fn(),
     })),
     resetTransform: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    translate: vi.fn(),
     fillStyle: '',
     strokeStyle: '',
     lineWidth: 0,
@@ -115,6 +118,16 @@ describe('CanvasRenderer', () => {
       expect(mockContext.fillText).toHaveBeenCalledWith(expect.stringContaining('Time:'), 44, 140);
     });
 
+    it('reuses a cached radial gradient across draws with the same colors/radii', () => {
+      const renderer = new CanvasRenderer(mockCanvas);
+      mockContext.createRadialGradient.mockClear();
+      renderer.draw(fixedState, emptyTrails, false, null, viewport);
+      const calls = mockContext.createRadialGradient.mock.calls.length;
+      expect(calls).toBeGreaterThan(0);
+      renderer.draw(fixedState, emptyTrails, false, null, viewport);
+      expect(mockContext.createRadialGradient).toHaveBeenCalledTimes(calls);
+    });
+
     it('renders sandbox bodies with names, custom trails, and locked/selected markers', () => {
       const renderer = new CanvasRenderer(mockCanvas);
       const sandboxState: SimulationState = {
@@ -150,14 +163,8 @@ describe('CanvasRenderer', () => {
     });
 
     it('does nothing if the canvas context is unavailable', () => {
-      const canvasWithoutContext = {
-        getContext: vi.fn(() => null),
-        getBoundingClientRect: vi.fn(() => ({ width: 800, height: 600 })),
-        width: 800,
-        height: 600,
-      } as unknown as HTMLCanvasElement;
+      const canvasWithoutContext = { getContext: vi.fn(() => null), getBoundingClientRect: vi.fn(() => ({ width: 800, height: 600 })), width: 800, height: 600 } as unknown as HTMLCanvasElement;
       const renderer = new CanvasRenderer(canvasWithoutContext);
-
       expect(() => renderer.draw(fixedState, emptyTrails, true, null, viewport)).not.toThrow();
     });
   });

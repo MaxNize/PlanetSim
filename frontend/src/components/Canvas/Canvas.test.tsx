@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { simulationContext, DEFAULT_INITIAL_STATE } from '../../context/SimulationContext';
+import { simulationAnimationContext } from '../../context/SimulationAnimationContext';
 import { Canvas } from './Canvas';
 import { SandboxBody, SimulationMode } from '../../types';
 
@@ -39,7 +40,11 @@ function TestProvider({ overrides, children }: { overrides: Partial<typeof baseC
   const toggleMiniview = (body: SandboxBody) => setMiniviewBodyId((prev) => (prev === body.id ? null : body.id));
 
   const value = { ...baseContextValue, ...overrides, trackedBodyId, setTrackedBodyId, toggleTracking, miniviewBodyId, setMiniviewBodyId, toggleMiniview };
-  return <simulationContext.Provider value={value as any}>{children}</simulationContext.Provider>;
+  return (
+    <simulationContext.Provider value={value as any}>
+      <simulationAnimationContext.Provider value={value as any}>{children}</simulationAnimationContext.Provider>
+    </simulationContext.Provider>
+  );
 }
 
 describe('Canvas component', () => {
