@@ -71,6 +71,7 @@ export const de: Record<string, string> = {
   'telemetry.statusSmooth': 'Flüssig (60 FPS)',
   'telemetry.statusModerate': 'Mäßig (30–54 FPS)',
   'telemetry.statusLag': 'Ruckelnd (<30 FPS)',
+  'telemetry.selectBodyHint': 'Körper auswählen, um Live-Telemetrie zu sehen.',
   'stressTest.title': 'Performance-Stresstest',
   'stressTest.subtitle': 'Messe die Grenzen der Physik-Engine und ermittle, wann die FPS unter 60 fallen.',
   'stressTest.startBenchmark': '▶ Auto-Benchmark starten',
