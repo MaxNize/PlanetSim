@@ -3,20 +3,9 @@ import { SandboxControlsProps, SandboxBody } from '../../types';
 import { useSimulationContext } from '../../context/SimulationContext';
 import { useI18n } from '../../context/I18nContext';
 import { BodyEditDialog } from '../BodyEditDialog/BodyEditDialog';
-import { SandboxBodyItem } from './SandboxBodyItem';
+import { VirtualizedBodyList } from './VirtualizedBodyList';
 import { colors } from '../../styles/tokens';
 import { MAX_SANDBOX_BODIES } from '../../context/useSandbox';
-
-/**
- * The body list is windowed (only rows near the visible scroll area are mounted) so its DOM/React
- * cost stays flat instead of scaling with sandboxBodies.length — at the stress test's 1000-body
- * cap, mounting all rows unconditionally made the whole page (not just the canvas) sluggish.
- */
-const LIST_HEIGHT_PX = 200;
-const ROW_HEIGHT_PX = 64;
-const ROW_GAP_PX = 8;
-const ROW_STEP_PX = ROW_HEIGHT_PX + ROW_GAP_PX;
-const OVERSCAN_ROWS = 3;
 
 const SECTION_HEADER_STYLE = {
   fontSize: '12px',
@@ -50,7 +39,6 @@ function notifySelection(id: string | null, onSelectBody: ((id: string | null) =
 /**
  * Renders sandbox specific panel controls including custom bodies listing, selection, editing, and active toggling.
  */
-// fallow-ignore-next-line complexity
 export function SandboxControls({ selectedBodyId: propsSelectedId, onSelectBody, onOpenStressTest }: SandboxControlsProps) {
   const {
     sandboxBodies,
@@ -80,13 +68,16 @@ export function SandboxControls({ selectedBodyId: propsSelectedId, onSelectBody,
     }
   };
 
-  const totalCount = sandboxBodies.length;
-  const visibleRowCount = Math.ceil(LIST_HEIGHT_PX / ROW_STEP_PX) + OVERSCAN_ROWS * 2;
-  const startIndex = Math.max(0, Math.floor(scrollTop / ROW_STEP_PX) - OVERSCAN_ROWS);
-  const endIndex = Math.min(totalCount, startIndex + visibleRowCount);
-  const visibleBodies = sandboxBodies.slice(startIndex, endIndex);
-  const topSpacerHeight = startIndex * ROW_STEP_PX;
-  const bottomSpacerHeight = (totalCount - endIndex) * ROW_STEP_PX;
+  const itemLabels = {
+    edit: t('sandbox.editBody'),
+    delete: t('sandbox.deleteBody'),
+    defaultName: t('sandbox.defaultBodyName'),
+    locked: t('editDialog.locked'),
+    track: t('contextMenu.track'),
+    untrack: t('contextMenu.untrack'),
+    showMiniview: t('contextMenu.showMiniview'),
+    hideMiniview: t('contextMenu.hideMiniview'),
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -98,35 +89,20 @@ export function SandboxControls({ selectedBodyId: propsSelectedId, onSelectBody,
         {t('sandbox.bodiesTitle')} ({sandboxBodies.length}/{MAX_SANDBOX_BODIES})
       </h3>
 
-      <div style={{ maxHeight: `${LIST_HEIGHT_PX}px`, overflowY: 'auto' }} onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)} data-testid="sandbox-body-list">
-        {topSpacerHeight > 0 && <div style={{ height: `${topSpacerHeight}px` }} />}
-        {visibleBodies.map((b) => (
-          <div key={b.id} style={{ marginBottom: `${ROW_GAP_PX}px` }}>
-            <SandboxBodyItem
-              body={b}
-              isSelected={activeSelectedId === b.id}
-              isTracked={trackedBodyId === b.id}
-              isInMiniview={miniviewBodyId === b.id}
-              onSelect={handleSelect}
-              onEdit={setEditingBody}
-              onDelete={removeBody}
-              onTrackToggle={toggleTracking}
-              onMiniviewToggle={toggleMiniview}
-              labels={{
-                edit: t('sandbox.editBody'),
-                delete: t('sandbox.deleteBody'),
-                defaultName: t('sandbox.defaultBodyName'),
-                locked: t('editDialog.locked'),
-                track: t('contextMenu.track'),
-                untrack: t('contextMenu.untrack'),
-                showMiniview: t('contextMenu.showMiniview'),
-                hideMiniview: t('contextMenu.hideMiniview'),
-              }}
-            />
-          </div>
-        ))}
-        {bottomSpacerHeight > 0 && <div style={{ height: `${bottomSpacerHeight}px` }} />}
-      </div>
+      <VirtualizedBodyList
+        sandboxBodies={sandboxBodies}
+        scrollTop={scrollTop}
+        onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
+        activeSelectedId={activeSelectedId}
+        trackedBodyId={trackedBodyId}
+        miniviewBodyId={miniviewBodyId}
+        handleSelect={handleSelect}
+        setEditingBody={setEditingBody}
+        removeBody={removeBody}
+        toggleTracking={toggleTracking}
+        toggleMiniview={toggleMiniview}
+        labels={itemLabels}
+      />
 
       {editingBody && (
         <BodyEditDialog
