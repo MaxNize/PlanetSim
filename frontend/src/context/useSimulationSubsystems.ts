@@ -5,6 +5,7 @@ import { useMiniview } from '../hooks/useMiniview';
 import { useFps } from '../hooks/useFps';
 import { useSimulationCoreState } from './useSimulationCoreState';
 
+/** Coordinates secondary hooks for sandbox, camera tracking, miniview, and FPS measurement. */
 export function useSimulationSubsystems(core: ReturnType<typeof useSimulationCoreState>, simulator: SimulatorBridge | null, setStepResult: React.Dispatch<React.SetStateAction<StepResult | null>>) {
   const sandbox = useSandbox(core.sandboxBodies, core.setSandboxBodies, core.currentState, core.setCurrentState, core.setInitialState, core.setIsPaused, setStepResult, core.setModeState, simulator);
   const tracking = useBodyTracking(core.currentState, core.mode);

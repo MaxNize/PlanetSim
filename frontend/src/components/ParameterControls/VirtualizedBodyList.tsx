@@ -32,6 +32,7 @@ export interface VirtualizedBodyListProps {
   };
 }
 
+/** Renders a windowed/virtualized list of sandbox bodies for high performance. */
 export function VirtualizedBodyList({
   sandboxBodies,
   scrollTop,
