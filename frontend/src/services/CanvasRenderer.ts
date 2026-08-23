@@ -7,6 +7,10 @@ import { colors } from '../styles/tokens';
 
 export type { ViewportConfig };
 
+/** Shared per-frame budget for trail points, split across bodies. See decimateTrail in canvasHelpers.ts. */
+const TRAIL_POINT_BUDGET = 10_000;
+const MIN_TRAIL_POINTS_PER_BODY = 20;
+
 /** Which highlight rings to draw around a body (selection, lock, fixed-role, camera-tracking). */
 export interface BodyMarkers {
   isFixed?: boolean;
@@ -27,9 +31,6 @@ export class CanvasRenderer {
   }
 
   /** Main render method that coordinates drawing the entire simulation state. */
-  // 4 independent top-level rendering steps (early-return guard, optional Lagrange points,
-  // sandbox-vs-fixed body dispatch, optional placement preview) — already delegated to helper
-  // methods; wrapping single `if`s in more functions would only dodge the metric.
   // fallow-ignore-next-line complexity
   public draw(
     state: SimulationState,
@@ -52,10 +53,13 @@ export class CanvasRenderer {
       drawLagrangePoints(ctx, lagrangePoints, wtc);
     }
 
+    const bodyCount = state.bodies ? state.bodies.length : 3;
+    const trailPointBudget = Math.max(MIN_TRAIL_POINTS_PER_BODY, Math.floor(TRAIL_POINT_BUDGET / Math.max(1, bodyCount)));
+
     if (state.bodies) {
-      this.drawSandboxBodies(ctx, state.bodies, trailHistory, showTrail, viewport, width, height, selectedBodyId, trackedBodyId, wtc);
+      this.drawSandboxBodies(ctx, state.bodies, trailHistory, showTrail, viewport, width, height, selectedBodyId, trackedBodyId, wtc, trailPointBudget);
     } else {
-      this.drawFixedBodies(ctx, state, trailHistory, showTrail, viewport, width, height, selectedBodyId, trackedBodyId, wtc);
+      this.drawFixedBodies(ctx, state, trailHistory, showTrail, viewport, width, height, selectedBodyId, trackedBodyId, wtc, trailPointBudget);
     }
 
     if (placementPreview) {
@@ -97,6 +101,7 @@ export class CanvasRenderer {
     selectedBodyId: string | null | undefined,
     trackedBodyId: string | null | undefined,
     wtc: (pos: [number, number]) => { x: number; y: number },
+    trailPointBudget: number,
   ): void {
     const fixedBodies = [
       { id: 'primary', body: state.primary, color: colors.primaryBody, trail: trailHistory.primary },
@@ -104,12 +109,13 @@ export class CanvasRenderer {
       { id: 'testParticle', body: state.testParticle, color: colors.testParticleBody, trail: trailHistory.testParticle },
     ];
     fixedBodies.forEach(({ id, body, color, trail }) => {
-      if (showTrail) drawTrail(ctx, trail, color, wtc);
+      if (showTrail) drawTrail(ctx, trail, color, wtc, trailPointBudget);
       this.drawBody(body.position, body.radius, color, viewport, width, height, { isSelected: selectedBodyId === id, isTracked: trackedBodyId === id });
     });
   }
 
   /** Renders each sandbox body's trail, disc, and optional name label. */
+  // fallow-ignore-next-line complexity
   private drawSandboxBodies(
     ctx: CanvasRenderingContext2D,
     bodies: (Body & { id?: string; name?: string; color?: string; locked?: boolean })[],
@@ -121,13 +127,12 @@ export class CanvasRenderer {
     selectedBodyId: string | null | undefined,
     trackedBodyId: string | null | undefined,
     wtc: (pos: [number, number]) => { x: number; y: number },
+    trailPointBudget: number,
   ): void {
-    // 3 independent per-body concerns: id fallback, optional trail, optional label — already minimal.
-    // fallow-ignore-next-line complexity
     bodies.forEach((b, idx) => {
       const bodyId = b.id || `body-${idx}`;
       if (showTrail && trailHistory.customBodies?.[bodyId]) {
-        drawTrail(ctx, trailHistory.customBodies[bodyId], b.color || colors.white, wtc);
+        drawTrail(ctx, trailHistory.customBodies[bodyId], b.color || colors.white, wtc, trailPointBudget);
       }
       this.drawBody(b.position, b.radius, b.color || colors.white, viewport, width, height, { isSelected: selectedBodyId === bodyId, isLocked: b.locked, isTracked: trackedBodyId === bodyId });
       if (b.name) drawBodyLabel(ctx, b.position, b.name, wtc);

@@ -85,10 +85,10 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         enriched.bodies = enrichBodies(enriched.bodies, sandboxBodies);
       }
       setCurrentState(enriched);
-      recordStep(enriched);
+      if (showTrail) recordStep(enriched); // O(bodies) work (see useTrailHistory); skip if unseen.
       if (simulator && mode === '3body') refreshLagrangePoints(simulator, setLagrangePoints);
     },
-    [simulator, sandboxBodies, mode, recordStep],
+    [simulator, sandboxBodies, mode, recordStep, showTrail],
   );
 
   const { stepResult, setStepResult } = useSimulationStep(simulator, isPaused, speedMultiplier, handleStep);

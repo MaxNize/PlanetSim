@@ -32,32 +32,30 @@ export function BodyDisplay({ name, color, position, velocity, posLabel, velLabe
 interface BodyListProps {
   mode: SimulationMode;
   sandboxBodies?: { id?: string; name?: string; color?: string; position: [number, number]; velocity: [number, number] }[];
+  selectedBodyId: string | null;
   primary: { pos: [number, number]; vel: [number, number] };
   secondary: { pos: [number, number]; vel: [number, number] };
   testParticle: { pos: [number, number]; vel: [number, number] };
-  labels: { primary: string; secondary: string; testParticle: string; pos: string; vel: string };
+  labels: { primary: string; secondary: string; testParticle: string; pos: string; vel: string; selectBodyHint: string };
 }
 
 /**
- * Renders the position/velocity readout for either the sandbox custom bodies or the fixed 3-body set.
+ * Renders the position/velocity readout for either the fixed 3-body set, or — in sandbox mode —
+ * just the selected body. Live telemetry sits inside SimulationAnimationContext's 60Hz-updating
+ * subtree; React re-walks that whole subtree on every context update (the Provider wraps the
+ * entire Simulator tree), so its cost scales with everything rendered under the provider, not
+ * just with what actually reads the context. Rendering one row per sandbox body — up to 1000 of
+ * them — dwarfed the physics step itself. The interactive, editable list in SandboxControls
+ * (which only updates on add/remove/edit, not every step) already covers browsing all bodies.
  */
-export function BodyList({ mode, sandboxBodies, primary, secondary, testParticle, labels }: BodyListProps) {
+export function BodyList({ mode, sandboxBodies, selectedBodyId, primary, secondary, testParticle, labels }: BodyListProps) {
   if (mode === 'sandbox' && sandboxBodies) {
-    return (
-      <>
-        {sandboxBodies.map((b, idx) => (
-          <BodyDisplay
-            key={b.id || `body-${idx}`}
-            name={b.name || `Body ${idx + 1}`}
-            color={b.color || colors.white}
-            position={b.position}
-            velocity={b.velocity}
-            posLabel={labels.pos}
-            velLabel={labels.vel}
-          />
-        ))}
-      </>
-    );
+    const idx = sandboxBodies.findIndex((b) => b.id === selectedBodyId);
+    if (idx === -1) {
+      return <span style={{ fontSize: '11px', fontStyle: 'italic', color: colors.textMuted }}>{labels.selectBodyHint}</span>;
+    }
+    const b = sandboxBodies[idx];
+    return <BodyDisplay name={b.name || `Body ${idx + 1}`} color={b.color || colors.white} position={b.position} velocity={b.velocity} posLabel={labels.pos} velLabel={labels.vel} />;
   }
   return (
     <>

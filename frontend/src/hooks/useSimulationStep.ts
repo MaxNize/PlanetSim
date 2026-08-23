@@ -18,7 +18,13 @@ function performStep(simulator: SimulatorBridge | null, dt: number, speedMultipl
   const totalDt = dt * speedMultiplier;
   if (totalDt <= 0) return null;
 
-  const steps = Math.min(Math.max(1, Math.ceil(totalDt / MAX_SUB_STEP_SECONDS)), MAX_SUB_STEPS_PER_FRAME);
+  const currentState = simulator.getState?.();
+  const bodyCount = currentState?.bodies ? currentState.bodies.length : 3;
+  // Bounding total pairwise body interactions per frame (~300,000 max) keeps WASM cost well under 2ms even at 500+ bodies.
+  const maxStepsForBodies = bodyCount > 10 ? Math.max(1, Math.floor(300_000 / (bodyCount * bodyCount))) : MAX_SUB_STEPS_PER_FRAME;
+  const maxSteps = Math.min(MAX_SUB_STEPS_PER_FRAME, maxStepsForBodies);
+
+  const steps = Math.min(Math.max(1, Math.ceil(totalDt / MAX_SUB_STEP_SECONDS)), maxSteps);
   const subDt = totalDt / steps;
 
   try {

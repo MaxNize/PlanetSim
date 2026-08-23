@@ -50,7 +50,24 @@ describe('SandboxControls', () => {
     contextMock.sandboxBodies = Array.from({ length: Math.ceil(MAX_SANDBOX_BODIES * 0.5) }, (elementIgnored, i) => makeBody(`b${i}`));
     render(<SandboxControls />);
     expect(screen.getByText(/High body count/)).toBeDefined();
-  }, 30000);
+  });
+
+  it('windows the body list: only mounts rows near the visible scroll area, not all of them', () => {
+    contextMock.sandboxBodies = Array.from({ length: 500 }, (elementIgnored, i) => makeBody(`w${i}`));
+    render(<SandboxControls />);
+
+    // Far below the initial viewport — must not be mounted yet.
+    expect(screen.queryByTestId('body-item-w499')).toBeNull();
+    // Within the initial viewport (list starts scrolled to top).
+    expect(screen.getByTestId('body-item-w0')).toBeDefined();
+
+    const list = screen.getByTestId('sandbox-body-list');
+    fireEvent.scroll(list, { target: { scrollTop: 35800 } });
+
+    // After scrolling far down, an earlier row is unmounted and a later one appears.
+    expect(screen.queryByTestId('body-item-w0')).toBeNull();
+    expect(screen.getByTestId('body-item-w499')).toBeDefined();
+  });
 
   it('uses the controlled selectedBodyId prop over context state when provided', () => {
     contextMock.sandboxBodies = [makeBody('a')];

@@ -27,14 +27,14 @@ describe('canvasHelpers', () => {
   describe('drawTrail', () => {
     it('does nothing for fewer than 2 points', () => {
       const ctx = createMockContext();
-      drawTrail(ctx, [[0, 0]], '#fff', worldToCanvas);
+      drawTrail(ctx, [[0, 0]], '#fff', worldToCanvas, 100);
       expect(ctx.beginPath).not.toHaveBeenCalled();
     });
 
     it('draws sections for a longer history and resets alpha', () => {
       const ctx = createMockContext();
       const history: [number, number][] = Array.from({ length: 25 }, (elementIgnored, i) => [i, i]);
-      drawTrail(ctx, history, '#fff', worldToCanvas);
+      drawTrail(ctx, history, '#fff', worldToCanvas, 100);
       expect(ctx.beginPath).toHaveBeenCalled();
       expect(ctx.stroke).toHaveBeenCalled();
       expect(ctx.globalAlpha).toBe(1.0);
@@ -47,8 +47,46 @@ describe('canvasHelpers', () => {
         [1, 1],
         [2, 2],
       ];
-      drawTrail(ctx, history, '#fff', worldToCanvas);
+      drawTrail(ctx, history, '#fff', worldToCanvas, 100);
       expect(ctx.stroke).toHaveBeenCalled();
+    });
+
+    it('downsamples a history longer than maxPoints, keeping the most recent point', () => {
+      const ctx = createMockContext();
+      const history: [number, number][] = Array.from({ length: 1000 }, (elementIgnored, i) => [i, i]);
+      drawTrail(ctx, history, '#fff', worldToCanvas, 100);
+
+      // The last lineTo call must still reach the trail's most recent point (999, 999) -> (1998, 1998).
+      const lineToMock = ctx.lineTo as ReturnType<typeof vi.fn>;
+      const lastCall = lineToMock.mock.calls[lineToMock.mock.calls.length - 1];
+      expect(lastCall).toEqual([1998, 1998]);
+
+      // Far fewer draw calls than the 1000-point history would need undecimated.
+      expect(lineToMock.mock.calls.length).toBeLessThan(150);
+    });
+
+    it('handles downsampling when stride lands exactly on the last point', () => {
+      const ctx = createMockContext();
+      // 201 points with maxPoints=100 -> stride = Math.ceil(201/100) = 3.
+      // i = 0, 3, 6, ..., 198 (67 points). Last point index 200 is not 198, so push(last).
+      // 201 points with maxPoints=101 -> stride = 2.
+      // i = 0, 2, 4, ..., 200 (101 points). Last point index 200 IS 200, so branch skipped.
+      const history: [number, number][] = Array.from({ length: 201 }, (elementIgnored, i) => [i, i]);
+      drawTrail(ctx, history, '#fff', worldToCanvas, 101);
+
+      const lineToMock = ctx.lineTo as ReturnType<typeof vi.fn>;
+      const lastCall = lineToMock.mock.calls[lineToMock.mock.calls.length - 1];
+      expect(lastCall).toEqual([400, 400]);
+    });
+
+    it('draws every point when the history is within the budget', () => {
+      const ctx = createMockContext();
+      const history: [number, number][] = Array.from({ length: 10 }, (elementIgnored, i) => [i, i]);
+      drawTrail(ctx, history, '#fff', worldToCanvas, 100);
+
+      const lineToMock = ctx.lineTo as ReturnType<typeof vi.fn>;
+      // 9 segments connect 10 points.
+      expect(lineToMock.mock.calls.length).toBe(9);
     });
   });
 
