@@ -71,6 +71,7 @@ export const tlh: Record<string, string> = {
   'telemetry.statusSmooth': 'Smooth (60 FPS)',
   'telemetry.statusModerate': 'Moderate (30-54 FPS)',
   'telemetry.statusLag': 'Lag (<30 FPS)',
+  'telemetry.selectBodyHint': 'ghItlh legh DaneHchugh, Say choH.',
   'stressTest.title': 'Do Stress Test',
   'stressTest.subtitle': "chuyH Quj veH yIjuv. 60 FPS bup PoH yISha'.",
   'stressTest.startBenchmark': '▶ Benchmark yIghoS',

@@ -64,6 +64,27 @@ describe('useSimulationStep hook', () => {
     expect(result.current.stepResult).toBe(stepResult);
   });
 
+  it('bounds sub-steps dynamically when body count is high (>10)', () => {
+    const stepResult = { time: 1.0 } as unknown as StepResult;
+    const simulator = {
+      step: vi.fn(() => stepResult),
+      getState: vi.fn(() => ({ bodies: Array(50).fill({}) })),
+    } as unknown as SimulatorBridge;
+
+    const raf = mockRequestAnimationFrame();
+    const { result } = renderHook(() => useSimulationStep(simulator, false, 10000));
+
+    act(() => {
+      raf.fire(1000.0);
+      raf.fire(1016.7);
+    });
+
+    const calls = (simulator.step as ReturnType<typeof vi.fn>).mock.calls as [number][];
+    // 300,000 / (50*50) = 120 steps max.
+    expect(calls.length).toBeLessThanOrEqual(120);
+    expect(result.current.stepResult).toBe(stepResult);
+  });
+
   it('does nothing when the speed multiplier scales dt down to zero', () => {
     const stepResult = { time: 1.0 } as unknown as StepResult;
     const simulator = { step: vi.fn(() => stepResult) } as unknown as SimulatorBridge;

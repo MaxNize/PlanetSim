@@ -26,7 +26,7 @@ export function StateDisplay({
   error,
   onOpenStressTest,
 }: StateDisplayProps) {
-  const { mode } = useSimulationContext();
+  const { mode, selectedBodyId } = useSimulationContext();
   const { currentState } = useSimulationAnimation();
   const { t } = useI18n();
   const totalEnergy = kineticEnergy !== undefined && potentialEnergy !== undefined ? kineticEnergy + potentialEnergy : undefined;
@@ -81,10 +81,18 @@ export function StateDisplay({
           <BodyList
             mode={mode}
             sandboxBodies={currentState.bodies}
+            selectedBodyId={selectedBodyId}
             primary={{ pos: primaryPos, vel: primaryVel }}
             secondary={{ pos: secondaryPos, vel: secondaryVel }}
             testParticle={{ pos: testParticlePos, vel: testParticleVel }}
-            labels={{ primary: t('telemetry.primary'), secondary: t('telemetry.secondary'), testParticle: t('telemetry.testParticle'), pos: posLabel, vel: velLabel }}
+            labels={{
+              primary: t('telemetry.primary'),
+              secondary: t('telemetry.secondary'),
+              testParticle: t('telemetry.testParticle'),
+              pos: posLabel,
+              vel: velLabel,
+              selectBodyHint: t('telemetry.selectBodyHint'),
+            }}
           />
         </div>
 

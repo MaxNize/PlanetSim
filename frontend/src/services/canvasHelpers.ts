@@ -26,10 +26,33 @@ function drawTrailSection(
 }
 
 /**
- * Draws a fading trajectory trail for a celestial body.
+ * Downsamples a trail to at most `maxPoints`, always keeping the most recent point so the trail
+ * still visibly reaches the body's current position. Drawing every stored point (up to
+ * `trailLength`, default 1000) for every body doesn't add visible detail to a smooth orbit curve,
+ * but at scale it dominates frame cost: 150 sandbox bodies × 1000 points is up to 150k `lineTo`
+ * calls and 1500 `stroke()` calls (the expensive part — each rasterizes) per frame. The caller
+ * derives `maxPoints` from a shared per-frame point budget split across all currently-drawn
+ * trails, so resolution degrades gracefully as body count grows instead of cost scaling with it.
  */
-export function drawTrail(ctx: CanvasRenderingContext2D, history: [number, number][], color: string, worldToCanvas: (pos: [number, number]) => { x: number; y: number }): void {
-  const len = history.length;
+function decimateTrail(points: [number, number][], maxPoints: number): [number, number][] {
+  if (points.length <= maxPoints) return points;
+  const stride = Math.ceil(points.length / maxPoints);
+  const result: [number, number][] = [];
+  for (let i = 0; i < points.length; i += stride) {
+    result.push(points[i]);
+  }
+  const last = points[points.length - 1];
+  if (result[result.length - 1] !== last) result.push(last);
+  return result;
+}
+
+/**
+ * Draws a fading trajectory trail for a celestial body, downsampled to `maxPoints` (see
+ * decimateTrail).
+ */
+export function drawTrail(ctx: CanvasRenderingContext2D, history: [number, number][], color: string, worldToCanvas: (pos: [number, number]) => { x: number; y: number }, maxPoints: number): void {
+  const points = decimateTrail(history, maxPoints);
+  const len = points.length;
   if (len < 2) return;
 
   const numSections = Math.min(10, len - 1);
@@ -42,7 +65,7 @@ export function drawTrail(ctx: CanvasRenderingContext2D, history: [number, numbe
   })).filter(({ startIdx, endIdx }) => startIdx < endIdx);
 
   sections.forEach(({ s, startIdx, endIdx }) => {
-    drawTrailSection(ctx, history, startIdx, endIdx, color, ((s + 1) / numSections) * 0.45, worldToCanvas);
+    drawTrailSection(ctx, points, startIdx, endIdx, color, ((s + 1) / numSections) * 0.45, worldToCanvas);
   });
 
   ctx.globalAlpha = 1.0;

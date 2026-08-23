@@ -3,7 +3,7 @@ import { SandboxControlsProps, SandboxBody } from '../../types';
 import { useSimulationContext } from '../../context/SimulationContext';
 import { useI18n } from '../../context/I18nContext';
 import { BodyEditDialog } from '../BodyEditDialog/BodyEditDialog';
-import { SandboxBodyItem } from './SandboxBodyItem';
+import { VirtualizedBodyList } from './VirtualizedBodyList';
 import { colors } from '../../styles/tokens';
 import { MAX_SANDBOX_BODIES } from '../../context/useSandbox';
 
@@ -54,6 +54,7 @@ export function SandboxControls({ selectedBodyId: propsSelectedId, onSelectBody,
   } = useSimulationContext();
   const { t } = useI18n();
   const [editingBody, setEditingBody] = useState<SandboxBody | null>(null);
+  const [scrollTop, setScrollTop] = useState(0);
 
   const activeSelectedId = resolveActiveSelectedId(propsSelectedId, contextSelectedId);
 
@@ -67,6 +68,17 @@ export function SandboxControls({ selectedBodyId: propsSelectedId, onSelectBody,
     }
   };
 
+  const itemLabels = {
+    edit: t('sandbox.editBody'),
+    delete: t('sandbox.deleteBody'),
+    defaultName: t('sandbox.defaultBodyName'),
+    locked: t('editDialog.locked'),
+    track: t('contextMenu.track'),
+    untrack: t('contextMenu.untrack'),
+    showMiniview: t('contextMenu.showMiniview'),
+    hideMiniview: t('contextMenu.hideMiniview'),
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <h3 style={SECTION_HEADER_STYLE}>{t('sandbox.creatorTitle')}</h3>
@@ -77,32 +89,20 @@ export function SandboxControls({ selectedBodyId: propsSelectedId, onSelectBody,
         {t('sandbox.bodiesTitle')} ({sandboxBodies.length}/{MAX_SANDBOX_BODIES})
       </h3>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto' }}>
-        {sandboxBodies.map((b) => (
-          <SandboxBodyItem
-            key={b.id}
-            body={b}
-            isSelected={activeSelectedId === b.id}
-            isTracked={trackedBodyId === b.id}
-            isInMiniview={miniviewBodyId === b.id}
-            onSelect={handleSelect}
-            onEdit={setEditingBody}
-            onDelete={removeBody}
-            onTrackToggle={toggleTracking}
-            onMiniviewToggle={toggleMiniview}
-            labels={{
-              edit: t('sandbox.editBody'),
-              delete: t('sandbox.deleteBody'),
-              defaultName: t('sandbox.defaultBodyName'),
-              locked: t('editDialog.locked'),
-              track: t('contextMenu.track'),
-              untrack: t('contextMenu.untrack'),
-              showMiniview: t('contextMenu.showMiniview'),
-              hideMiniview: t('contextMenu.hideMiniview'),
-            }}
-          />
-        ))}
-      </div>
+      <VirtualizedBodyList
+        sandboxBodies={sandboxBodies}
+        scrollTop={scrollTop}
+        onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
+        activeSelectedId={activeSelectedId}
+        trackedBodyId={trackedBodyId}
+        miniviewBodyId={miniviewBodyId}
+        handleSelect={handleSelect}
+        setEditingBody={setEditingBody}
+        removeBody={removeBody}
+        toggleTracking={toggleTracking}
+        toggleMiniview={toggleMiniview}
+        labels={itemLabels}
+      />
 
       {editingBody && (
         <BodyEditDialog
