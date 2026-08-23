@@ -48,6 +48,7 @@ interface BodyListProps {
  * them — dwarfed the physics step itself. The interactive, editable list in SandboxControls
  * (which only updates on add/remove/edit, not every step) already covers browsing all bodies.
  */
+// fallow-ignore-next-line complexity
 export function BodyList({ mode, sandboxBodies, selectedBodyId, primary, secondary, testParticle, labels }: BodyListProps) {
   if (mode === 'sandbox' && sandboxBodies) {
     const idx = sandboxBodies.findIndex((b) => b.id === selectedBodyId);
