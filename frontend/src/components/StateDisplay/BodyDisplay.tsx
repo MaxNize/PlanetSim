@@ -39,6 +39,43 @@ interface BodyListProps {
   labels: { primary: string; secondary: string; testParticle: string; pos: string; vel: string; selectBodyHint: string };
 }
 
+function SelectedSandboxBody({
+  sandboxBodies,
+  selectedBodyId,
+  labels,
+}: {
+  sandboxBodies: { id?: string; name?: string; color?: string; position: [number, number]; velocity: [number, number] }[];
+  selectedBodyId: string | null;
+  labels: { pos: string; vel: string; selectBodyHint: string };
+}) {
+  const idx = sandboxBodies.findIndex((b) => b.id === selectedBodyId);
+  if (idx === -1) {
+    return <span style={{ fontSize: '11px', fontStyle: 'italic', color: colors.textMuted }}>{labels.selectBodyHint}</span>;
+  }
+  const b = sandboxBodies[idx];
+  return <BodyDisplay name={b.name ?? `Body ${idx + 1}`} color={b.color ?? colors.white} position={b.position} velocity={b.velocity} posLabel={labels.pos} velLabel={labels.vel} />;
+}
+
+function FixedBodyList({
+  primary,
+  secondary,
+  testParticle,
+  labels,
+}: {
+  primary: { pos: [number, number]; vel: [number, number] };
+  secondary: { pos: [number, number]; vel: [number, number] };
+  testParticle: { pos: [number, number]; vel: [number, number] };
+  labels: { primary: string; secondary: string; testParticle: string; pos: string; vel: string };
+}) {
+  return (
+    <>
+      <BodyDisplay name={labels.primary} color="#f0932b" position={primary.pos} velocity={primary.vel} posLabel={labels.pos} velLabel={labels.vel} />
+      <BodyDisplay name={labels.secondary} color="#48dbfb" position={secondary.pos} velocity={secondary.vel} posLabel={labels.pos} velLabel={labels.vel} />
+      <BodyDisplay name={labels.testParticle} color="#2ed573" position={testParticle.pos} velocity={testParticle.vel} posLabel={labels.pos} velLabel={labels.vel} />
+    </>
+  );
+}
+
 /**
  * Renders the position/velocity readout for either the fixed 3-body set, or — in sandbox mode —
  * just the selected body. Live telemetry sits inside SimulationAnimationContext's 60Hz-updating
@@ -48,21 +85,9 @@ interface BodyListProps {
  * them — dwarfed the physics step itself. The interactive, editable list in SandboxControls
  * (which only updates on add/remove/edit, not every step) already covers browsing all bodies.
  */
-// fallow-ignore-next-line complexity
 export function BodyList({ mode, sandboxBodies, selectedBodyId, primary, secondary, testParticle, labels }: BodyListProps) {
   if (mode === 'sandbox' && sandboxBodies) {
-    const idx = sandboxBodies.findIndex((b) => b.id === selectedBodyId);
-    if (idx === -1) {
-      return <span style={{ fontSize: '11px', fontStyle: 'italic', color: colors.textMuted }}>{labels.selectBodyHint}</span>;
-    }
-    const b = sandboxBodies[idx];
-    return <BodyDisplay name={b.name || `Body ${idx + 1}`} color={b.color || colors.white} position={b.position} velocity={b.velocity} posLabel={labels.pos} velLabel={labels.vel} />;
+    return <SelectedSandboxBody sandboxBodies={sandboxBodies} selectedBodyId={selectedBodyId} labels={labels} />;
   }
-  return (
-    <>
-      <BodyDisplay name={labels.primary} color="#f0932b" position={primary.pos} velocity={primary.vel} posLabel={labels.pos} velLabel={labels.vel} />
-      <BodyDisplay name={labels.secondary} color="#48dbfb" position={secondary.pos} velocity={secondary.vel} posLabel={labels.pos} velLabel={labels.vel} />
-      <BodyDisplay name={labels.testParticle} color="#2ed573" position={testParticle.pos} velocity={testParticle.vel} posLabel={labels.pos} velLabel={labels.vel} />
-    </>
-  );
+  return <FixedBodyList primary={primary} secondary={secondary} testParticle={testParticle} labels={labels} />;
 }

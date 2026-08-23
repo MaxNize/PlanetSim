@@ -44,8 +44,20 @@ export class CanvasRenderer {
     this.ctx = canvas.getContext('2d');
   }
 
+  private calculateTrailBudget(bodies?: Body[]): number {
+    const count = bodies ? bodies.length : 3;
+    return Math.max(MIN_TRAIL_POINTS_PER_BODY, Math.floor(TRAIL_POINT_BUDGET / Math.max(1, count)));
+  }
+
+  private renderBodies(rc: RenderContext, state: SimulationState, trailHistory: TrailHistory, showTrail: boolean): void {
+    if (state.bodies) {
+      this.drawSandboxBodies(rc, state.bodies, trailHistory, showTrail);
+    } else {
+      this.drawFixedBodies(rc, state, trailHistory, showTrail);
+    }
+  }
+
   /** Main render method that coordinates drawing the entire simulation state. */
-  // fallow-ignore-next-line complexity
   public draw(
     state: SimulationState,
     trailHistory: TrailHistory,
@@ -64,20 +76,11 @@ export class CanvasRenderer {
     const wtc: WorldToCanvasFn = (pos) => this.worldToCanvas(pos, viewport, width, height);
     if (lagrangePoints) drawLagrangePoints(ctx, lagrangePoints, wtc);
 
-    const bodyCount = state.bodies ? state.bodies.length : 3;
-    const trailPointBudget = Math.max(MIN_TRAIL_POINTS_PER_BODY, Math.floor(TRAIL_POINT_BUDGET / Math.max(1, bodyCount)));
+    const trailPointBudget = this.calculateTrailBudget(state.bodies);
     const rc: RenderContext = { ctx, viewport, width, height, selectedBodyId, trackedBodyId, wtc, trailPointBudget };
 
-    if (state.bodies) {
-      this.drawSandboxBodies(rc, state.bodies, trailHistory, showTrail);
-    } else {
-      this.drawFixedBodies(rc, state, trailHistory, showTrail);
-    }
-
-    if (placementPreview) {
-      this.drawPlacementPreview(rc, placementPreview);
-    }
-
+    this.renderBodies(rc, state, trailHistory, showTrail);
+    if (placementPreview) this.drawPlacementPreview(rc, placementPreview);
     drawOverlay(ctx, state, viewport.scale);
   }
 
@@ -105,22 +108,30 @@ export class CanvasRenderer {
     });
   }
 
+  private getSandboxBodyVisuals(b: SandboxRenderBody, idx: number) {
+    return {
+      bodyId: b.id || `body-${idx}`,
+      color: b.color || colors.white,
+    };
+  }
+
+  private drawSandboxBodyTrail(rc: RenderContext, trailHistory: TrailHistory, bodyId: string, color: string, showTrail: boolean): void {
+    if (!showTrail || !trailHistory.customBodies) return;
+    const trail = trailHistory.customBodies[bodyId];
+    if (trail) drawTrail(rc.ctx, trail, color, rc.wtc, rc.trailPointBudget);
+  }
+
+  private drawSingleSandboxBody(rc: RenderContext, b: SandboxRenderBody, idx: number, trailHistory: TrailHistory, showTrail: boolean): void {
+    const { bodyId, color } = this.getSandboxBodyVisuals(b, idx);
+    this.drawSandboxBodyTrail(rc, trailHistory, bodyId, color, showTrail);
+    const markers: BodyMarkers = { isSelected: rc.selectedBodyId === bodyId, isLocked: b.locked, isTracked: rc.trackedBodyId === bodyId };
+    this.drawBody(b.position, b.radius, color, rc.viewport, rc.width, rc.height, markers);
+    if (b.name) drawBodyLabel(rc.ctx, b.position, b.name, rc.wtc);
+  }
+
   /** Renders each sandbox body's trail, disc, and optional name label. */
-  // fallow-ignore-next-line complexity
   private drawSandboxBodies(rc: RenderContext, bodies: SandboxRenderBody[], trailHistory: TrailHistory, showTrail: boolean): void {
-    // fallow-ignore-next-line complexity
-    bodies.forEach((b, idx) => {
-      const bodyId = b.id || `body-${idx}`;
-      if (showTrail && trailHistory.customBodies?.[bodyId]) {
-        drawTrail(rc.ctx, trailHistory.customBodies[bodyId], b.color || colors.white, rc.wtc, rc.trailPointBudget);
-      }
-      this.drawBody(b.position, b.radius, b.color || colors.white, rc.viewport, rc.width, rc.height, {
-        isSelected: rc.selectedBodyId === bodyId,
-        isLocked: b.locked,
-        isTracked: rc.trackedBodyId === bodyId,
-      });
-      if (b.name) drawBodyLabel(rc.ctx, b.position, b.name, rc.wtc);
-    });
+    bodies.forEach((b, idx) => this.drawSingleSandboxBody(rc, b, idx, trailHistory, showTrail));
   }
 
   /** Resizes canvas to match client dimensions, accounting for high-DPI screens. */
