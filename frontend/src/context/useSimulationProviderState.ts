@@ -59,6 +59,7 @@ function useSimulationPresetActions(
   return { resetSimulation, setPreset, setInitialStateAndSync };
 }
 
+/** Main hook coordinating simulation provider state, callbacks, and context creation. */
 export function useSimulationProviderState() {
   const core = useSimulationCoreState();
   const {

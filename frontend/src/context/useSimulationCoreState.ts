@@ -3,6 +3,7 @@ import { SimulationState, LagrangePointSet } from '../services/wasmBridge';
 import { SimulationMode, SandboxBody } from '../types';
 import { DEFAULT_INITIAL_STATE, PresetType } from './presets';
 
+/** Core React state variables for the simulation provider. */
 export function useSimulationCoreState() {
   const [mode, setModeState] = useState<SimulationMode>('3body');
   const [sandboxBodies, setSandboxBodies] = useState<SandboxBody[]>([]);
