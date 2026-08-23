@@ -52,6 +52,19 @@ const initTrail = (s: SimulationState): TrailHistory => ({
   customBodies: {},
 });
 
+function buildTrailSnapshot(primary: TrailBuffer, secondary: TrailBuffer, testParticle: TrailBuffer, custom: Map<string, TrailBuffer>): TrailHistory {
+  const nextCustom: { [bodyId: string]: [number, number][] } = {};
+  custom.forEach((buf, id) => {
+    nextCustom[id] = buf.toArray();
+  });
+  return {
+    primary: primary.toArray(),
+    secondary: secondary.toArray(),
+    testParticle: testParticle.toArray(),
+    customBodies: nextCustom,
+  };
+}
+
 /**
  * Hook that manages trajectory trail history for all bodies (primary/secondary/test particle and sandbox custom bodies).
  */
@@ -90,17 +103,7 @@ export function useTrailHistory(initialState: SimulationState) {
       });
     }
 
-    const nextCustom: { [bodyId: string]: [number, number][] } = {};
-    customRef.current.forEach((buf, id) => {
-      nextCustom[id] = buf.toArray();
-    });
-
-    setTrailHistory({
-      primary: primaryRef.current.toArray(),
-      secondary: secondaryRef.current.toArray(),
-      testParticle: testParticleRef.current.toArray(),
-      customBodies: nextCustom,
-    });
+    setTrailHistory(buildTrailSnapshot(primaryRef.current, secondaryRef.current, testParticleRef.current, customRef.current));
   }, []);
 
   const setTrailLength = useCallback((len: number) => {
@@ -110,18 +113,11 @@ export function useTrailHistory(initialState: SimulationState) {
     primaryRef.current.setCapacity(len);
     secondaryRef.current.setCapacity(len);
     testParticleRef.current.setCapacity(len);
-    const nextCustom: { [bodyId: string]: [number, number][] } = {};
-    customRef.current.forEach((buf, id) => {
+    customRef.current.forEach((buf) => {
       buf.setCapacity(len);
-      nextCustom[id] = buf.toArray();
     });
 
-    setTrailHistory({
-      primary: primaryRef.current.toArray(),
-      secondary: secondaryRef.current.toArray(),
-      testParticle: testParticleRef.current.toArray(),
-      customBodies: nextCustom,
-    });
+    setTrailHistory(buildTrailSnapshot(primaryRef.current, secondaryRef.current, testParticleRef.current, customRef.current));
   }, []);
 
   return { trailHistory, trailLength, recordStep, resetTrail, setTrailLength };

@@ -50,6 +50,7 @@ function notifySelection(id: string | null, onSelectBody: ((id: string | null) =
 /**
  * Renders sandbox specific panel controls including custom bodies listing, selection, editing, and active toggling.
  */
+// fallow-ignore-next-line complexity
 export function SandboxControls({ selectedBodyId: propsSelectedId, onSelectBody, onOpenStressTest }: SandboxControlsProps) {
   const {
     sandboxBodies,

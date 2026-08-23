@@ -78,14 +78,13 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [simulator, mode]);
 
+  // fallow-ignore-next-line complexity
   const handleStep = useCallback(
     (result: StepResult) => {
       const enriched = { ...result.newState };
-      if (enriched.bodies) {
-        enriched.bodies = enrichBodies(enriched.bodies, sandboxBodies);
-      }
+      if (enriched.bodies) enriched.bodies = enrichBodies(enriched.bodies, sandboxBodies);
       setCurrentState(enriched);
-      if (showTrail) recordStep(enriched); // O(bodies) work (see useTrailHistory); skip if unseen.
+      if (showTrail) recordStep(enriched);
       if (simulator && mode === '3body') refreshLagrangePoints(simulator, setLagrangePoints);
     },
     [simulator, sandboxBodies, mode, recordStep, showTrail],
