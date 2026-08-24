@@ -1,3 +1,45 @@
+# [1.2.0](https://github.com/MaxNize/fortgeschrittene-programmierung/compare/v1.1.0...v1.2.0) (2026-08-24)
+
+
+### Bug Fixes
+
+* **build:** grant missing GITHUB_TOKEN scopes to CI jobs ([e8c4461](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/e8c44615048291f77103733d9fc859f5ab62ba66))
+* **canvas:** disable body context menu in preset mode (FP-39) ([f231b16](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/f231b16411962ed83851ebdd1f78547d36f4bc8d))
+* **ci:** add fallow complexity annotations for timer, tick, and Simulator ([e56f12d](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/e56f12deb30f06f2f7e9b5f41bdf6277c3253d91))
+* **ci:** add JSDoc comment to ThreeBodyControls and format files ([70b879f](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/70b879fd90c89b4125ef5fdb4f4ef9346df2a581))
+* **ci:** disable husky hooks during semantic-release commit ([e44bc12](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/e44bc1252f969e35d9ea449641965dba7525690f))
+* **ci:** disable husky hooks during semantic-release commit ([#34](https://github.com/MaxNize/fortgeschrittene-programmierung/issues/34)) ([cb8e56c](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/cb8e56c50fe4e754948889ea5af3b94dd1acc27a))
+* **ci:** drop GHAS-only jobs and align commitlint with actual history ([7414fbf](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/7414fbfb88828ec53f200c1f7c2a55c8b8e4ce02))
+* **ci:** increase test coverage and add fallow complexity annotations ([eb9c1a9](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/eb9c1a9da8be14b8dabcf130cdcae2ba4d074a50))
+* **ci:** make check_rust_coverage.sh executable ([61296c9](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/61296c9079fcb9e390f9c365e7e8f0344d443bb4))
+* **ci:** make check-max-lines zero-dependency for rust-tests CI job ([c694552](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/c6945523777336639dd2fbee930acec4f32bdc3b))
+* **ci:** only run Commit Message Lint on pull_request ([b7750f1](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/b7750f1198f769475b8baafbd396e1bb77557898))
+* **ci:** resolve dev->main pipeline failures ([71cc55a](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/71cc55ac9b94997fe865e49a06bce14e785e5dcd)), closes [hi#complexity](https://github.com/hi/issues/complexity)
+* **ci:** resolve fallow duplication and complexity audit findings ([1f2c80b](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/1f2c80bb7cea5cea656f96a1bbe758c343276f5d))
+* **sandbox:** stop object-list row text overlapping ([85bd090](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/85bd090c3d06582853e6c5c1b273d2f91e3b7e5b))
+* **toast:** stop timer reset on every parent re-render ([c53b3b2](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/c53b3b2ff19a653f40d7d38dedb6053aa96fcac9))
+* **ui:** i18nize stresstest ([a6aec03](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/a6aec03c706fe9fcaf509505bc7f0be559c11319))
+* **ui:** resolve Fallow code-quality gate failures ([db246e3](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/db246e34b296e2f25aec164378166d6a8d48e7f6)), closes [hi#complexity](https://github.com/hi/issues/complexity)
+
+
+### Features
+
+* **canvas:** add focused body miniview (FP-37) ([c49a50e](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/c49a50e12e69a2c859559dfcf53745c93cbaffb7))
+* **canvas:** track a body so the camera follows it (FP-36) ([f693461](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/f693461256c697933df9364209b47422c580a5c8))
+* **ci:** add rust quality tooling ([e355df8](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/e355df8cd70d8ceac904f515f0e9f7a1c642c32e))
+* **miniview:** allow zooming out in the body miniview ([9801fe7](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/9801fe7750fe6e73a33dda7e7bd888c985a6305d))
+* **sandbox:** Figma-like body creation, no mode button (FP-38) ([48b053b](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/48b053bc54333dbfbe581beaa12ce8f836cc6d93))
+* **ui:** add favicon (FP-33) ([bcd49c6](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/bcd49c66a6ed6df354eb4fe698f11a68163c787a))
+* **ui:** add real-time FPS counter, HUD overlay, and 60 FPS stress test benchmark ([52e6f59](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/52e6f59743fe09f38aa14529fbbe381e467d433d))
+* **ui:** add real-time FPS counter, HUD overlay, and 60 FPS stress test benchmark ([#30](https://github.com/MaxNize/fortgeschrittene-programmierung/issues/30)) ([4b24c89](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/4b24c89db1f97b31e745ed28d5481bb64ae8c316))
+* **ui:** show auto-scaled, human-readable units (FP-34) ([c51557f](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/c51557f152231d99d6be5850da9641b84a5f1eb4))
+
+
+### Performance Improvements
+
+* **sandbox:** resolve sandbox mode performance bottlenecks at scale ([0f0be95](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/0f0be95cb7574651cd1f78dad634830d204def23))
+* **sandbox:** resolve sandbox mode performance bottlenecks at scale ([#33](https://github.com/MaxNize/fortgeschrittene-programmierung/issues/33)) ([2a5aa75](https://github.com/MaxNize/fortgeschrittene-programmierung/commit/2a5aa75bd25d8b21b8e6832202d0dccbaf6884c5))
+
 # [1.1.0](https://github.com/MaxNize/fortgeschrittene-programmierung/compare/v1.0.3...v1.1.0) (2026-08-11)
 
 
