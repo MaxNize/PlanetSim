@@ -1,6 +1,12 @@
 {
   "name": "fortgeschrittene-programmierung",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MaxNize/fortgeschrittene-programmierung.git"
+  },
+  "homepage": "https://github.com/MaxNize/fortgeschrittene-programmierung",
   "workspaces": [
     "frontend",
     "wasm"
