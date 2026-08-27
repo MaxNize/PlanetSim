@@ -5,7 +5,7 @@
 > existing documentation spread across `Docs/` (ADRs, SPECs, guides, definitions of done) and links to the
 > detailed documents where appropriate instead of duplicating them.
 >
-> **Team**: Gemmingen, Müller, Tsigaropoulos · **Jira project**: FP · **As of**: 2026-08-14
+> **Team**: Gemming, Müller, Tsigaropoulos · **Jira project**: FP · **As of**: 2026-08-14
 
 ---
 
@@ -44,7 +44,7 @@ Prioritized quality goals (from the README, `testing-philosophy.md`, and SPEC-00
 | Role | Expectations |
 |---|---|
 | Students / end users | Intuitive, performant simulation for experimenting with orbits |
-| Team (Gemmingen, Müller, Tsigaropoulos) | Maintainable, spec-driven codebase for the exam deliverable |
+| Team (Gemming, Müller, Tsigaropoulos) | Maintainable, spec-driven codebase for the exam deliverable |
 | Instructors / graders | Traceable architecture and decision documentation (ADRs, arc42, SPECs) |
 
 ---
