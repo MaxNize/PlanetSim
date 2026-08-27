@@ -71,4 +71,4 @@ This project demonstrates:
 - **Physics simulation** (gravitational mechanics, numerical methods)
 - **Performance optimization** techniques for computational workloads
 
-- **Exam project for Advanced Programming Module** | Team: Gemmingen, Müller, Tsigaropoulos
+- **Exam project for Advanced Programming Module** | Team: Gemming, Müller, Tsigaropoulos
