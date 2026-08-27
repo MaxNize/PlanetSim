@@ -75,11 +75,23 @@ real-time  physics simulation.
 
 | Spec     | Title                          | Dependencies           | Status | Notes                                         |
 | -------- | ------------------------------ | ---------------------- | ------ | --------------------------------------------- |
-| SPEC-012 | Deployment Strategy            | SPEC-001, SPEC-011     | ✅ Done | GitHub Pages, Docker, auto-release            |
 | SPEC-013 | API Documentation              | All physics/WASM specs | ✅ Done | Cargo docs, JSDoc, physics guide              |
 | SPEC-014 | Developer Guide & Contribution | All specs              | ✅ Done | CONTRIBUTING.md, architecture guide, examples |
 
-**Deliverable**: App live at `planet-sim.example.com`, docs complete, contributions welcome
+**Deliverable**: Docs complete, contributions welcome
+
+-
+
+### Phase 7: Advanced Interactivity & Performance Benchmarking (Weeks 13-14)
+**Goal**: Expand object inspection, view modes, and real-time performance evaluation
+
+| Spec     | Title                          | Dependencies           | Status | Notes                                         |
+| -------- | ------------------------------ | ---------------------- | ------ | --------------------------------------------- |
+| SPEC-015 | Object Tracking & Camera Follow | SPEC-005, SPEC-006     | ✅ Done | Lock viewport camera to follow target body     |
+| SPEC-016 | Miniview Canvas                | SPEC-005, SPEC-006     | ✅ Done | Picture-in-picture mini view canvas           |
+| SPEC-017 | FPS & Performance Stress Test  | SPEC-003, SPEC-005     | ✅ Done | Live FPS telemetry, HUD, 60 FPS benchmark     |
+
+**Deliverable**: Object tracking, picture-in-picture miniview, and automated 60 FPS performance benchmark complete
 
 -
 
@@ -92,7 +104,7 @@ real-time  physics simulation.
 └────────────┬────────────────────────┘
              │
              ├──→ SPEC-002: Testing
-             │     ├──→ SPEC-003: Physics Engine
+             │     ├──→ SPEC-003: Physics Engine ─────→ SPEC-017: FPS Stress Test
              │         └──→ SPEC-004: WASM Bridge
              │             ├──→ SPEC-005: React Architecture
              │             │   ├──→ SPEC-006: Canvas
@@ -100,9 +112,11 @@ real-time  physics simulation.
              │             │   │   ├──→ SPEC-008: Trajectory
              │             │   │   │   ├──→ SPEC-009: Sandbox Placement
              │             │   │   │   └──→ SPEC-010: Object Manipulation
+             │             │   │   │
+             │             │   │   ├──→ SPEC-015: Object Tracking
+             │             │   │   └──→ SPEC-016: Miniview Canvas
              │             │   │
-             └──────→ SPEC-012: Deployment
-                     └──→ SPEC-013: API Docs
+             └──────→ SPEC-013: API Docs
                      └──→ SPEC-014: Developer Guide
 ```
 -
@@ -113,6 +127,7 @@ real-time  physics simulation.
 - **Phase 1**: SPEC-001, SPEC-002, SPEC-011 (all independent)
 - **Phase 3 & 4**: SPEC-007 + SPEC-008 (both use SPEC-006)
 - **Phase 6**: All documentation specs can be drafted while Phase 5 is in progress
+- **Phase 7**: SPEC-015, SPEC-016, and SPEC-017 can be implemented in parallel
 
 ### Recommended sequential order
 1. SPEC-001 → foundation ready
@@ -124,8 +139,8 @@ real-time  physics simulation.
 7. SPEC-007 + SPEC-008 in parallel → interactivity added
 8. SPEC-009 → sandbox mode
 9. SPEC-010 → manipulation features
-10. SPEC-012 → deploy to production
-11. SPEC-013 + SPEC-014 in parallel → documentation complete
+10. SPEC-013 + SPEC-014 in parallel → documentation complete
+11. SPEC-015 + SPEC-016 + SPEC-017 in parallel → advanced features & benchmarking complete
 
 -
 
@@ -138,7 +153,8 @@ real-time  physics simulation.
 | **UI Foundation**    | 005, 006      | 6    | Two-body orbits visualized on canvas      |
 | **Core Features**    | 007, 008      | 8    | Interactive parameter controls + trails   |
 | **Sandbox Mode**     | 009, 010      | 10   | Multi-body sandbox for experimentation    |
-| **Production Ready** | 012, 013, 014 | 12   | Deployed, documented, maintainable        |
+| **Advanced Specs**   | 015, 016, 017 | 14   | Tracking, Miniview, and Stress Benchmark  |
+| **Docs Ready**        | 013, 014      | 12   | Documented, maintainable                  |
 
 -
 
