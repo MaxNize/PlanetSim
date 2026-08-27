@@ -72,3 +72,7 @@ This project demonstrates:
 - **Performance optimization** techniques for computational workloads
 
 - **Exam project for Advanced Programming Module** | Team: Gemmingen, Müller, Tsigaropoulos
+
+## Acknowledgements
+
+This project was built based on [ben9583/solar-sim](https://github.com/ben9583/solar-sim).
