@@ -351,8 +351,7 @@ SPEC-001 (Foundation)
 │ │ └→ SPEC-008 (Trajectory)
 │ │ ├→ SPEC-009 (Sandbox)
 │ │ └→ SPEC-010 (Manipulation)
-├→ SPEC-011 (CI/CD)
-└→ SPEC-012 (Deployment)
+└→ SPEC-011 (CI/CD)
 
 ```text
 ## Adding a New Feature

@@ -75,11 +75,10 @@ real-time  physics simulation.
 
 | Spec     | Title                          | Dependencies           | Status | Notes                                         |
 | -------- | ------------------------------ | ---------------------- | ------ | --------------------------------------------- |
-| SPEC-012 | Deployment Strategy            | SPEC-001, SPEC-011     | ✅ Done | GitHub Pages, Docker, auto-release            |
 | SPEC-013 | API Documentation              | All physics/WASM specs | ✅ Done | Cargo docs, JSDoc, physics guide              |
 | SPEC-014 | Developer Guide & Contribution | All specs              | ✅ Done | CONTRIBUTING.md, architecture guide, examples |
 
-**Deliverable**: App live at `planet-sim.example.com`, docs complete, contributions welcome
+**Deliverable**: Docs complete, contributions welcome
 
 -
 
@@ -117,8 +116,7 @@ real-time  physics simulation.
              │             │   │   ├──→ SPEC-015: Object Tracking
              │             │   │   └──→ SPEC-016: Miniview Canvas
              │             │   │
-             └──────→ SPEC-012: Deployment
-                     └──→ SPEC-013: API Docs
+             └──────→ SPEC-013: API Docs
                      └──→ SPEC-014: Developer Guide
 ```
 -
@@ -141,9 +139,8 @@ real-time  physics simulation.
 7. SPEC-007 + SPEC-008 in parallel → interactivity added
 8. SPEC-009 → sandbox mode
 9. SPEC-010 → manipulation features
-10. SPEC-012 → deploy to production
-11. SPEC-013 + SPEC-014 in parallel → documentation complete
-12. SPEC-015 + SPEC-016 + SPEC-017 in parallel → advanced features & benchmarking complete
+10. SPEC-013 + SPEC-014 in parallel → documentation complete
+11. SPEC-015 + SPEC-016 + SPEC-017 in parallel → advanced features & benchmarking complete
 
 -
 
@@ -157,7 +154,7 @@ real-time  physics simulation.
 | **Core Features**    | 007, 008      | 8    | Interactive parameter controls + trails   |
 | **Sandbox Mode**     | 009, 010      | 10   | Multi-body sandbox for experimentation    |
 | **Advanced Specs**   | 015, 016, 017 | 14   | Tracking, Miniview, and Stress Benchmark  |
-| **Production Ready** | 012, 013, 014 | 12   | Deployed, documented, maintainable        |
+| **Docs Ready**        | 013, 014      | 12   | Documented, maintainable                  |
 
 -
 

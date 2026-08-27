@@ -87,7 +87,6 @@ SPEC-001 (Foundation)
   │   │   │       └→ SPEC-016 (Miniview Canvas)
   │   └→ SPEC-017 (FPS Stress Test)
   ├→ SPEC-011 (CI/CD)
-  ├→ SPEC-012 (Deployment)
   ├→ SPEC-013 (API Documentation)
   └→ SPEC-014 (Developer Guide)
 ```

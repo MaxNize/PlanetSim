@@ -66,7 +66,7 @@ Priorisierte Qualitätsziele (aus README, `testing-philosophy.md` und SPEC-001):
   `Docs/Management/Project-Management/Specs/`).
 - Commit-Konventionen: Conventional Commits mit Scopes (`wasm`, `ui`, `physics`, `perf`, `build`, `docs`);
   Branch-Präfixe `feature/`, `fix/`, `docs/`, `refactor/`, `chore/` (siehe SPEC-001, ADR-003).
-- Deployment auf privatem Server (ADR-002), CI/CD über GitHub Actions.
+- CI/CD über GitHub Actions.
 
 ### 2.3 Konventionen
 
@@ -111,8 +111,7 @@ selbst (WebAssembly-Runtime, Canvas API).
 └──────────────────────────────────────────┘
 ```
 
-Ausgeliefert wird die Anwendung als statisches Bundle (Vite-Build) hinter Nginx Proxy Manager auf einem privaten
-Server (siehe Kapitel 7 / `deployment-guide.md`).
+Ausgeliefert wird die Anwendung als statisches Bundle (Vite-Build) in einem Docker-Container (siehe Kapitel 7).
 
 ---
 
@@ -222,24 +221,9 @@ dokumentiert und wird hier nicht dupliziert.
 
 ## 7. Verteilungssicht
 
-```text
-┌──────────┐               ┌───────────┐  Port Forward  ┌─────────────┐
-│  Client  ├──────────────▶│  DynDNS    ├───────────────▶│ Home Router │
-└──────────┘ (IPv6→IPv4)   └───────────┘  (80/443)       └──────┬──────┘
-                                                                  ▼
-┌──────────────────────────────── Server ───────────────────────────────┐
-│  ┌──────────────────────┐  Reverse Proxy  ┌──────────────────────┐    │
-│  │ planet-simulation     │◀────────────────┤ Nginx Proxy Manager  │◀───┘
-│  │ Container (Port 80)   │ Shared Network  │ Container (Port 443) │
-│  └──────────────────────┘                  └──────────────────────┘
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-- Deployment auf privatem Server (ADR-002), Container via Docker Compose, Reverse Proxy via Nginx Proxy Manager,
-  TLS via Let's Encrypt.
+- Container via Docker Compose, Alpine-Nginx-Image.
 - CI/CD über GitHub Actions. Workflows: `test.yml`, `deploy-docs.yml`, `docs.yml`, `release.yml`,
   `security.yml` (`.github/workflows/`).
-- Details, Prerequisites und NPM-Konfiguration: `Docs/Guides/deployment-guide.md`.
 
 ---
 
@@ -287,7 +271,6 @@ Entscheidungen werden als ADRs (Kontext → Optionen → Entscheidung) unter `Do
 | ADR | Entscheidung |
 |---|---|
 | [ADR-001](./ADRs/ADR-001-project-language.md) | Projektsprache: Englisch (Code & Standarddokumentation) |
-| [ADR-002](./ADRs/ADR-002-deployment.md) | Deployment auf privatem Server mit Auto-Changelog/Auto-Deploy |
 | [ADR-003](./ADRs/ADR-003-colocated-files.md) | Colocated Components (Implementierung + Tests im selben Ordner) |
 
 Feature-/Architektur-Spezifikationen mit detaillierten Entscheidungen zu Umsetzung und Akzeptanzkriterien:

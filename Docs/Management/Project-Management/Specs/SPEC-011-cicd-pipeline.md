@@ -166,43 +166,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-**`.github/workflows/deploy.yml`** (Deploy Pipeline: Runs on self-hosted runner after CI Pipeline success on main)
-```yaml
-name: Deploy via Self-Hosted Runner
-
-on:
-  workflow_run:
-    workflows: [CI Pipeline]
-    types: [completed]
-    branches: [main]
-  workflow_dispatch:
-
-jobs:
-  deploy:
-    runs-on: self-hosted
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: frontend/.nvmrc
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32-unknown-unknown
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: wasm
-      - run: npm ci
-      - run: cd frontend && npm ci
-      - run: cd wasm && cargo build --release --target wasm32-unknown-unknown
-      - run: npm run build
-      - run: |
-          # Custom check size and local deploy script
-          echo "Deploying application..."
-```
-
 **`.github/workflows/security.yml`** (Security Audit: Runs on PR and push to main/develop)
 ```yaml
 name: Security Scanning
@@ -277,7 +240,6 @@ Local pre-commit hooks are disabled; all linting, formatting, secret scanning, a
 4. Ensure CI checks run secret detection and linting
 5. Configure branch protection rules on main
 6. Test: Open PR → tests run, push to main → full CI/CD runs
-7. Verify deployment triggers correctly after main push
 
 -
 
@@ -288,12 +250,10 @@ Local pre-commit hooks are disabled; all linting, formatting, secret scanning, a
 - [x] Build workflow runs only on push to main
 - [x] Security checks run on all PRs and main push
 - [ ] Branch protection enforced: PR requires passing tests before merge
-- [ ] Deployment pipeline triggers automatically on main push
-- [x] Team aware of CI/CD workflow: PR for testing, merge to main for deployment
+- [x] Team aware of CI/CD workflow: PR for testing, merge to main
 
 -
 
 ## 📚 Related Specs
 
 **Depends on**: SPEC-001, SPEC-002
-**Related**: SPEC-012 (Deployment)
