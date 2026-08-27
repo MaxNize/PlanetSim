@@ -66,7 +66,7 @@ Priorisierte Qualitätsziele (aus README, `testing-philosophy.md` und SPEC-001):
   `Docs/Management/Project-Management/Specs/`).
 - Commit-Konventionen: Conventional Commits mit Scopes (`wasm`, `ui`, `physics`, `perf`, `build`, `docs`);
   Branch-Präfixe `feature/`, `fix/`, `docs/`, `refactor/`, `chore/` (siehe SPEC-001, ADR-003).
-- Deployment auf privatem Server (ADR-002), CI/CD über GitHub Actions inkl. self-hosted Runner.
+- Deployment auf privatem Server (ADR-002), CI/CD über GitHub Actions.
 
 ### 2.3 Konventionen
 
@@ -237,8 +237,8 @@ dokumentiert und wird hier nicht dupliziert.
 
 - Deployment auf privatem Server (ADR-002), Container via Docker Compose, Reverse Proxy via Nginx Proxy Manager,
   TLS via Let's Encrypt.
-- CI/CD über GitHub Actions mit **self-hosted Runner** (Docker-Zugriff nötig). Workflows: `test.yml`,
-  `deploy.yml`, `deploy-docs.yml`, `docs.yml`, `release.yml`, `security.yml` (`.github/workflows/`).
+- CI/CD über GitHub Actions. Workflows: `test.yml`, `deploy-docs.yml`, `docs.yml`, `release.yml`,
+  `security.yml` (`.github/workflows/`).
 - Details, Prerequisites und NPM-Konfiguration: `Docs/Guides/deployment-guide.md`.
 
 ---
