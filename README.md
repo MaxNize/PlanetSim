@@ -13,7 +13,7 @@ Structure
 - frontend/ — Vite + React + TypeScript
 - wasm/ — Rust library compiled to WASM (wasm-bindgen)
 - Docs/ — project docs and specs
-  - [arc42 Architekturdokumentation](./Docs/arc42.md) — Full arc42 architecture document (German)
+  - [arc42 Architecture Documentation](./Docs/arc42.md) — Full arc42 architecture document
 
 See Docs/Management/Project-Management/Specs/SPEC-001-project-setup-guardrails.md for conventions and guardrails.
 

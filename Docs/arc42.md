@@ -1,98 +1,97 @@
-# arc42 Architekturdokumentation — Planet Simulation
+# arc42 Architecture Documentation — Planet Simulation
 
-> Dieses Dokument folgt dem [arc42](https://arc42.de/)-Template (12 Kapitel) und beschreibt die Architektur des
-> Projekts "Planet Simulation" (Prüfungsprojekt Modul Fortgeschrittene Programmierung). Es fasst die vorhandene,
-> über `Docs/` verteilte Dokumentation (ADRs, SPECs, Guides, Definitions of Done) konsolidiert zusammen und
-> verlinkt bei Bedarf auf die Detaildokumente statt sie zu duplizieren.
+> This document follows the [arc42](https://arc42.de/) template (12 chapters) and describes the architecture of
+> the "Planet Simulation" project (exam project for the Advanced Programming module). It consolidates the
+> existing documentation spread across `Docs/` (ADRs, SPECs, guides, definitions of done) and links to the
+> detailed documents where appropriate instead of duplicating them.
 >
-> **Team**: Gemmingen, Müller, Tsigaropoulos · **Jira-Projekt**: FP · **Stand**: 2026-08-14
+> **Team**: Gemmingen, Müller, Tsigaropoulos · **Jira project**: FP · **As of**: 2026-08-14
 
 ---
 
-## 1. Einführung und Ziele
+## 1. Introduction and Goals
 
-### 1.1 Aufgabenstellung
+### 1.1 Requirements Overview
 
-Die Planet Simulation ist eine browserbasierte, interaktive 2D-Simulation für gravitative Mechanik (Zwei- bzw.
-Dreikörperproblem). Sie richtet sich an Studierende und physikinteressierte Hobbyanwender:innen, die
-Planetenbahnen und Gravitationskräfte in Echtzeit erkunden möchten, ohne dass träge, JavaScript-basierte
-Simulationen die Interaktion ausbremsen.
+Planet Simulation is a browser-based, interactive 2D simulation of gravitational mechanics (two-body and
+restricted three-body problems). It targets students and physics-interested hobbyists who want to explore
+planetary orbits and gravitational forces in real time, without sluggish JavaScript-based simulations getting
+in the way of interaction.
 
-Aus dem Projekt-README (`README.md`):
+From the project README (`README.md`):
 
 > Existing JavaScript-based physics simulations are slow and difficult to extend. Students and hobbyist
 > astronomers need a fluid, responsive tool to explore gravitational interactions in real-time.
 
-Die Lösung: Ein Browser-Sandbox, in dem Nutzer:innen Massen und Startbedingungen interaktiv verändern,
-Gravitationskräfte und Bahnen visualisieren und dabei durchgehend 60 FPS erleben — durch Auslagerung der
-Physik-Berechnung nach Rust/WebAssembly.
+The solution: a browser sandbox where users interactively change masses and initial conditions, visualize
+gravitational forces and orbits, and experience a consistent 60 FPS — achieved by offloading physics
+computation to Rust/WebAssembly.
 
-### 1.2 Qualitätsziele
+### 1.2 Quality Goals
 
-Priorisierte Qualitätsziele (aus README, `testing-philosophy.md` und SPEC-001):
+Prioritized quality goals (from the README, `testing-philosophy.md`, and SPEC-001):
 
-| Priorität | Qualitätsziel | Konkretisierung |
+| Priority | Quality Goal | Details |
 |---|---|---|
-| 1 | **Performance** | Durchgehend ~60 FPS im Browser, keine GC-Stotterer während der Simulation |
-| 2 | **Korrektheit der Physik** | Numerisch stabile Integration (Energieerhaltung, siehe `physics-guide.md`) |
-| 3 | **Wartbarkeit** | Harte 200-Zeilen-Grenze pro Datei, klare Modulgrenzen, hohe Testabdeckung |
-| 4 | **Nachvollziehbarkeit** | Spec-getriebener Workflow (SPEC → Test → Implementierung → Review) |
-| 5 | **Erlernbarkeit** | Verständliche UI für Studierende (Presets, Parametersteuerung, i18n) |
+| 1 | **Performance** | Consistent ~60 FPS in the browser, no GC stutter during simulation |
+| 2 | **Physics Correctness** | Numerically stable integration (energy conservation, see `physics-guide.md`) |
+| 3 | **Maintainability** | Hard 200-line limit per file, clear module boundaries, high test coverage |
+| 4 | **Traceability** | Spec-driven workflow (SPEC → test → implementation → review) |
+| 5 | **Learnability** | Understandable UI for students (presets, parameter controls, i18n) |
 
-### 1.3 Stakeholder
+### 1.3 Stakeholders
 
-| Rolle | Erwartungshaltung |
+| Role | Expectations |
 |---|---|
-| Studierende / Endnutzer:innen | Intuitive, performante Simulation zum Experimentieren mit Orbits |
-| Team (Gemmingen, Müller, Tsigaropoulos) | Wartbare, spec-getriebene Codebasis für die Prüfungsleistung |
-| Lehrende / Prüfer:innen | Nachvollziehbare Architektur- und Entscheidungsdokumentation (ADRs, arc42, SPECs) |
+| Students / end users | Intuitive, performant simulation for experimenting with orbits |
+| Team (Gemmingen, Müller, Tsigaropoulos) | Maintainable, spec-driven codebase for the exam deliverable |
+| Instructors / graders | Traceable architecture and decision documentation (ADRs, arc42, SPECs) |
 
 ---
 
-## 2. Randbedingungen
+## 2. Architecture Constraints
 
-### 2.1 Technische Randbedingungen
+### 2.1 Technical Constraints
 
-- **Monorepo**: `frontend/` (TypeScript/React) + `wasm/` (Rust) + `Docs/` (siehe SPEC-001).
-- **Zielplattform**: moderner Browser mit WebAssembly-Unterstützung, keine Server-seitige Physik.
-- **Node-Version**: gepinnt via `.nvmrc` (Node 25); **Rust**: `stable`-Toolchain via `.rust-toolchain.toml`.
-- **Harte 200-Zeilen-Grenze** pro Quelldatei (TS/Rust/Docs), durchgesetzt via ESLint `max-lines` /
-  Clippy `too-many-lines-threshold`, Ausnahmen nur über `max-lines-exceptions.json`.
-- **64-Bit-Fließkommazahlen** für physikalische Präzision (siehe `physics-guide.md`).
+- **Monorepo**: `frontend/` (TypeScript/React) + `wasm/` (Rust) + `Docs/` (see SPEC-001).
+- **Target platform**: modern browser with WebAssembly support, no server-side physics.
+- **Node version**: pinned via `.nvmrc` (Node 25); **Rust**: `stable` toolchain via `.rust-toolchain.toml`.
+- **Hard 200-line limit** per source file (TS/Rust/docs), enforced via ESLint `max-lines` /
+  Clippy `too-many-lines-threshold`, exceptions only via `max-lines-exceptions.json`.
+- **64-bit floating-point numbers** for physical precision (see `physics-guide.md`).
 
-### 2.2 Organisatorische Randbedingungen
+### 2.2 Organizational Constraints
 
-- Prüfungsprojekt mit festem Team (3 Personen), Vorgehen spec-getrieben (SPEC-XXX-Dateien in
+- Exam project with a fixed team (3 people), spec-driven approach (SPEC-XXX files in
   `Docs/Management/Project-Management/Specs/`).
-- Commit-Konventionen: Conventional Commits mit Scopes (`wasm`, `ui`, `physics`, `perf`, `build`, `docs`);
-  Branch-Präfixe `feature/`, `fix/`, `docs/`, `refactor/`, `chore/` (siehe SPEC-001, ADR-003).
-- CI/CD über GitHub Actions.
+- Commit conventions: Conventional Commits with scopes (`wasm`, `ui`, `physics`, `perf`, `build`, `docs`);
+  branch prefixes `feature/`, `fix/`, `docs/`, `refactor/`, `chore/` (see SPEC-001, ADR-003).
+- CI/CD via GitHub Actions.
 
-### 2.3 Konventionen
+### 2.3 Conventions
 
-- **Projektsprache Code/Docs**: Englisch (ADR-001) — dieses arc42-Dokument ist eine bewusste deutschsprachige
-  Ausnahme für die Prüfungsdokumentation.
-- Doku-Konventionen: siehe `Docs/Guides/documentation-conventions.md`.
-- Architekturentscheidungen werden als ADRs unter `Docs/ADRs/` festgehalten (Kontext → Optionen → Entscheidung).
+- **Project language for code/docs**: English (ADR-001).
+- Documentation conventions: see `Docs/Guides/documentation-conventions.md`.
+- Architecture decisions are recorded as ADRs under `Docs/ADRs/` (context → options → decision).
 
 ---
 
-## 3. Kontextabgrenzung
+## 3. System Scope and Context
 
-### 3.1 Fachlicher Kontext
+### 3.1 Business Context
 
 ```text
-┌───────────────────┐        Mausklicks, Slider,        ┌───────────────────────────┐
-│  Nutzer:in         │────────Presets, Sandbox-Edits────▶│   Planet Simulation (App)  │
-│ (Browser)          │◀───────Canvas-Rendering, State────│                            │
+┌───────────────────┐        Mouse clicks, sliders,     ┌───────────────────────────┐
+│  User               │────────presets, sandbox edits───▶│   Planet Simulation (App)  │
+│ (Browser)           │◀───────Canvas rendering, state───│                            │
 └───────────────────┘                                    └───────────────────────────┘
 ```
 
-Die Anwendung hat **keine externen Systeme** im Sinne von Drittanbieter-APIs oder Datenbanken — sie ist eine
-vollständig client-seitige Single-Page-Anwendung. Einzige "externe" Abhängigkeit zur Laufzeit ist der Browser
-selbst (WebAssembly-Runtime, Canvas API).
+The application has **no external systems** in the sense of third-party APIs or databases — it is a fully
+client-side single-page application. The only "external" runtime dependency is the browser itself
+(WebAssembly runtime, Canvas API).
 
-### 3.2 Technischer Kontext
+### 3.2 Technical Context
 
 ```text
 ┌──────────────────────────────────────────┐
@@ -104,239 +103,239 @@ selbst (WebAssembly-Runtime, Canvas API).
 │                  │ WASM-Bindgen Bridge      │
 │                  │ (SimulatorBridge)        │
 │  ┌───────────────▼───────────────────────┐  │
-│  │   Physik-Engine (Rust → WASM)        │  │
-│  │   Newton'sche Gravitation, Verlet-   │  │
-│  │   Integrator                          │  │
+│  │   Physics Engine (Rust → WASM)       │  │
+│  │   Newtonian gravity, Verlet          │  │
+│  │   integrator                          │  │
 │  └────────────────────────────────────────┘  │
 └──────────────────────────────────────────┘
 ```
 
-Ausgeliefert wird die Anwendung als statisches Bundle (Vite-Build) in einem Docker-Container (siehe Kapitel 7).
+The application is shipped as a static bundle (Vite build) inside a Docker container (see chapter 7).
 
 ---
 
-## 4. Lösungsstrategie
+## 4. Solution Strategy
 
-Kernentscheidungen, die die Architektur prägen (Details siehe `Docs/ADRs/`):
+Core decisions that shape the architecture (see `Docs/ADRs/` for details):
 
-1. **Hybrid Rust/WASM + React**: Physik-intensive Berechnungen sind zustandslos in Rust implementiert und nach
-   WebAssembly kompiliert (Performance-Qualitätsziel), UI-Zustand und Rendering bleiben in React/TypeScript
-   (Produktivität, Ökosystem). Begründung siehe `Docs/Guides/architecture.md`.
-2. **Unidirektionaler Datenfluss**: `User Input → React State → SimulatorBridge.step(dt) → WASM → StepResult →
-   Canvas`. Kein bidirektionaler Zustand zwischen JS und WASM — die WASM-Seite ist pro Aufruf zustandslos
-   bezüglich UI-Belangen, der volle Simulationszustand wird explizit über `setState`/`step` ausgetauscht.
-3. **Spec-getriebener Entwicklungsprozess**: Jedes Feature beginnt mit einer SPEC (Akzeptanzkriterien), gefolgt
-   von TDD (Rot → Grün → Refactor), siehe `architecture.md` Abschnitt "Adding a New Feature".
-4. **Colocated Components** (ADR-003): Jede Komponente ist ein Ordner mit Implementierung und Tests
-   nebeneinander, statt getrennter `components/` und `tests/`-Bäume.
-5. **Zwei Simulationsmodi** (`3body`/Preset vs. `sandbox`): Preset-Modus nutzt feste physikalische Rollen
-   (`primary`, `secondary`, `testParticle`); Sandbox-Modus verwaltet eine flexible Liste editierbarer Körper
-   (`sandboxBodies`). Diese bewusste Trennung ist Quelle mehrerer UI-Constraints (z. B. FP-39: Bearbeiten ist
-   nur im Sandbox-Modus sinnvoll, da nur dort ein editierbares Datenmodell existiert).
-6. **Harte Qualitäts-Gates in CI**: 200-Zeilen-Limit, ESLint/Clippy strict, `fallow` (Unused-Code/Complexity),
-   Coverage-Ziele — Wartbarkeit wird technisch statt nur organisatorisch erzwungen (SPEC-001).
+1. **Hybrid Rust/WASM + React**: Physics-intensive computation is implemented statelessly in Rust and compiled
+   to WebAssembly (performance quality goal), while UI state and rendering stay in React/TypeScript
+   (productivity, ecosystem). Rationale: see `Docs/Guides/architecture.md`.
+2. **Unidirectional data flow**: `User input → React state → SimulatorBridge.step(dt) → WASM → StepResult →
+   Canvas`. No bidirectional state between JS and WASM — the WASM side is stateless with respect to UI
+   concerns per call; the full simulation state is explicitly exchanged via `setState`/`step`.
+3. **Spec-driven development process**: Every feature starts with a SPEC (acceptance criteria), followed by
+   TDD (red → green → refactor), see `architecture.md`, section "Adding a New Feature".
+4. **Colocated components** (ADR-003): Every component is a folder with implementation and tests side by
+   side, instead of separate `components/` and `tests/` trees.
+5. **Two simulation modes** (`3body`/preset vs. `sandbox`): Preset mode uses fixed physical roles (`primary`,
+   `secondary`, `testParticle`); sandbox mode manages a flexible list of editable bodies (`sandboxBodies`).
+   This deliberate separation is the source of several UI constraints (e.g. FP-39: editing only makes sense
+   in sandbox mode, since only there does an editable data model exist).
+6. **Hard quality gates in CI**: 200-line limit, strict ESLint/Clippy, `fallow` (unused code/complexity),
+   coverage targets — maintainability is enforced technically rather than only organizationally (SPEC-001).
 
 ---
 
-## 5. Bausteinsicht
+## 5. Building Block View
 
-### 5.1 Whitebox Gesamtsystem
+### 5.1 Whitebox Overall System
 
 ```text
 Planet Simulation (Monorepo)
 ├── frontend/   — Vite + React + TypeScript SPA
-├── wasm/       — Rust-Physik-Engine, kompiliert zu WebAssembly
-└── Docs/       — Architektur-/Prozessdokumentation, Specs, ADRs
+├── wasm/       — Rust physics engine, compiled to WebAssembly
+└── Docs/       — Architecture/process documentation, specs, ADRs
 ```
 
-### 5.2 Ebene 1 — Frontend (`frontend/src/`)
+### 5.2 Level 1 — Frontend (`frontend/src/`)
 
-| Baustein | Verantwortung |
+| Building Block | Responsibility |
 |---|---|
-| `components/` | Visuelle React-Komponenten (z. B. `Canvas`, `SimulationShell`, `BodyEditDialog`, `BodyPlacementDialog`, `BodyContextMenu`, `ParameterControls`) |
-| `context/` | Globaler Simulationszustand: `SimulationProvider`, `useSandbox` (Sandbox-Körper-Verwaltung), `useTrailHistory`, `presets.ts` (Earth-Moon/Binary-Stars), `I18nContext` |
-| `hooks/` | Wiederverwendbare Logik: `useSimulation`, `useSimulationStep`, `useSimulationControls`, `useCanvasInteraction` (Maus-/Kontextmenü-Interaktion), `useAnimationFrame` |
-| `services/` | `wasmBridge.ts` (Wrapper um die WASM-`Simulator`-Instanz), `wasm.ts` (asynchroner Loader), `CanvasRenderer.ts` (2D-Rendering-Pipeline), `canvasHelpers.ts` |
-| `types/` | Domänentypen (`SimulationMode`, `SandboxBody`, physikalische Typen) |
-| `utils/` | Reine Hilfsfunktionen (z. B. `calculateOrbitalVelocity`) |
-| `i18n/` | Übersetzungstabellen (de/en) |
+| `components/` | Visual React components (e.g. `Canvas`, `SimulationShell`, `BodyEditDialog`, `BodyPlacementDialog`, `BodyContextMenu`, `ParameterControls`) |
+| `context/` | Global simulation state: `SimulationProvider`, `useSandbox` (sandbox body management), `useTrailHistory`, `presets.ts` (Earth-Moon/binary stars), `I18nContext` |
+| `hooks/` | Reusable logic: `useSimulation`, `useSimulationStep`, `useSimulationControls`, `useCanvasInteraction` (mouse/context-menu interaction), `useAnimationFrame` |
+| `services/` | `wasmBridge.ts` (wrapper around the WASM `Simulator` instance), `wasm.ts` (async loader), `CanvasRenderer.ts` (2D rendering pipeline), `canvasHelpers.ts` |
+| `types/` | Domain types (`SimulationMode`, `SandboxBody`, physics types) |
+| `utils/` | Pure helper functions (e.g. `calculateOrbitalVelocity`) |
+| `i18n/` | Translation tables (de/en) |
 
-Die zentrale Zustandsverwaltung läuft über `SimulationProvider` (`context/SimulationProvider.tsx`), der per
-React Context (`SimulationContext`) allen Komponenten `currentState`, `mode`, `sandboxBodies` sowie Aktionen
-(`updateBody`, `addBody`, `removeBody`, `setMode`, `setPreset`, …) bereitstellt.
+Central state management runs through `SimulationProvider` (`context/SimulationProvider.tsx`), which provides
+all components with `currentState`, `mode`, `sandboxBodies`, and actions (`updateBody`, `addBody`, `removeBody`,
+`setMode`, `setPreset`, …) via React Context (`SimulationContext`).
 
-### 5.3 Ebene 1 — Physik-Engine (`wasm/src/`)
+### 5.3 Level 1 — Physics Engine (`wasm/src/`)
 
-| Baustein | Verantwortung |
+| Building Block | Responsibility |
 |---|---|
-| `lib.rs` | Re-Export der öffentlichen WASM-Bindings |
-| `physics/types.rs` | Kernstrukturen: `Body`, `State`, `PhysicsConfig` |
-| `physics/gravity.rs` | Newton'sches Gravitationsgesetz, Lagrange-Punkt-Berechnung |
-| `physics/integrator.rs` | Symplektischer Velocity-Verlet-Integrator |
-| `wasm/mod.rs` | `Simulator`-Wrapper-Klasse, exponiert Methoden (`step`, `setState`, `getLagrangePoints`) an JavaScript |
+| `lib.rs` | Re-exports of the public WASM bindings |
+| `physics/types.rs` | Core structures: `Body`, `State`, `PhysicsConfig` |
+| `physics/gravity.rs` | Newton's law of gravitation, Lagrange point calculation |
+| `physics/integrator.rs` | Symplectic velocity-Verlet integrator |
+| `wasm/mod.rs` | `Simulator` wrapper class, exposes methods (`step`, `setState`, `getLagrangePoints`) to JavaScript |
 
-### 5.4 Abhängigkeitsgraph (Feature-Ebene)
+### 5.4 Dependency Graph (Feature Level)
 
-Der vollständige Feature-Abhängigkeitsgraph (SPEC-001…SPEC-017) ist in `Docs/Guides/architecture.md#dependency-graph`
-dokumentiert und wird hier nicht dupliziert.
+The full feature dependency graph (SPEC-001…SPEC-017) is documented in
+`Docs/Guides/architecture.md#dependency-graph` and not duplicated here.
 
 ---
 
-## 6. Laufzeitsicht
+## 6. Runtime View
 
-### 6.1 Simulationsschritt (Standardfall)
+### 6.1 Simulation Step (Default Case)
 
 ```text
-1. Nutzer:in startet/pausiert Simulation oder ändert Parameter (UI)
-2. Animation-Loop (Ziel: 60 FPS) ruft SimulatorBridge.step(dt) auf
-3. Bridge übergibt dt (Sekunden) an den Rust-Simulator
-4. Rust: Velocity-Verlet-Integrator aktualisiert Positionen/Geschwindigkeiten/Zeit
-5. Neuer Zustand wird als StepResult (inkl. Systemenergie) nach JS serialisiert
-6. SimulationProvider.handleStep reichert Körper an (enrichBodies: id/name/color/locked
-   aus sandboxBodies bzw. synthetische ids im Preset-Modus) und setzt currentState
-7. CanvasRenderer zeichnet primary/secondary/testParticle bzw. sandboxBodies neu
+1. User starts/pauses the simulation or changes parameters (UI)
+2. Animation loop (target: 60 FPS) calls SimulatorBridge.step(dt)
+3. Bridge passes dt (seconds) to the Rust simulator
+4. Rust: velocity-Verlet integrator updates positions/velocities/time
+5. New state is serialized to JS as StepResult (including system energy)
+6. SimulationProvider.handleStep enriches bodies (enrichBodies: id/name/color/locked
+   from sandboxBodies, or synthetic ids in preset mode) and sets currentState
+7. CanvasRenderer redraws primary/secondary/testParticle or sandboxBodies
 ```
 
-### 6.2 Objekt bearbeiten (Sandbox-Modus)
+### 6.2 Editing an Object (Sandbox Mode)
 
 ```text
-1. Rechtsklick auf Körper → useCanvasInteraction.handleContextMenu (nur wenn mode === 'sandbox', s. FP-39)
-2. BodyContextMenu → "Edit" → BodyEditDialog öffnet mit aktuellem SandboxBody
-3. Bestätigung → Canvas.onEditConfirm → updateBody(id, updates)
-4. useSandbox.updateBody mappt sandboxBodies, merged updates für passende id
-5. commitSandboxBodies schreibt state in React (setSandboxBodies/setCurrentState)
-   und synchron in den laufenden Simulator (simulator.setState)
+1. Right-click on a body → useCanvasInteraction.handleContextMenu (only when mode === 'sandbox', see FP-39)
+2. BodyContextMenu → "Edit" → BodyEditDialog opens with the current SandboxBody
+3. Confirm → Canvas.onEditConfirm → updateBody(id, updates)
+4. useSandbox.updateBody maps sandboxBodies, merging updates for the matching id
+5. commitSandboxBodies writes state into React (setSandboxBodies/setCurrentState)
+   and synchronously into the running simulator (simulator.setState)
 ```
 
-### 6.3 Moduswechsel (Preset ↔ Sandbox)
+### 6.3 Mode Switch (Preset ↔ Sandbox)
 
 ```text
-1. setMode('sandbox') → useSandbox.setMode befüllt sandboxBodies aus dem aktuellen
-   currentState (primary/secondary/testParticle → drei SandboxBody-Einträge)
-2. setMode('3body') → sandboxBodies bleibt/wird geleert; Physik läuft auf den festen
-   primary/secondary/testParticle-Feldern weiter
+1. setMode('sandbox') → useSandbox.setMode populates sandboxBodies from the current
+   currentState (primary/secondary/testParticle → three SandboxBody entries)
+2. setMode('3body') → sandboxBodies is kept/cleared; physics continues to run on the
+   fixed primary/secondary/testParticle fields
 ```
 
 ---
 
-## 7. Verteilungssicht
+## 7. Deployment View
 
-- Container via Docker Compose, Alpine-Nginx-Image.
-- CI/CD über GitHub Actions. Workflows: `test.yml`, `deploy-docs.yml`, `docs.yml`, `release.yml`,
+- Containerized via Docker Compose, Alpine Nginx image.
+- CI/CD via GitHub Actions. Workflows: `test.yml`, `deploy-docs.yml`, `docs.yml`, `release.yml`,
   `security.yml` (`.github/workflows/`).
 
 ---
 
-## 8. Querschnittliche Konzepte
+## 8. Crosscutting Concepts
 
-### 8.1 Physikmodell
+### 8.1 Physics Model
 
-Klassische Newton'sche Mechanik (Zweikörper- bzw. eingeschränktes Dreikörperproblem), 64-Bit-Präzision,
-symplektischer Velocity-Verlet-Integrator zur Energieerhaltung. Vollständige Herleitung, Formeln und
-Einheiten: `Docs/Guides/physics-guide.md`.
+Classical Newtonian mechanics (two-body and restricted three-body problem), 64-bit precision, symplectic
+velocity-Verlet integrator for energy conservation. Full derivation, formulas, and units:
+`Docs/Guides/physics-guide.md`.
 
-### 8.2 Internationalisierung (i18n)
+### 8.2 Internationalization (i18n)
 
-UI-Texte sind über `I18nContext`/`frontend/src/i18n/translations.ts` in Deutsch und Englisch verfügbar
-(`LanguageSelector`-Komponente).
+UI text is available in German and English via `I18nContext`/`frontend/src/i18n/translations.ts`
+(`LanguageSelector` component).
 
-### 8.3 Teststrategie
+### 8.3 Test Strategy
 
-Testpyramide mit Schwerpunkt Unit-Tests (~90 %) und Integrationstests (~10 %) für WASM-Bridge und
-Canvas-Rendering. Coverage-Ziel: 100 % für Physik-Kernlogik, >80 % für Frontend-Hooks/Utils. Details:
+Test pyramid with a focus on unit tests (~90%) and integration tests (~10%) for the WASM bridge and canvas
+rendering. Coverage target: 100% for core physics logic, >80% for frontend hooks/utils. Details:
 `Docs/Guides/testing/testing-philosophy.md`, `testing-best-practices.md`, `unit-testing.md`.
-E2E-Abdeckung (Playwright) ist mit FP-42 umgesetzt (siehe Testberichte unter
+E2E coverage (Playwright) was implemented as part of FP-42 (see test reports under
 `Docs/Guides/testing/reports/`).
 
-### 8.4 Code-Qualität & Wartbarkeit
+### 8.4 Code Quality & Maintainability
 
-- Harte 200-Zeilen-Grenze je Datei (ESLint `max-lines` / Clippy-Threshold), Ausnahmen nur via
+- Hard 200-line limit per file (ESLint `max-lines` / Clippy threshold), exceptions only via
   `max-lines-exceptions.json`.
-- `fallow` (Frontend) und `cargo-udeps`/`cargo-modules orphans` (Rust) als Checks gegen toten Code,
-  unnötige Komplexität und Duplikation (`npm run check:quality`).
-- ESLint/Prettier/Stylelint/Clippy/`cargo fmt` als verbindliche Formatierungs-/Lint-Gates.
-- Vollständiges Regelwerk: SPEC-001.
+- `fallow` (frontend) and `cargo-udeps`/`cargo-modules orphans` (Rust) as checks against dead code,
+  unnecessary complexity, and duplication (`npm run check:quality`).
+- ESLint/Prettier/Stylelint/Clippy/`cargo fmt` as mandatory formatting/lint gates.
+- Full rule set: SPEC-001.
 
-### 8.5 Fehlerbehandlung
+### 8.5 Error Handling
 
-WASM-Aufrufe (`simulator.setState`, `getLagrangePoints`) sind defensiv mit `try/catch` umschlossen und loggen
-statt zu werfen, um die UI bei transienten Fehlern nicht abstürzen zu lassen (siehe `SimulationProvider.tsx`).
+WASM calls (`simulator.setState`, `getLagrangePoints`) are defensively wrapped in `try/catch` and log instead
+of throwing, so the UI doesn't crash on transient errors (see `SimulationProvider.tsx`).
 
 ---
 
-## 9. Architekturentscheidungen
+## 9. Architecture Decisions
 
-Entscheidungen werden als ADRs (Kontext → Optionen → Entscheidung) unter `Docs/ADRs/` geführt:
+Decisions are recorded as ADRs (context → options → decision) under `Docs/ADRs/`:
 
-| ADR | Entscheidung |
+| ADR | Decision |
 |---|---|
-| [ADR-001](./ADRs/ADR-001-project-language.md) | Projektsprache: Englisch (Code & Standarddokumentation) |
-| [ADR-003](./ADRs/ADR-003-colocated-files.md) | Colocated Components (Implementierung + Tests im selben Ordner) |
+| [ADR-001](./ADRs/ADR-001-project-language.md) | Project language: English (code & standard documentation) |
+| [ADR-003](./ADRs/ADR-003-colocated-files.md) | Colocated components (implementation + tests in the same folder) |
 
-Feature-/Architektur-Spezifikationen mit detaillierten Entscheidungen zu Umsetzung und Akzeptanzkriterien:
-`Docs/Management/Project-Management/Specs/SPEC-001` bis `SPEC-017` (siehe Abhängigkeitsgraph in Kapitel 5.4).
+Feature/architecture specifications with detailed implementation decisions and acceptance criteria:
+`Docs/Management/Project-Management/Specs/SPEC-001` through `SPEC-017` (see dependency graph in chapter 5.4).
 
 ---
 
-## 10. Qualitätsanforderungen
+## 10. Quality Requirements
 
-### 10.1 Qualitätsbaum (Auszug)
+### 10.1 Quality Tree (Excerpt)
 
 ```text
-Qualität
+Quality
 ├── Performance
-│   └── 60 FPS Rendering, keine GC-Jank während Simulation
-├── Korrektheit
-│   ├── Physikalische Invarianten (Energieerhaltung < 0.1 % Abweichung bei Kreisbahnen)
-│   └── Deterministisches Verhalten pro Modus (Preset vs. Sandbox)
-├── Wartbarkeit
-│   ├── 200-Zeilen-Limit je Datei
-│   └── Klare Modulgrenzen Frontend/WASM
-└── Bedienbarkeit
-    ├── Verständliche Einheiten (→ FP-34)
-    └── Konsistentes Styling (→ FP-44)
+│   └── 60 FPS rendering, no GC jank during simulation
+├── Correctness
+│   ├── Physical invariants (energy conservation < 0.1% deviation on circular orbits)
+│   └── Deterministic behavior per mode (preset vs. sandbox)
+├── Maintainability
+│   ├── 200-line limit per file
+│   └── Clear module boundaries frontend/WASM
+└── Usability
+    ├── Understandable units (→ FP-34)
+    └── Consistent styling (→ FP-44)
 ```
 
-### 10.2 Qualitätsszenarien
+### 10.2 Quality Scenarios
 
-| Szenario | Erwartetes Verhalten |
+| Scenario | Expected Behavior |
 |---|---|
-| Nutzer:in ändert Massen-Slider während laufender Simulation | Physik reagiert ohne Neustart, Trail bleibt erhalten (siehe `SimulationProvider` Kommentar zu Trail-Reset) |
-| Nutzer:in bearbeitet einen Sandbox-Körper | Änderung wird sofort persistiert und im nächsten Simulationsschritt übernommen (Regressionsschutz: `Canvas.test.tsx`, FP-39) |
-| Nutzer:in bearbeitet einen Körper im Preset-Modus | Kontextmenü ist deaktiviert, da Preset-Rollen kein editierbares Datenmodell besitzen (FP-39) |
-| Referenz-Kreisbahn simuliert über N Schritte | Energieabweichung < 0.1 % (Physik-Referenztest, DOD-Physics-WASM) |
+| User changes the mass slider during a running simulation | Physics reacts without a restart, trail is preserved (see `SimulationProvider` comment on trail reset) |
+| User edits a sandbox body | Change is persisted immediately and picked up in the next simulation step (regression protection: `Canvas.test.tsx`, FP-39) |
+| User edits a body in preset mode | Context menu is disabled, since preset roles have no editable data model (FP-39) |
+| Reference circular orbit simulated over N steps | Energy deviation < 0.1% (physics reference test, DOD-Physics-WASM) |
 
-Vollständige Kriterien je Feature: `Docs/Management/Project-Management/Definitions of Done/`.
+Full criteria per feature: `Docs/Management/Project-Management/Definitions of Done/`.
 
 ---
 
-## 11. Risiken und technische Schulden
+## 11. Risks and Technical Debt
 
-| Risiko / Schuld | Beschreibung | Bezug |
+| Risk / Debt | Description | Reference |
 |---|---|---|
-| Implizite Modus-Kopplung | UI war nicht gegen `mode` abgesichert, obwohl `sandboxBodies` nur im Sandbox-Modus existiert (Ursache von FP-39). Ähnliches kann anderswo fortbestehen. | FP-39 |
-| Einheiten-Lesbarkeit | Physikalische Rohwerte (z. B. `6.371e6` m) werden UI-seitig teils unformatiert dargestellt, was die Interpretierbarkeit für Studierende einschränkt. | FP-34 |
-| Uneinheitliches Styling | Kein zentral geprüftes Styling-System; Inline-Styles (z. B. `BodyContextMenu.tsx`) und Komponenten-Styles sind nicht durchgängig konsolidiert. | FP-44 |
-| Sandbox-Objekterstellung (Placement-Flow) | Der aktuelle Objekt-Erstellungs-Flow im Sandbox-Modus gilt als reworkbedürftig (UX). | FP-38 |
-| Fehlendes Objekt-Tracking/Miniview | Es existiert aktuell keine Möglichkeit, einzelne Objekte gezielt zu verfolgen oder in einer fokussierten Miniansicht zu betrachten. | FP-36, FP-37 |
-| Fehlendes Favicon | Kein Branding-Favicon vorhanden. | FP-33 |
+| Implicit mode coupling | The UI was not guarded against `mode`, even though `sandboxBodies` only exists in sandbox mode (root cause of FP-39). Similar issues may persist elsewhere. | FP-39 |
+| Unit readability | Raw physical values (e.g. `6.371e6` m) are sometimes displayed unformatted in the UI, limiting interpretability for students. | FP-34 |
+| Inconsistent styling | No centrally enforced styling system; inline styles (e.g. `BodyContextMenu.tsx`) and component styles are not consistently consolidated. | FP-44 |
+| Sandbox object creation (placement flow) | The current object-creation flow in sandbox mode is considered in need of rework (UX). | FP-38 |
+| Missing object tracking/miniview | There is currently no way to specifically track individual objects or view them in a focused mini view. | FP-36, FP-37 |
+| Missing favicon | No branding favicon exists. | FP-33 |
 
-Dieses Kapitel wird bei Bearbeitung der referenzierten Tickets aktualisiert.
+This chapter is updated as the referenced tickets are addressed.
 
 ---
 
-## 12. Glossar
+## 12. Glossary
 
-| Begriff | Bedeutung |
+| Term | Meaning |
 |---|---|
-| **Preset-Modus** (`mode: '3body'`) | Modus mit festen physikalischen Rollen `primary`, `secondary`, `testParticle`, initialisiert über Presets (`earth-moon`, `binary-stars`) |
-| **Sandbox-Modus** (`mode: 'sandbox'`) | Modus mit einer flexiblen, nutzerdefinierten Liste von Körpern (`sandboxBodies`), die hinzugefügt, bearbeitet, gelöscht und gesperrt werden können |
-| **SandboxBody** | Datentyp für einen editierbaren Körper im Sandbox-Modus (`id`, `position`, `velocity`, `mass`, `radius`, `color`, `name`, `locked`) |
-| **SimulatorBridge** | TypeScript-Wrapper um die WASM-`Simulator`-Instanz; kapselt `step`, `setState`, `getLagrangePoints` |
-| **StepResult** | Von der Physik-Engine nach jedem `step(dt)`-Aufruf zurückgegebener, serialisierter Zustand (Positionen, Geschwindigkeiten, Energie) |
-| **Velocity-Verlet-Integrator** | Symplektisches numerisches Integrationsverfahren zur Lösung der Bewegungsgleichungen mit guter Langzeit-Energieerhaltung |
-| **Lagrange-Punkte** | Gleichgewichtspunkte im eingeschränkten Dreikörperproblem, berechnet in `physics/gravity.rs` |
-| **Trail** | Visualisierte Bahnspur eines Körpers über die letzten N Simulationsschritte (`useTrailHistory`) |
-| **SPEC** | Feature-Spezifikation mit User Story und Akzeptanzkriterien unter `Docs/Management/Project-Management/Specs/` |
-| **ADR** | Architecture Decision Record — dokumentierte Architekturentscheidung unter `Docs/ADRs/` |
-| **DoD** | Definition of Done — verbindliche Fertigstellungskriterien je Bereich (`Docs/Management/Project-Management/Definitions of Done/`) |
+| **Preset mode** (`mode: '3body'`) | Mode with fixed physical roles `primary`, `secondary`, `testParticle`, initialized via presets (`earth-moon`, `binary-stars`) |
+| **Sandbox mode** (`mode: 'sandbox'`) | Mode with a flexible, user-defined list of bodies (`sandboxBodies`) that can be added, edited, deleted, and locked |
+| **SandboxBody** | Data type for an editable body in sandbox mode (`id`, `position`, `velocity`, `mass`, `radius`, `color`, `name`, `locked`) |
+| **SimulatorBridge** | TypeScript wrapper around the WASM `Simulator` instance; encapsulates `step`, `setState`, `getLagrangePoints` |
+| **StepResult** | Serialized state returned by the physics engine after each `step(dt)` call (positions, velocities, energy) |
+| **Velocity-Verlet integrator** | Symplectic numerical integration method for solving equations of motion with good long-term energy conservation |
+| **Lagrange points** | Equilibrium points in the restricted three-body problem, computed in `physics/gravity.rs` |
+| **Trail** | Visualized orbital path of a body over the last N simulation steps (`useTrailHistory`) |
+| **SPEC** | Feature specification with user story and acceptance criteria under `Docs/Management/Project-Management/Specs/` |
+| **ADR** | Architecture Decision Record — documented architecture decision under `Docs/ADRs/` |
+| **DoD** | Definition of Done — binding completion criteria per area (`Docs/Management/Project-Management/Definitions of Done/`) |
