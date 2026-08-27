@@ -23,7 +23,7 @@ so that users always access the latest stable version and maintainers have clear
 - [x] AC 2.3: Automatically stops and rebuilds the container using Docker Compose
 
 ### DNS & Reverse Proxy Integration
-- [x] AC 3.1: Server exposed publicly using DynDNS / CDN () mapping
+- [x] AC 3.1: Server exposed publicly using DynDNS / CDN mapping
 - [x] AC 3.2: Reverse proxy routes traffic to the container using Nginx Proxy Manager (NPM) on the shared external network
 - [x] AC 3.3: Let's Encrypt SSL certificates managed by Nginx Proxy Manager
 

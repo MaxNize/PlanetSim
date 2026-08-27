@@ -223,7 +223,7 @@ dokumentiert und wird hier nicht dupliziert.
 ## 7. Verteilungssicht
 
 ```text
-┌──────────┐      ┌───────────┐  Port Forward  ┌─────────────┐
+┌──────────┐               ┌───────────┐  Port Forward  ┌─────────────┐
 │  Client  ├──────────────▶│  DynDNS    ├───────────────▶│ Home Router │
 └──────────┘ (IPv6→IPv4)   └───────────┘  (80/443)       └──────┬──────┘
                                                                   ▼

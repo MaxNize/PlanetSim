@@ -8,7 +8,7 @@ application containerized behind Nginx Proxy Manager (NPM) on a private home ser
 ## 🏗️ Architecture Overview
 
 ```text
-┌──────────┐            ┌───────────┐      Port Forward      ┌─────────────┐
+┌──────────┐                     ┌───────────┐      Port Forward      ┌─────────────┐
 │  Client  ├────────────────────→│  DynDNS   ├───────────────────────→│ Home Router │
 └──────────┘  (IPv6->IPv4 CDN)   └───────────┘      (Ports 80/443)    └──────┬──────┘
                                                                              │
@@ -54,7 +54,7 @@ Define the following repository secrets under **Settings ➔ Secrets and variabl
 1. Open your NPM admin interface.
 2. Go to **Hosts ➔ Proxy Hosts ➔ Add Proxy Host**.
 3. Configure the following options:
-   - **Domain Names**: Enter your DynDNS domain (e.g., ``).
+   - **Domain Names**: Enter your DynDNS domain.
    - **Scheme**: `http`
    - **Forward Hostname / IP**: `planet-simulation` (matches compose container name).
    - **Forward Port**: `80`
@@ -64,7 +64,7 @@ Define the following repository secrets under **Settings ➔ Secrets and variabl
    - Request a new SSL Certificate from **Let's Encrypt**.
    - Force SSL to enable HTTPS.
 
-### 3. DynDNS Configuration ()
+### 3. DynDNS Configuration
 
-- Configure your home router to update your  prefix on IP change.
-- If using IPv6-only WAN, configure the IPv6-to-IPv4 mapping proxy on  to route IPv4 client requests.
+- Configure your home router to update your DynDNS prefix on IP change.
+- If using IPv6-only WAN, configure an IPv6-to-IPv4 mapping proxy with your DynDNS provider to route IPv4 client requests.
